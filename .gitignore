@@ -1,0 +1,26 @@
+# Compiled files
+target/
+*.class
+
+# Maven dependencies
+.mvn/
+pom.xml.tag
+pom.xml.releaseBackup
+dependency-reduced-pom.xml
+buildNumber.properties
+
+# IDE / OS settings
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Node.js dependencies
+node_modules/
+dist/
+.env
+
+# OS settings
+.DS_Store
+.vscode/
+.idea/
