@@ -1,26 +1,48 @@
+############################################
+#       BACKEND (Spring Boot / Maven)      #
+############################################
+
 # Compiled files
 target/
 *.class
 
-# Maven dependencies
-.mvn/
+# Maven build artifacts
 pom.xml.tag
 pom.xml.releaseBackup
 dependency-reduced-pom.xml
 buildNumber.properties
 
-# IDE / OS settings
-.idea/
-.vscode/
-*.iml
-.DS_Store
+# Maven wrapper
+# NOTE: If you *use* the Maven wrapper (./mvnw) and want others
+# to run it without installing Maven, *remove* or comment out the line below
+.mvn/
+
+# Logs (if any)
+logs/
+
+############################################
+#         FRONTEND (Angular / Node)        #
+############################################
 
 # Node.js dependencies
 node_modules/
 dist/
+# Angular cache folder
+.angular/
+
+# Environment files (if you store secrets or environment-specific config)
 .env
 
-# OS settings
-.DS_Store
-.vscode/
+############################################
+#           IDE / OS Settings              #
+############################################
+
+# IntelliJ
 .idea/
+*.iml
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
