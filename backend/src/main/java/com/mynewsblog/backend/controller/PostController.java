@@ -1,12 +1,13 @@
 package com.mynewsblog.backend.controller;
 
 import com.mynewsblog.backend.dto.CreatePostRequest;
-import com.mynewsblog.backend.dto.DeletePostRequest;
 import com.mynewsblog.backend.dto.UpdatePostRequest;
 import com.mynewsblog.backend.dto.AddImagesRequest;
 import com.mynewsblog.backend.model.Post;
+import com.mynewsblog.backend.security.UserPrincipal;
 import com.mynewsblog.backend.service.PostService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,11 +24,14 @@ public class PostController {
 
     // 1) CREATE a new post
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody CreatePostRequest request) {
+    public ResponseEntity<Post> createPost(
+            @RequestBody CreatePostRequest request,
+            @AuthenticationPrincipal UserPrincipal currentUser
+    ) {
         Post newPost = postService.createPost(
                 request.getTitle(),
                 request.getContent(),
-                request.getAuthorId(),
+                currentUser.getId(),  // Get ID from UserPrincipal
                 request.getCategoryId()
         );
         return ResponseEntity.ok(newPost);
@@ -45,15 +49,16 @@ public class PostController {
         return ResponseEntity.ok(postService.getPost(id));
     }
 
-    // 4) UPDATE a post
+    // 4) UPDATE a post (Only the owner can update)
     @PutMapping("/{id}")
     public ResponseEntity<Post> updatePost(
             @PathVariable Long id,
-            @RequestBody UpdatePostRequest request) {
-
+            @RequestBody UpdatePostRequest request,
+            @AuthenticationPrincipal UserPrincipal currentUser
+    ) {
         Post updatedPost = postService.updatePost(
                 id,
-                request.getRequestUserId(),
+                currentUser.getId(), // Get user ID
                 request.getTitle(),
                 request.getContent(),
                 request.getCategoryId()
@@ -61,16 +66,17 @@ public class PostController {
         return ResponseEntity.ok(updatedPost);
     }
 
-    // 5) DELETE a post
+    // 5) DELETE a post (Only the owner or admin can delete)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(
             @PathVariable Long id,
-            @RequestBody DeletePostRequest request) {
-        postService.deletePost(id, request.getRequestUserId());
+            @AuthenticationPrincipal UserPrincipal currentUser
+    ) {
+        postService.deletePost(id, currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 
-    // 6) (Optional) ADD IMAGES
+    // 6) ADD IMAGES to a post
     @PostMapping("/{id}/images")
     public ResponseEntity<Post> addImages(
             @PathVariable Long id,

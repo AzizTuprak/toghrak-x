@@ -10,4 +10,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByAuthor(User author);
     List<Post> findByCategory(Category category);
+    // New: Allowing Admins to fetch unpublished posts if needed
+    List<Post> findByAuthorId(Long authorId);
 }
