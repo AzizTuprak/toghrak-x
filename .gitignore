@@ -12,13 +12,11 @@ pom.xml.releaseBackup
 dependency-reduced-pom.xml
 buildNumber.properties
 
-# Maven wrapper
-# NOTE: If you *use* the Maven wrapper (./mvnw) and want others
-# to run it without installing Maven, *remove* or comment out the line below
-.mvn/
+# Maven wrapper (if you want to include it in the repo, comment out or remove the line below)
+#.mvn/
 
 # Logs (if any)
-logs/
+logs/**
 
 ############################################
 #         FRONTEND (Angular / Node)        #

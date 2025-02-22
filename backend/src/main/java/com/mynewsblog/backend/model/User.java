@@ -1,4 +1,5 @@
 package com.mynewsblog.backend.model;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -6,15 +7,17 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include  // Use only the primary key for equality
     private Long id;
 
     // e.g., "editor01", "adminUser"
@@ -28,7 +31,7 @@ public class User {
     private String password;
 
     // Many users can share the same role
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
@@ -36,12 +39,12 @@ public class User {
     private LocalDateTime updatedAt;
 
     @PrePersist
-    void onCreate() {
+    public void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    void onUpdate() {
+    public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 }

@@ -1,20 +1,30 @@
 package com.mynewsblog.backend.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class JwtUtil {
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
+    private final Key key;
+    private final Long jwtExpirationMs;
 
-    @Value("${app.jwt.expiration}")
-    private Long jwtExpirationMs;
+    public JwtUtil(@Value("${app.jwt.secret}") String secret,
+                   @Value("${app.jwt.expiration}") Long jwtExpirationMs) {
+        // Convert the secret string to a Key.
+        // The secret must be long enough (at least 64 characters for HS512).
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.jwtExpirationMs = jwtExpirationMs;
+    }
 
     public String generateToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
@@ -23,13 +33,14 @@ public class JwtUtil {
                 .setSubject(String.valueOf(userPrincipal.getId()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
     public Long getUserIdFromToken(String token) {
-        return Long.parseLong(Jwts.parser()
-                .setSigningKey(jwtSecret)
+        return Long.parseLong(Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject());
@@ -37,11 +48,11 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (SignatureException | MalformedJwtException | ExpiredJwtException |
-                 UnsupportedJwtException | IllegalArgumentException e) {
-            return false;
+        } catch (JwtException e) {
+            log.error("JWT validation failed: {}", e.getMessage());
         }
+        return false;
     }
 }

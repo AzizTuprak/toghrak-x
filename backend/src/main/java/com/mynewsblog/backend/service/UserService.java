@@ -8,10 +8,12 @@ import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.repository.RoleRepository;
 import com.mynewsblog.backend.repository.UserRepository;
 import com.mynewsblog.backend.security.UserPrincipal;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,7 +24,9 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -30,17 +34,20 @@ public class UserService {
 
     // 1️⃣ Create user (Editor/Admin)
     public User createUser(String username, String email, String password, String roleName) {
+        // Check for duplicate username
         if (userRepository.findByUsername(username).isPresent()) {
             throw new UsernameAlreadyExistsException("Username already exists!");
         }
 
+        // Retrieve role by name or throw an exception if not found
         Role role = roleRepository.findByName(roleName)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleName));
 
+        // Build and save the new user with hashed password
         User user = User.builder()
                 .username(username)
                 .email(email)
-                .password(passwordEncoder.encode(password)) // 🔹 Hash password
+                .password(passwordEncoder.encode(password))
                 .role(role)
                 .build();
 
@@ -58,46 +65,72 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    // 4️⃣ Update user
+    // 4️⃣ Update user (Users can update their own profile, Admins can update any user)
     public User updateUser(Long userId, UserPrincipal currentUser, UpdateUserRequest request) {
+        // Fetch the existing user
         User user = getUser(userId);
 
-        // 🔹 Ensure only user themselves or an admin can update
+        // Ensure that only the user themselves or an admin can update
         if (!currentUser.getId().equals(userId) && !isAdmin(currentUser)) {
-            throw new RuntimeException("You can only update your own account!");
+            throw new AccessDeniedException("You can only update your own account!");
         }
 
-        if (request.getUsername() != null && !request.getUsername().isBlank()) {
-            user.setUsername(request.getUsername());
+        // Update username if provided and different
+        String newUsername = request.getUsername();
+        if (newUsername != null && !newUsername.isBlank() && !newUsername.equals(user.getUsername())) {
+            if (userRepository.findByUsername(newUsername).isPresent()) {
+                throw new UsernameAlreadyExistsException("Username already exists!");
+            }
+            user.setUsername(newUsername);
         }
 
+        // Update password if provided (after encoding)
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-
-        if (request.getRoleName() != null && !request.getRoleName().isBlank()) {
-            Role newRole = roleRepository.findByName(request.getRoleName())
-                    .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRoleName()));
-            user.setRole(newRole);
+        // Update email if provided and check uniqueness
+        String newEmail = request.getEmail();
+        if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(user.getEmail())) {
+            if (userRepository.findByEmail(newEmail).isPresent()) {
+                throw new RuntimeException("Email already exists!");
+            }
+            user.setEmail(newEmail);
         }
 
+        // Update role only if current user is admin
+        if (isAdmin(currentUser)) {
+            if (request.getRoleName() != null && !request.getRoleName().isBlank()) {
+                Role newRole = roleRepository.findByName(request.getRoleName())
+                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRoleName()));
+                user.setRole(newRole);
+            }
+        } else {
+            // Non-admin users are not allowed to update their role.
+            if (request.getRoleName() != null) {
+                throw new AccessDeniedException("You cannot change your role.");
+            }
+        }
+
+        // Update the timestamp and save
+        user.setUpdatedAt(LocalDateTime.now());
         return userRepository.save(user);
     }
 
-    // 5️⃣ Delete user (Admins only, cannot delete last admin)
+
+    // 5️⃣ Delete user (Admins only, cannot delete the last admin)
     public void deleteUser(Long userId) {
         User user = getUser(userId);
 
-        // 🔹 Ensure there is at least one admin remaining
+        // Ensure there is at least one admin remaining
         if ("ADMIN".equals(user.getRole().getName()) &&
-                userRepository.findByRoleName("ADMIN").size() <= 1) {
-            throw new RuntimeException("Cannot delete the last admin.");
+                userRepository.findByRole_Name("ADMIN").size() <= 1) {
+            throw new AccessDeniedException("Cannot delete the last admin.");
         }
 
         userRepository.deleteById(userId);
     }
 
-    // 🔹 Utility: Check if the user is an admin
+    // Utility: Check if the current user has admin privileges
     private boolean isAdmin(UserPrincipal user) {
         return user.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));

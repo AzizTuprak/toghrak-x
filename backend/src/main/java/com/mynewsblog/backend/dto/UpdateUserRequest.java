@@ -1,4 +1,5 @@
 package com.mynewsblog.backend.dto;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
 import lombok.Getter;
@@ -14,7 +15,10 @@ public class UpdateUserRequest {
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
-    private String roleName; // Optional, only for admins
+    @Email(message = "Invalid email format")
+    private String email;
+
+    private String roleName; // // Optional: Only admins may update role, hence not mandatory for every update
 
     public UpdateUserRequest() {
     }

@@ -1,6 +1,7 @@
 package com.mynewsblog.backend.service;
 
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import com.mynewsblog.backend.model.*;
 import com.mynewsblog.backend.repository.*;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class PostService {
     }
 
     // 1️⃣ Create a new post
-    public Post createPost(String title, String content, Long authorId, Long categoryId) {
+    public Post createPost(String title, String content, Long authorId, Long categoryId, String coverImage) {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found with id=" + authorId));
 
@@ -41,7 +42,8 @@ public class PostService {
                 .content(content)
                 .author(author)
                 .category(category)
-                .createdAt(LocalDateTime.now())
+                .coverImage(coverImage)  // Set the cover image URL
+                .createdAt(LocalDateTime.now()) // Optionally, you can rely on the entity's @PrePersist instead of manually setting createdAt.
                 .build();
 
         return postRepository.save(post);
@@ -55,14 +57,17 @@ public class PostService {
         User currentUser = userRepository.findById(requestUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id=" + requestUserId));
 
-        // 🔹 Ensure only the owner or an admin can update
+        // Ensure only the owner or an admin can update
         if (!isAdmin(currentUser) && !post.getAuthor().getId().equals(requestUserId)) {
-            throw new RuntimeException("You can only update your own posts!");
+            throw new AccessDeniedException("You can only update your own posts!");
         }
 
-        if (newTitle != null && !newTitle.isBlank()) post.setTitle(newTitle);
-        if (newContent != null && !newContent.isBlank()) post.setContent(newContent);
-
+        if (newTitle != null && !newTitle.isBlank()) {
+            post.setTitle(newTitle);
+        }
+        if (newContent != null && !newContent.isBlank()) {
+            post.setContent(newContent);
+        }
         if (newCategoryId != null) {
             Category category = categoryRepository.findById(newCategoryId)
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + newCategoryId));
@@ -71,6 +76,18 @@ public class PostService {
 
         post.setUpdatedAt(LocalDateTime.now());
         return postRepository.save(post);
+
+//        if (imageUrls != null && !imageUrls.isEmpty()) {
+//            for (String url : imageUrls) {
+//                PostImage pi = PostImage.builder()
+//                        .imageUrl(url)
+//                        .post(post)
+//                        .build();
+//                postImageRepository.save(pi);
+//                // Optionally add the image to post.getImages() if needed
+//            }
+//        }
+//        return post;
     }
 
     // 3️⃣ Delete a post
@@ -81,9 +98,9 @@ public class PostService {
         User currentUser = userRepository.findById(requestUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id=" + requestUserId));
 
-        // 🔹 Only the owner or an admin can delete
+        // Ensure only the owner or an admin can delete
         if (!isAdmin(currentUser) && !post.getAuthor().getId().equals(requestUserId)) {
-            throw new RuntimeException("You can only delete your own posts!");
+            throw new AccessDeniedException("You can only delete your own posts!");
         }
 
         postRepository.deleteById(postId);
@@ -100,20 +117,8 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    // 6️⃣ Attach multiple images to a post
-    public Post addImagesToPost(Long postId, List<String> imageUrls) {
-        Post post = getPost(postId);
 
-        List<PostImage> images = imageUrls.stream()
-                .map(url -> PostImage.builder().imageUrl(url).post(post).build())
-                .toList();
-
-        postImageRepository.saveAll(images);  // Persist images separately
-
-        return post;
-    }
-
-    // 🔹 Utility: Check if the user is an admin
+    // Utility: Check if the user is an admin
     private boolean isAdmin(User user) {
         return user.getRole() != null && "ADMIN".equals(user.getRole().getName());
     }

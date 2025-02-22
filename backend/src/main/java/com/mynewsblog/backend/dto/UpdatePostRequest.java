@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class UpdatePostRequest {
@@ -14,8 +16,12 @@ public class UpdatePostRequest {
     @NotBlank(message = "Content cannot be empty")
     private String content;
 
-    private Long categoryId;  // Optional, can be null if category remains unchanged
+    // Optional, can be null if category remains unchanged
+    private Long categoryId;
 
-    public UpdatePostRequest() {
-    }
+//    // Optional: list of image URLs to update/replace the existing images
+//    private List<String> imageUrls;
+
+//    public UpdatePostRequest() {
+//    }
 }

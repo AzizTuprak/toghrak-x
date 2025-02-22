@@ -9,14 +9,17 @@ import java.util.List;
 
 @Entity
 @Table(name = "posts")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include  // Use ID for equality checks
     private Long id;
 
     @Column(nullable = false, length = 200)
@@ -29,31 +32,31 @@ public class Post {
     // The main or featured image (optional)
     private String coverImage;
 
-    // which user created this post
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
+    // Which user created this post
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User author;
 
-    // which category it belongs to
-    @ManyToOne
+    // Which category the post belongs to
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Relationship to PostImage (one post can have many images)
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    // One post can have many images
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<PostImage> images = new ArrayList<>();
 
     @PrePersist
-    void onCreate() {
+    public void onCreate() {
         createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    void onUpdate() {
+    public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 }

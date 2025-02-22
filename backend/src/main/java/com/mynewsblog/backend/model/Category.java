@@ -8,25 +8,28 @@ import java.util.List;
 
 @Entity
 @Table(name = "categories")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
+// Optionally, you can customize equals and hashCode to exclude relationships:
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Use ID for equality
     private Long id;
 
     @Column(nullable = false, unique = true)
     private String name;  // e.g. "Events", "Problems", etc.
 
-    // optional: if you want a short description
+    // Optional description for the category
     private String description;
 
     // One category can have multiple posts
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Post> posts = new ArrayList<>();
 }

@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
-    // New: Get users by role
-    List<User> findByRoleName(String roleName);  // Useful for admins listing editors
+    Optional<User> findByEmail(String email); // Get user email
+
+    // Get users by role (using property path notation to access role's name)
+    List<User> findByRole_Name(String roleName);  // Useful for admins listing editors, etc.
 }

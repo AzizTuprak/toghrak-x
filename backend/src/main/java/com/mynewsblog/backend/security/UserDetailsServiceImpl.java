@@ -1,6 +1,5 @@
 package com.mynewsblog.backend.security;
 
-import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,17 +21,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
-
-        return UserPrincipal.create(user); // ✅ Keep only this return statement
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        return UserPrincipal.create(user);
     }
 
-    // 🔹 New method to load user by ID
     @Transactional
     public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
-
         return UserPrincipal.create(user);
     }
 }

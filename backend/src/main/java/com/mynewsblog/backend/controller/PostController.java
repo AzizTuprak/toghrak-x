@@ -1,11 +1,14 @@
 package com.mynewsblog.backend.controller;
 
 import com.mynewsblog.backend.dto.CreatePostRequest;
+import com.mynewsblog.backend.dto.PostResponseDTO;
 import com.mynewsblog.backend.dto.UpdatePostRequest;
-import com.mynewsblog.backend.dto.AddImagesRequest;
 import com.mynewsblog.backend.model.Post;
+import com.mynewsblog.backend.model.PostImage;
 import com.mynewsblog.backend.security.UserPrincipal;
 import com.mynewsblog.backend.service.PostService;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
+@Slf4j
 public class PostController {
 
     private final PostService postService;
@@ -24,46 +28,52 @@ public class PostController {
 
     // 1) CREATE a new post
     @PostMapping
-    public ResponseEntity<Post> createPost(
-            @RequestBody CreatePostRequest request,
+    public ResponseEntity<PostResponseDTO> createPost(
+            @Valid @RequestBody CreatePostRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser
     ) {
+        log.info("Current User ID = {}", currentUser.getId()); // this line can be deleted, it was only for testing
         Post newPost = postService.createPost(
                 request.getTitle(),
                 request.getContent(),
                 currentUser.getId(),  // Get ID from UserPrincipal
-                request.getCategoryId()
+                request.getCategoryId(),
+                request.getCoverImage()  // Include the cover image URL
         );
-        return ResponseEntity.ok(newPost);
+        return ResponseEntity.ok(toPostResponseDTO(newPost));
     }
 
     // 2) GET all posts
     @GetMapping
-    public List<Post> getAllPosts() {
-        return postService.getAllPosts();
+    public List<PostResponseDTO> getAllPosts() {
+        List<Post> posts = postService.getAllPosts();
+        return posts.stream()
+                .map(this::toPostResponseDTO)
+                .toList();
     }
 
     // 3) GET single post by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPost(@PathVariable Long id) {
-        return ResponseEntity.ok(postService.getPost(id));
+    public ResponseEntity<PostResponseDTO> getPost(@PathVariable Long id) {
+        Post post = postService.getPost(id);
+        return ResponseEntity.ok(toPostResponseDTO(post));
     }
 
     // 4) UPDATE a post (Only the owner can update)
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(
+    public ResponseEntity<PostResponseDTO> updatePost(
             @PathVariable Long id,
-            @RequestBody UpdatePostRequest request,
+            @Valid @RequestBody UpdatePostRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser
     ) {
         Post updatedPost = postService.updatePost(
                 id,
-                currentUser.getId(), // Get user ID
+                currentUser.getId(),
                 request.getTitle(),
                 request.getContent(),
                 request.getCategoryId()
         );
-        return ResponseEntity.ok(updatedPost);
+        return ResponseEntity.ok(toPostResponseDTO(updatedPost));
     }
 
     // 5) DELETE a post (Only the owner or admin can delete)
@@ -76,13 +86,24 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    // 6) ADD IMAGES to a post
-    @PostMapping("/{id}/images")
-    public ResponseEntity<Post> addImages(
-            @PathVariable Long id,
-            @RequestBody AddImagesRequest request
-    ) {
-        Post postWithImages = postService.addImagesToPost(id, request.getImageUrls());
-        return ResponseEntity.ok(postWithImages);
+    // Unified converter method to transform Post entity to PostResponseDTO
+    private PostResponseDTO toPostResponseDTO(Post post) {
+        PostResponseDTO dto = new PostResponseDTO();
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        dto.setContent(post.getContent());
+        dto.setCoverImage(post.getCoverImage());
+        dto.setCategoryName(post.getCategory().getName());
+        dto.setAuthorUsername(post.getAuthor().getUsername());
+        dto.setCreatedAt(post.getCreatedAt());
+        dto.setUpdatedAt(post.getUpdatedAt());
+        dto.setImageUrls(
+                post.getImages().stream()
+                        .map(PostImage::getImageUrl)
+                        .toList()
+        );
+        return dto;
+
     }
+
 }

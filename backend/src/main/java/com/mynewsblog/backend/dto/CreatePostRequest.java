@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class CreatePostRequest {
@@ -16,8 +18,14 @@ public class CreatePostRequest {
     private String content;
 
     @NotNull(message = "Category ID is required")
-    private Long categoryId;  // No need for authorId since we get it from `UserPrincipal`
+    private Long categoryId;
 
-    public CreatePostRequest() {
-    }
+    // Optional cover image URL returned by the image upload endpoint
+    private String coverImage;
+
+//    // Optional list of image URLs
+//    private List<String> imageUrls;
+
+//    public CreatePostRequest() {
+//    }
 }

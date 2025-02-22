@@ -8,8 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
+    // Find all posts created by a given author (using the User entity)
     List<Post> findByAuthor(User author);
+
+    // Find all posts under a specific category (using the Category entity)
     List<Post> findByCategory(Category category);
-    // New: Allowing Admins to fetch unpublished posts if needed
+
+    // Find all posts created by an author using their ID.
+    // This method leverages property path navigation (author.id)
     List<Post> findByAuthorId(Long authorId);
 }
