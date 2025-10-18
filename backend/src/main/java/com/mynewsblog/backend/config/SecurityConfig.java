@@ -13,6 +13,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 public class SecurityConfig {
 
@@ -25,13 +29,30 @@ public class SecurityConfig {
     }
 
     @Bean
+    AuthenticationEntryPoint restAuthenticationEntryPoint() {
+        return (request, response, authException) ->
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+    }
+
+    @Bean
+    AccessDeniedHandler restAccessDeniedHandler() {
+        return (request, response, accessDeniedException) ->
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+    }
+
+
+    @Bean
     public SecurityFilterChain securityFilterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())  // Disable CSRF for JWT usage
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(restAuthenticationEntryPoint())
+                        .accessDeniedHandler(restAccessDeniedHandler())
+                )
                 .authorizeHttpRequests(auth -> auth
-                        // 1) Authentication endpoints
-                        .requestMatchers("/api/auth/**").permitAll()
+                // 1) Authentication endpoints
+                .requestMatchers("/api/auth/**").permitAll()
 
                         // 2) Categories
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
