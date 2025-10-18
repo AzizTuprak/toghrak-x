@@ -4,6 +4,7 @@ import com.mynewsblog.backend.dto.LoginRequest;
 import com.mynewsblog.backend.dto.LoginResponse;
 import com.mynewsblog.backend.security.JwtUtil;
 import com.mynewsblog.backend.security.UserPrincipal;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         // Create authentication token
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
