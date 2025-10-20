@@ -9,6 +9,7 @@ import com.mynewsblog.backend.security.UserPrincipal;
 import com.mynewsblog.backend.service.PostService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -43,13 +44,32 @@ public class PostController {
         return ResponseEntity.ok(toPostResponseDTO(newPost));
     }
 
-    // 2) GET all posts
+//    // 2) GET all posts
+//    @GetMapping
+//    public List<PostResponseDTO> getAllPosts() {
+//        List<Post> posts = postService.getAllPosts();
+//        return posts.stream()
+//                .map(this::toPostResponseDTO)
+//                .toList();
+//    }
+    // paginated GET /api/posts
     @GetMapping
-    public List<PostResponseDTO> getAllPosts() {
-        List<Post> posts = postService.getAllPosts();
-        return posts.stream()
-                .map(this::toPostResponseDTO)
-                .toList();
+    public ResponseEntity<Page<PostResponseDTO>> getPosts(
+            @org.springframework.data.web.PageableDefault(
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ) {
+        // hard cap page size to prevent abuse (e.g., max 50)
+        int safeSize = Math.min(pageable.getPageSize(), 50);
+        Pageable safePageable = PageRequest.of(pageable.getPageNumber(), safeSize, pageable.getSort());
+
+        Page<PostResponseDTO> page = postService
+                .getPosts(safePageable)
+                .map(this::toPostResponseDTO);
+
+        return ResponseEntity.ok(page);
     }
 
     // 3) GET single post by ID

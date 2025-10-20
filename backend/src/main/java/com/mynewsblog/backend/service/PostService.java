@@ -6,6 +6,10 @@ import com.mynewsblog.backend.model.*;
 import com.mynewsblog.backend.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.mynewsblog.backend.model.Post;
+import com.mynewsblog.backend.repository.PostRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -77,17 +81,6 @@ public class PostService {
         post.setUpdatedAt(LocalDateTime.now());
         return postRepository.save(post);
 
-//        if (imageUrls != null && !imageUrls.isEmpty()) {
-//            for (String url : imageUrls) {
-//                PostImage pi = PostImage.builder()
-//                        .imageUrl(url)
-//                        .post(post)
-//                        .build();
-//                postImageRepository.save(pi);
-//                // Optionally add the image to post.getImages() if needed
-//            }
-//        }
-//        return post;
     }
 
     // 3️⃣ Delete a post
@@ -115,6 +108,11 @@ public class PostService {
     // 5️⃣ List all posts
     public List<Post> getAllPosts() {
         return postRepository.findAll();
+    }
+
+    // NEW: paginated listing
+    public Page<Post> getPosts(Pageable pageable) {
+        return postRepository.findAll(pageable);
     }
 
 
