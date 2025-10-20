@@ -7,11 +7,13 @@ import com.mynewsblog.backend.model.Role;
 import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.repository.RoleRepository;
 import com.mynewsblog.backend.repository.UserRepository;
+import com.mynewsblog.backend.repository.PostRepository;
 import com.mynewsblog.backend.security.UserPrincipal;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,13 +24,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PostRepository postRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository,
+                       RoleRepository roleRepository, PostRepository postRepository,
                        PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.postRepository = postRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -125,6 +129,15 @@ public class UserService {
         if ("ADMIN".equals(user.getRole().getName()) &&
                 userRepository.findByRole_Name("ADMIN").size() <= 1) {
             throw new AccessDeniedException("Cannot delete the last admin.");
+        }
+
+        // block if the user owns posts
+        if (postRepository.existsByAuthorId(userId)) {
+            long n = postRepository.countByAuthorId(userId);
+            throw new DataIntegrityViolationException(
+                    "Cannot delete user: they still own " + n + " post(s). " +
+                    "Delete or transfer their posts first."
+            );
         }
 
         userRepository.deleteById(userId);

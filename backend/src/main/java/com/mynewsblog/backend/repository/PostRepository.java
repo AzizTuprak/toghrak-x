@@ -24,4 +24,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @EntityGraph(attributePaths = {"author", "category", "images"})
     Page<Post> findAll(Pageable pageable);
+
+    boolean existsByAuthorId(Long authorId);
+    long countByAuthorId(Long authorId);
 }
