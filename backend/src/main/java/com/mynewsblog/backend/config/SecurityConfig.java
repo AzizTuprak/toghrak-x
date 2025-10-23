@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod; // <-- Important for requestMatchers with methods
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -17,6 +19,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -27,6 +36,22 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, UserDetailsServiceImpl userDetailsService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
+    }
+
+    /**
+     * Completely bypass Spring Security for Swagger/OpenAPI endpoints.
+     * This guarantees no 401 from security filters on the docs UI/assets.
+     */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers(
+                // OpenAPI/Swagger endpoints
+                "/swagger-ui.html",
+                "/swagger-ui/**",
+                "/v3/api-docs",
+                "/v3/api-docs/**",
+                "/v3/api-docs/swagger-config"
+        );
     }
 
     @Bean
@@ -46,45 +71,62 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())  // Disable CSRF for JWT usage
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(restAuthenticationEntryPoint())
                         .accessDeniedHandler(restAccessDeniedHandler())
                 )
                 .authorizeHttpRequests(auth -> auth
-                // 1) Authentication endpoints
-                .requestMatchers("/api/auth/**").permitAll()
 
-                        // 2) Categories
+                        // Static resources ((common locations) css, js, images, webjars, favicon, etc.)
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers("/error").permitAll()
+
+                        // Swagger / OpenAPI (all must be public) Keep permitAll for Swagger as a second guard
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs/swagger-config"
+                        ).permitAll()
+
+
+                        // Authentication endpoints
+                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // Categories
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,  "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/categories/**").hasRole("ADMIN")
 
-                        // 3) Posts
+                        // Posts
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/posts/**").hasAnyRole("EDITOR", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("EDITOR", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasAnyRole("EDITOR", "ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/posts/**").hasAnyRole("EDITOR","ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("EDITOR","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/posts/**").hasAnyRole("EDITOR","ADMIN")
 
-                        // 4) User Profile: Must be authenticated
+                        // User profile
                         .requestMatchers("/api/users/me").authenticated()
 
-                        // 5) Allow everyone to access static images (served by WebMvcConfig)
+                        // Public images
                         .requestMatchers("/images/**").permitAll()
 
-                        // 6) Image Upload API: Restrict POST /api/images/** to editors and admins
-                        .requestMatchers(HttpMethod.POST, "/api/images/**").hasAnyRole("EDITOR", "ADMIN")
+                        // Image upload
+                        .requestMatchers(HttpMethod.POST, "/api/images/**").hasAnyRole("EDITOR","ADMIN")
 
-                        // 7) User Management (list all users): Admin only
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
-
-                        // 8) Admin endpoints
+                        // Admin
+                        .requestMatchers("/api/users").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // 9) Any other request must be authenticated
+                        // Anything else requires auth
                         .anyRequest().authenticated()
                 )
+
+                // Let CORS preflight through (optional but helpful)
+                .cors(Customizer.withDefaults())
+                // JWT filter
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -98,5 +140,18 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        var config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:8080"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization","Content-Type", "Accept"));
+        config.setAllowCredentials(true);
+
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
