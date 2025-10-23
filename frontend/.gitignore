@@ -41,3 +41,12 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# advanced feutures
+.env
+.env.*
+.local
+
+.env
+.tmp/
+docker-compose.override.yml
