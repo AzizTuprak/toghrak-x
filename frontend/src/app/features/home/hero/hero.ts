@@ -1,47 +1,38 @@
-import { Component, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  standalone: true,
   selector: 'nb-hero',
-  imports: [RouterLink],
+  imports: [CommonModule, RouterLink],
   template: `
-    <section class="hero" *ngIf="image">
-      <img [src]="image" alt="" />
-      <a [routerLink]="link" class="overlay">
+    <div class="hero">
+      <a *ngIf="link; else plain" [routerLink]="link">
+        <img *ngIf="image" [src]="image" alt="" />
         <h2>{{ title }}</h2>
       </a>
-    </section>
+      <ng-template #plain>
+        <img *ngIf="image" [src]="image" alt="" />
+        <h2>{{ title }}</h2>
+      </ng-template>
+    </div>
   `,
   styles: [
     `
-      .hero {
-        position: relative;
-        border-radius: 18px;
-        overflow: hidden;
-      }
       .hero img {
         width: 100%;
-        height: 260px;
-        object-fit: cover;
+        height: auto;
         display: block;
       }
-      .overlay {
-        position: absolute;
-        left: 20px;
-        bottom: 20px;
-        background: rgba(63, 81, 181, 0.9);
-        color: #fff;
-        padding: 8px 14px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 700;
+      .hero h2 {
+        margin: 8px 0 0;
+        font-size: 1.4rem;
       }
     `,
   ],
 })
 export class HeroComponent {
-  image = input<string>();
-  title = input<string>();
-  link = input<any[] | string>();
+  @Input() image?: string | null;
+  @Input() title = '';
+  @Input() link?: any;
 }

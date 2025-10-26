@@ -1,11 +1,12 @@
-import { Component, computed, inject, signal, effect } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PostsService } from '../../core/posts.service';
-import { environment } from '../../../environments/environment';
-import { HeroComponent } from './hero/hero.component';
-import { FeaturedListComponent } from './featured-list/featured-list.component';
-import { SectionGridComponent } from './section-grid/section-grid.component';
+import { PostsService } from '../../../core/posts.service';
+import { PostSummary } from '../../core/models';
+import { environment } from '../../../../environments/environment';
+import { HeroComponent } from './hero/hero';
+import { FeaturedListComponent } from './featured-list/featured-list';
+import { SectionGridComponent } from './section-grid/section-grid';
 
 @Component({
   standalone: true,
@@ -51,7 +52,10 @@ import { SectionGridComponent } from './section-grid/section-grid.component';
 })
 export class HomeComponent {
   private postsSvc = inject(PostsService);
-  posts = signal<any[]>([]);
+  posts = signal<PostSummary[]>([]);
+  private resolveImage(imageUrl?: string | null) {
+    return imageUrl ? `${environment.imageBaseUrl}${imageUrl}` : '/assets/placeholder.jpg';
+  }
   ngOnInit() {
     this.postsSvc.list(0, 12).subscribe((pg) => this.posts.set(pg.content));
   }
@@ -60,11 +64,7 @@ export class HomeComponent {
     return this.posts()[0];
   }
   get firstImage() {
-    return this.first
-      ? this.first?.imageUrls?.[0]
-        ? `${environment.imageBaseUrl}${this.first.imageUrls[0]}`
-        : '/assets/placeholder.jpg'
-      : null;
+    return this.first ? this.resolveImage(this.first.imageUrl) : null;
   }
   get firstTitle() {
     return this.first?.title ?? '';
@@ -79,22 +79,18 @@ export class HomeComponent {
       .map((p) => ({
         slug: p.slug,
         title: p.title,
-        image: p.imageUrls?.[0]
-          ? `${environment.imageBaseUrl}${p.imageUrls[0]}`
-          : '/assets/placeholder.jpg',
+        image: this.resolveImage(p.imageUrl),
       }))
   );
 
   section = (categorySlug: string) =>
     this.posts()
-      .filter((p) => p.categorySlug === categorySlug) // adjust to your field name
+      .filter((p) => p.category?.slug === categorySlug)
       .slice(0, 3)
       .map((p) => ({
         slug: p.slug,
         title: p.title,
-        image: p.imageUrls?.[0]
-          ? `${environment.imageBaseUrl}${p.imageUrls[0]}`
-          : '/assets/placeholder.jpg',
+        image: this.resolveImage(p.imageUrl),
         date: p.createdAt,
       }));
 }

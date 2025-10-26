@@ -6,6 +6,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { SiteHeaderComponent } from './shared/site-header/site-header';
 import { SiteFooterComponent } from './shared/site-footer/site-footer';
+import { HeroComponent } from './features/home/hero/hero';
 
 @Component({
   selector: 'app-root',
@@ -18,9 +19,8 @@ import { SiteFooterComponent } from './shared/site-footer/site-footer';
     SiteFooterComponent,
   ],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
+  styleUrls: ['./app.scss'],
 })
 export class AppComponent {
   protected readonly title = signal('frontend');
 }
-// export class AppComponent {}

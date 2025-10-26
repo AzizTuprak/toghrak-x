@@ -1,14 +1,15 @@
+import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'nb-section-grid',
-  imports: [RouterLink],
+  imports: [RouterLink, CommonModule],
   template: `
     <h3 class="section-title">{{ title }}</h3>
     <div class="grid">
-      <article *ngFor="let p of posts">
+      <article *ngFor="let p of posts()">
         <a [routerLink]="['/post', p.slug]">
           <img [src]="p.image" alt="" />
           <h4>{{ p.title }}</h4>

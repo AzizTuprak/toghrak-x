@@ -1,13 +1,14 @@
+import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'nb-featured-list',
-  imports: [RouterLink],
+  imports: [RouterLink, CommonModule],
   template: `
     <ul class="featured">
-      <li *ngFor="let f of items">
+      <li *ngFor="let f of items()">
         <a [routerLink]="['/post', f.slug]">
           <img [src]="f.image" alt="" />
           <span class="badge">{{ f.title }}</span>

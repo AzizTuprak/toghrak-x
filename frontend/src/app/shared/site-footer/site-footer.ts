@@ -1,19 +1,3 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-site-footer',
-//   imports: [],
-//   template: `
-//     <p>
-//       site-footer works!
-//     </p>
-//   `,
-//   styles: ``,
-// })
-// export class SiteFooter {
-
-// }
-
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -21,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   standalone: true,
-  selector: 'nb-site-header',
+  selector: 'nb-site-footer',
   imports: [MatToolbarModule, MatButtonModule, RouterLink],
   template: `
     <mat-toolbar color="primary" class="nb-toolbar">
