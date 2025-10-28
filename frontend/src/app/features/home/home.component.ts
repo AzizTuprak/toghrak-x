@@ -1,9 +1,9 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PostsService } from '../../../core/posts.service';
+import { PostsService } from '../../core/posts.service';
 import { PostSummary } from '../../core/models';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { HeroComponent } from './hero/hero';
 import { FeaturedListComponent } from './featured-list/featured-list';
 import { SectionGridComponent } from './section-grid/section-grid';
