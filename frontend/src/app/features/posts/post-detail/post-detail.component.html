@@ -1,0 +1,49 @@
+<div class="container mt-4" *ngIf="post; else loadingTpl">
+  <div class="mb-3">
+    <a routerLink="/" class="btn btn-outline-secondary btn-sm">Back</a>
+  </div>
+  <div class="d-flex gap-2 mb-3" *ngIf="isAdmin || isOwner">
+    <a
+      class="btn btn-outline-primary btn-sm"
+      [routerLink]="['/posts', post?.id, 'edit']"
+      >Edit</a
+    >
+    <button
+      class="btn btn-outline-danger btn-sm"
+      (click)="deletePost()"
+      [disabled]="deleting"
+    >
+      {{ deleting ? "Deleting…" : "Delete" }}
+    </button>
+  </div>
+  <h3>{{ post.title }}</h3>
+  <div class="text-muted mb-2">
+    {{ post.categoryName }} • {{ post.authorUsername }}
+  </div>
+  <img
+    *ngIf="post.coverImage"
+    [src]="post.coverImage"
+    class="img-fluid mb-3"
+    alt="cover"
+  />
+  <p style="white-space: pre-line">{{ post.content }}</p>
+
+  <div *ngIf="post.imageUrls?.length">
+    <h6>Gallery</h6>
+    <div class="d-flex flex-wrap gap-2">
+      <img
+        *ngFor="let img of post.imageUrls"
+        [src]="img"
+        class="img-thumbnail"
+        style="max-width: 180px"
+      />
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="container mt-4">
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+    <div *ngIf="!error" class="alert alert-info">Loading…</div>
+  </div>
+</ng-template>

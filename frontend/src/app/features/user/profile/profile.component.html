@@ -1,0 +1,12 @@
+<div class="container mt-4" *ngIf="!loading; else loadingTpl">
+  <h4>Profile</h4>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="user">
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p *ngIf="user.roleName"><strong>Role:</strong> {{ user.roleName }}</p>
+  </div>
+</div>
+<ng-template #loadingTpl>
+  <div class="container mt-4"><div class="alert alert-info">Loading…</div></div>
+</ng-template>

@@ -1,30 +1,40 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import {FormsModule} from '@angular/Forms';
-import { HttpClientModule } from '@angular/common/http';
-import { NewsapiservicesService} from './service/newsapiservices.service';
-import { TopheadingComponent } from './components/topheading/topheading.component';
-import { TechnewsComponent } from './components/technews/technews.component';
-import { BusinessnewsComponent } from './components/businessnews/businessnews.component';
-import { UyghurnewsComponent } from './components/uyghurnews/uyghurnews.component';
+import { UserService } from './service/user.service';
+import { User, CreateUserRequest } from './models/user';
+import { LoginComponent } from './features/auth/login/login.component';
+import { PostsListComponent } from './features/posts/posts-list/posts-list.component';
+import { PostDetailComponent } from './features/posts/post-detail/post-detail.component';
+import { PostFormComponent } from './features/posts/post-form/post-form.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ProfileComponent } from './features/user/profile/profile.component';
+import { AdminUsersComponent } from './features/user/admin/admin-users/admin-users.component';
+
 @NgModule({
   declarations: [
     AppComponent,
-    TopheadingComponent,
-    TechnewsComponent,
-    BusinessnewsComponent,
-    UyghurnewsComponent
-    
+    LoginComponent,
+    PostsListComponent,
+    PostDetailComponent,
+    PostFormComponent,
+    ProfileComponent,
+    AdminUsersComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    ReactiveFormsModule,
+    HttpClientModule,
   ],
-  providers: [NewsapiservicesService],
-  bootstrap: [AppComponent]
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
