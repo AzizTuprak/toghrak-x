@@ -1,7 +1,7 @@
 <div class="container mt-4" style="max-width: 720px">
   <h4 class="mb-3">{{ isEdit ? "Edit Post" : "New Post" }}</h4>
 
-  <div *ngIf="loading" class="alert alert-info">Loading…</div>
+  <div *ngIf="loading" class="alert alert-info">Loading...</div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
   <form (ngSubmit)="submit()" [formGroup]="form">
@@ -11,11 +11,7 @@
     </div>
     <div class="mb-3">
       <label class="form-label">Content</label>
-      <textarea
-        class="form-control"
-        rows="8"
-        formControlName="content"
-      ></textarea>
+      <textarea class="form-control" rows="8" formControlName="content"></textarea>
     </div>
     <div class="mb-3">
       <label class="form-label">Category</label>
@@ -30,15 +26,11 @@
       <label class="form-label">Cover Image URL</label>
       <input class="form-control" formControlName="coverImage" />
       <div class="form-text">Or upload a file:</div>
-      <input
-        type="file"
-        class="form-control"
-        (change)="onCoverSelected($event)"
-      />
+      <input type="file" class="form-control" (change)="onCoverSelected($event)" />
       <div *ngIf="uploadError" class="text-danger small">{{ uploadError }}</div>
     </div>
     <button class="btn btn-primary" type="submit" [disabled]="saving">
-      {{ saving ? "Saving…" : "Save" }}
+      {{ saving ? "Saving..." : "Save" }}
     </button>
   </form>
 </div>

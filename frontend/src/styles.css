@@ -20,3 +20,21 @@ body
     font-size: 18px;
     font-weight: bold;
 }
+
+.cover-img {
+    width: 100%;
+    max-width: 900px;
+    max-height: 420px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+}
+
+.gallery-thumb {
+    width: 160px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 6px;
+}

@@ -3,8 +3,10 @@ package com.mynewsblog.backend.service;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.model.Category;
 import com.mynewsblog.backend.repository.CategoryRepository;
+import com.mynewsblog.backend.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 
@@ -13,9 +15,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final PostRepository postRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, PostRepository postRepository) {
         this.categoryRepository = categoryRepository;
+        this.postRepository = postRepository;
     }
 
     public List<Category> getAllCategories() {
@@ -44,6 +48,11 @@ public class CategoryService {
 
     public void deleteCategory(Long id) {
         Category existing = getCategoryById(id);
+        if (postRepository.existsByCategoryId(id)) {
+            long n = postRepository.countByCategoryId(id);
+            throw new DataIntegrityViolationException(
+                    "Cannot delete category: there are still " + n + " post(s) assigned to it.");
+        }
         categoryRepository.delete(existing);
     }
 }

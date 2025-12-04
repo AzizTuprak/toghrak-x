@@ -58,8 +58,8 @@ public class AuthController {
 
                 // Issue refresh token cookie
                 Long userId = ((UserPrincipal) authentication.getPrincipal()).getId();
-        var refresh = refreshTokenService.create(userId);
-        ResponseCookie cookie = buildRefreshCookie(refresh.getPlainToken(), refreshExpiryMs);
+                var refresh = refreshTokenService.create(userId);
+                ResponseCookie cookie = buildRefreshCookie(refresh.getPlainToken(), refreshExpiryMs);
 
                 return ResponseEntity.ok()
                                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -72,13 +72,13 @@ public class AuthController {
                 if (refreshToken == null || refreshToken.isBlank()) {
                         return ResponseEntity.status(401).build();
                 }
-        var rotated = refreshTokenService.rotate(refreshToken);
-        String newAccess = jwtUtil.generateTokenFromUserId(rotated.getUser().getId());
-        ResponseCookie cookie = buildRefreshCookie(rotated.getPlainToken(), refreshExpiryMs);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new LoginResponse(newAccess));
-    }
+                var rotated = refreshTokenService.rotate(refreshToken);
+                String newAccess = jwtUtil.generateTokenFromUserId(rotated.getUser().getId());
+                ResponseCookie cookie = buildRefreshCookie(rotated.getPlainToken(), refreshExpiryMs);
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                        .body(new LoginResponse(newAccess));
+        }
 
         @PostMapping("/logout")
         public ResponseEntity<Void> logout(
@@ -90,7 +90,7 @@ public class AuthController {
                                 .httpOnly(true)
                                 .secure(secureCookie)
                                 .sameSite("Lax")
-                                .path("/api/auth/refresh")
+                                .path("/api/auth")
                                 .maxAge(0)
                                 .domain(cookieDomain.isBlank() ? null : cookieDomain)
                                 .build();
@@ -104,7 +104,7 @@ public class AuthController {
                                 .httpOnly(true)
                                 .secure(secureCookie)
                                 .sameSite("Lax")
-                                .path("/api/auth/refresh")
+                                .path("/api/auth")
                                 .maxAge(ttlMs / 1000)
                                 .domain(cookieDomain.isBlank() ? null : cookieDomain)
                                 .build();

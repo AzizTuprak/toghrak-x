@@ -6,10 +6,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 @SpringBootApplication
 @EnableMethodSecurity
-public class NewsBlogBackendApplication {
+public class TuprakNewsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(NewsBlogBackendApplication.class, args);
+		SpringApplication.run(TuprakNewsApplication.class, args);
 	}
 
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of, switchMap } from 'rxjs';
 import { PostsService } from '../../../service/posts.service';
 import { AuthService } from '../../../service/auth.service';
@@ -18,11 +19,14 @@ export class PostsListComponent implements OnInit {
   isLoggedIn$: Observable<boolean>;
   currentUser?: User;
   isAdmin = false;
+  currentCategoryId?: number;
 
   constructor(
     private posts: PostsService,
     private auth: AuthService,
-    private users: UserService
+    private users: UserService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.isLoggedIn$ = this.auth.isLoggedIn();
   }
@@ -36,7 +40,14 @@ export class PostsListComponent implements OnInit {
         this.currentUser = user ?? undefined;
         this.isAdmin = user?.roleName === 'ADMIN';
       });
-    this.load(0);
+
+    // react to category filter in query params
+    this.route.queryParamMap.subscribe((params) => {
+      const categoryIdParam = params.get('category');
+      const categoryId = categoryIdParam ? Number(categoryIdParam) : undefined;
+      this.currentCategoryId = categoryId;
+      this.load(0, categoryId);
+    });
   }
 
   canEdit(post: PostResponse): boolean {
@@ -44,10 +55,11 @@ export class PostsListComponent implements OnInit {
     return !!this.currentUser && post.authorUsername === this.currentUser.username;
   }
 
-  load(page: number) {
+  load(page: number, categoryId: number | undefined = this.currentCategoryId) {
+    this.currentCategoryId = categoryId;
     this.loading = true;
     this.error = null;
-    this.posts.list(page, 10).subscribe({
+    this.posts.list(page, 10, categoryId).subscribe({
       next: (res) => {
         this.page = res;
         this.loading = false;
@@ -57,5 +69,9 @@ export class PostsListComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  clearCategory() {
+    this.router.navigate([], { relativeTo: this.route, queryParams: { category: null }, queryParamsHandling: 'merge' });
   }
 }

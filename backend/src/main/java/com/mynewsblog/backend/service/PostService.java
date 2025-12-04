@@ -121,7 +121,10 @@ public class PostService {
     }
 
     // NEW: paginated listing
-    public Page<Post> getPosts(Pageable pageable) {
+    public Page<Post> getPosts(Pageable pageable, Long categoryId) {
+        if (categoryId != null) {
+            return postRepository.findByCategoryId(categoryId, pageable);
+        }
         return postRepository.findAll(pageable);
     }
 

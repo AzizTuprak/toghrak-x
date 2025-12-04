@@ -3,6 +3,7 @@ package com.mynewsblog.backend.service;
 import com.mynewsblog.backend.dto.UpdateUserRequest;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.exception.UsernameAlreadyExistsException;
+import com.mynewsblog.backend.exception.EmailAlreadyExistsException;
 import com.mynewsblog.backend.model.Role;
 import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.repository.RoleRepository;
@@ -41,6 +42,9 @@ public class UserService {
         // Check for duplicate username
         if (userRepository.findByUsername(username).isPresent()) {
             throw new UsernameAlreadyExistsException("Username already exists!");
+        }
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new EmailAlreadyExistsException("Email already exists!");
         }
 
         // Retrieve role by name or throw an exception if not found
@@ -97,7 +101,7 @@ public class UserService {
         String newEmail = request.getEmail();
         if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(user.getEmail())) {
             if (userRepository.findByEmail(newEmail).isPresent()) {
-                throw new RuntimeException("Email already exists!");
+                throw new EmailAlreadyExistsException("Email already exists!");
             }
             user.setEmail(newEmail);
         }

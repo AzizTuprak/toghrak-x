@@ -16,13 +16,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Slf4j
 public class DataInitializer {
 
-    @Value("${default.admin.username}")
+    @Value("${default.admin.username:}")
     private String adminUsername;
 
-    @Value("${default.admin.email}")
+    @Value("${default.admin.email:}")
     private String adminEmail;
 
-    @Value("${default.admin.password}")
+    @Value("${default.admin.password:}")
     private String adminPassword;
 
     @Bean
@@ -42,8 +42,10 @@ public class DataInitializer {
             // Seed a default admin user if none exists
             if (userRepo.findByRole_Name("ADMIN").isEmpty()) {
                 // Ensure the injected admin credentials are present
-                if (adminUsername == null || adminPassword == null) {
-                    throw new IllegalStateException("Default admin credentials must be set in application.properties.");
+                if (adminUsername == null || adminUsername.isBlank() ||
+                        adminPassword == null || adminPassword.isBlank()) {
+                    log.warn("Default admin credentials not configured; skipping admin seed.");
+                    return;
                 }
 
                 Role adminRole = roleRepo.findByName("ADMIN")

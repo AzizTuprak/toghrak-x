@@ -52,13 +52,14 @@ public class PostController {
     // paginated GET /api/posts
     @GetMapping
     public ResponseEntity<Page<PostResponseDTO>> getPosts(
-            @org.springframework.data.web.PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @org.springframework.data.web.PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(value = "categoryId", required = false) Long categoryId) {
         // hard cap page size to prevent abuse (e.g., max 50)
         int safeSize = Math.min(pageable.getPageSize(), 50);
         Pageable safePageable = PageRequest.of(pageable.getPageNumber(), safeSize, pageable.getSort());
 
         Page<PostResponseDTO> page = postService
-                .getPosts(safePageable)
+                .getPosts(safePageable, categoryId)
                 .map(this::toPostResponseDTO);
 
         return ResponseEntity.ok(page);

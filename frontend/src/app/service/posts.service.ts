@@ -15,8 +15,11 @@ export class PostsService {
 
   constructor(private http: HttpClient) {}
 
-  list(page = 0, size = 10): Observable<Page<PostResponse>> {
-    const params = new HttpParams().set('page', page).set('size', size);
+  list(page = 0, size = 10, categoryId?: number): Observable<Page<PostResponse>> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (categoryId !== undefined && categoryId !== null) {
+      params = params.set('categoryId', categoryId);
+    }
     return this.http.get<Page<PostResponse>>(this.base, { params });
   }
 

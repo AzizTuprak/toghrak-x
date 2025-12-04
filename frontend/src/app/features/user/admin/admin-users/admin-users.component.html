@@ -1,6 +1,6 @@
 <div class="container mt-4">
   <h4>Users</h4>
-  <div *ngIf="loading" class="alert alert-info">Loading…</div>
+  <div *ngIf="loading" class="alert alert-info">Loading...</div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
   <form class="row g-2 mb-3" (ngSubmit)="create()">
