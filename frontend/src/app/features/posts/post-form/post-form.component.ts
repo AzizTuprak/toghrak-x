@@ -27,7 +27,7 @@ export class PostFormComponent implements OnInit {
   form = this.fb.group({
     title: ['', Validators.required],
     content: ['', Validators.required],
-    categoryId: [null, Validators.required],
+    categoryId: [null as number | null, Validators.required],
     coverImage: [''],
   });
 
@@ -64,7 +64,7 @@ export class PostFormComponent implements OnInit {
         this.form.patchValue({
           title: p.title,
           content: p.content,
-          categoryId: null, // backend returns name only; user must pick if changing
+          categoryId: p.categoryId ?? null,
           coverImage: p.coverImage || '',
         });
         this.loading = false;

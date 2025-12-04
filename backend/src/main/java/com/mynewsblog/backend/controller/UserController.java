@@ -34,8 +34,7 @@ public class UserController {
                 request.getUsername(),
                 request.getEmail(),
                 request.getPassword(),
-                request.getRoleName()
-        );
+                request.getRoleName());
         // Only admins can create users, so we return the admin DTO.
         return ResponseEntity.status(HttpStatus.CREATED).body(mapToAdminDTO(newUser));
     }
@@ -67,13 +66,13 @@ public class UserController {
         return ResponseEntity.ok(mapToAdminDTO(userService.getUser(id)));
     }
 
-    // 5️⃣ Update user (Users can update their own profile, Admins can update any user)
+    // 5️⃣ Update user (Users can update their own profile, Admins can update any
+    // user)
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest request,
-            @AuthenticationPrincipal UserPrincipal currentUser
-    ) {
+            @AuthenticationPrincipal UserPrincipal currentUser) {
         User updatedUser = userService.updateUser(id, currentUser, request);
         if (isAdmin(currentUser)) {
             return ResponseEntity.ok(mapToAdminDTO(updatedUser));
@@ -112,8 +111,7 @@ public class UserController {
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
-        // Excludes role info for non-admin users
+        dto.setRoleName(user.getRole() != null ? user.getRole().getName() : null);
         return dto;
     }
 }
-

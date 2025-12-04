@@ -21,6 +21,9 @@ build/
 
 # Logs (if any)
 logs/**
+# Uploaded media (do not version local files)
+/uploads/
+backend/uploads/
 
 ############################################
 #         FRONTEND (Angular / Node)        #

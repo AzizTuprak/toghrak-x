@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -22,9 +22,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // This method leverages property path navigation (author.id)
     List<Post> findByAuthorId(Long authorId);
 
-    @EntityGraph(attributePaths = {"author", "category", "images"})
-    Page<Post> findAll(Pageable pageable);
+    @EntityGraph(attributePaths = { "author", "category", "images" })
+    Page<Post> findAll(@NonNull Pageable pageable);
 
     boolean existsByAuthorId(Long authorId);
+
     long countByAuthorId(Long authorId);
 }

@@ -14,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/posts")
 @Slf4j
@@ -31,36 +29,30 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostResponseDTO> createPost(
             @Valid @RequestBody CreatePostRequest request,
-            @AuthenticationPrincipal UserPrincipal currentUser
-    ) {
+            @AuthenticationPrincipal UserPrincipal currentUser) {
         log.info("Current User ID = {}", currentUser.getId()); // this line can be deleted, it was only for testing
         Post newPost = postService.createPost(
                 request.getTitle(),
                 request.getContent(),
-                currentUser.getId(),  // Get ID from UserPrincipal
+                currentUser.getId(), // Get ID from UserPrincipal
                 request.getCategoryId(),
-                request.getCoverImage()  // Include the cover image URL
+                request.getCoverImage() // Include the cover image URL
         );
         return ResponseEntity.ok(toPostResponseDTO(newPost));
     }
 
-//    // 2) GET all posts
-//    @GetMapping
-//    public List<PostResponseDTO> getAllPosts() {
-//        List<Post> posts = postService.getAllPosts();
-//        return posts.stream()
-//                .map(this::toPostResponseDTO)
-//                .toList();
-//    }
+    // // 2) GET all posts
+    // @GetMapping
+    // public List<PostResponseDTO> getAllPosts() {
+    // List<Post> posts = postService.getAllPosts();
+    // return posts.stream()
+    // .map(this::toPostResponseDTO)
+    // .toList();
+    // }
     // paginated GET /api/posts
     @GetMapping
     public ResponseEntity<Page<PostResponseDTO>> getPosts(
-            @org.springframework.data.web.PageableDefault(
-                    size = 10,
-                    sort = "createdAt",
-                    direction = Sort.Direction.DESC
-            ) Pageable pageable
-    ) {
+            @org.springframework.data.web.PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         // hard cap page size to prevent abuse (e.g., max 50)
         int safeSize = Math.min(pageable.getPageSize(), 50);
         Pageable safePageable = PageRequest.of(pageable.getPageNumber(), safeSize, pageable.getSort());
@@ -84,15 +76,14 @@ public class PostController {
     public ResponseEntity<PostResponseDTO> updatePost(
             @PathVariable Long id,
             @Valid @RequestBody UpdatePostRequest request,
-            @AuthenticationPrincipal UserPrincipal currentUser
-    ) {
+            @AuthenticationPrincipal UserPrincipal currentUser) {
         Post updatedPost = postService.updatePost(
                 id,
                 currentUser.getId(),
                 request.getTitle(),
                 request.getContent(),
-                request.getCategoryId()
-        );
+                request.getCategoryId(),
+                request.getCoverImage());
         return ResponseEntity.ok(toPostResponseDTO(updatedPost));
     }
 
@@ -100,8 +91,7 @@ public class PostController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserPrincipal currentUser
-    ) {
+            @AuthenticationPrincipal UserPrincipal currentUser) {
         postService.deletePost(id, currentUser.getId());
         return ResponseEntity.noContent().build();
     }
@@ -113,6 +103,7 @@ public class PostController {
         dto.setTitle(post.getTitle());
         dto.setContent(post.getContent());
         dto.setCoverImage(post.getCoverImage());
+        dto.setCategoryId(post.getCategory().getId());
         dto.setCategoryName(post.getCategory().getName());
         dto.setAuthorUsername(post.getAuthor().getUsername());
         dto.setCreatedAt(post.getCreatedAt());
@@ -120,8 +111,7 @@ public class PostController {
         dto.setImageUrls(
                 post.getImages().stream()
                         .map(PostImage::getImageUrl)
-                        .toList()
-        );
+                        .toList());
         return dto;
 
     }

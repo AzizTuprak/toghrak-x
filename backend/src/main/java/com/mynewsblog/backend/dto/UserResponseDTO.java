@@ -9,5 +9,5 @@ public class UserResponseDTO {
     private Long id;
     private String username;
     private String email;
-    // Notice: No role field here.
+    private String roleName;
 }

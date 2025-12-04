@@ -35,6 +35,12 @@
             [routerLink]="['/posts', p.id]"
             >Read</a
           >
+          <a
+            *ngIf="canEdit(p)"
+            class="btn btn-sm btn-outline-secondary ms-2"
+            [routerLink]="['/posts', p.id, 'edit']"
+            >Edit</a
+          >
         </div>
       </div>
     </div>

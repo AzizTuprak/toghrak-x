@@ -5,7 +5,7 @@
   <div class="d-flex gap-2 mb-3" *ngIf="isAdmin || isOwner">
     <a
       class="btn btn-outline-primary btn-sm"
-      [routerLink]="['/posts', post?.id, 'edit']"
+      [routerLink]="['/posts', post.id, 'edit']"
       >Edit</a
     >
     <button
@@ -28,7 +28,7 @@
   />
   <p style="white-space: pre-line">{{ post.content }}</p>
 
-  <div *ngIf="post.imageUrls?.length">
+  <div *ngIf="post.imageUrls.length">
     <h6>Gallery</h6>
     <div class="d-flex flex-wrap gap-2">
       <img

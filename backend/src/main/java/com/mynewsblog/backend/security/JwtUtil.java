@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -19,7 +21,7 @@ public class JwtUtil {
     private final Long jwtExpirationMs;
 
     public JwtUtil(@Value("${app.jwt.secret}") String secret,
-                   @Value("${app.jwt.expiration}") Long jwtExpirationMs) {
+            @Value("${app.jwt.expiration}") Long jwtExpirationMs) {
         // Convert the secret string to a Key.
         // The secret must be long enough (at least 64 characters for HS512).
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
@@ -54,5 +56,14 @@ public class JwtUtil {
             log.error("JWT validation failed: {}", e.getMessage());
         }
         return false;
+    }
+
+    public String generateTokenFromUserId(Long userId) {
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
     }
 }

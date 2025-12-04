@@ -3,6 +3,7 @@ export interface PostResponse {
   title: string;
   content: string;
   coverImage?: string | null;
+  categoryId?: number;
   categoryName: string;
   authorUsername: string;
   createdAt: string;

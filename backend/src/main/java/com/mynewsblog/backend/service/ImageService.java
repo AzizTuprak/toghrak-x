@@ -20,7 +20,7 @@ public class ImageService {
     private final String imageBaseUrl;
 
     public ImageService(@Value("${app.image.upload-dir}") String uploadDir,
-                        @Value("${app.image.base-url}") String imageBaseUrl) {
+            @Value("${app.image.base-url}") String imageBaseUrl) {
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
         this.imageBaseUrl = imageBaseUrl;
         try {

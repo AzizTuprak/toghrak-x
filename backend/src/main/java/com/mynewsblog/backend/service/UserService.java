@@ -28,8 +28,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository, PostRepository postRepository,
-                       PasswordEncoder passwordEncoder) {
+            RoleRepository roleRepository, PostRepository postRepository,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.postRepository = postRepository;
@@ -69,7 +69,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    // 4️⃣ Update user (Users can update their own profile, Admins can update any user)
+    // 4️⃣ Update user (Users can update their own profile, Admins can update any
+    // user)
     public User updateUser(Long userId, UserPrincipal currentUser, UpdateUserRequest request) {
         // Fetch the existing user
         User user = getUser(userId);
@@ -120,7 +121,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
     // 5️⃣ Delete user (Admins only, cannot delete the last admin)
     public void deleteUser(Long userId) {
         User user = getUser(userId);
@@ -136,8 +136,7 @@ public class UserService {
             long n = postRepository.countByAuthorId(userId);
             throw new DataIntegrityViolationException(
                     "Cannot delete user: they still own " + n + " post(s). " +
-                    "Delete or transfer their posts first."
-            );
+                            "Delete or transfer their posts first.");
         }
 
         userRepository.deleteById(userId);

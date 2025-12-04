@@ -21,16 +21,13 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final PostImageRepository postImageRepository;
 
     public PostService(PostRepository postRepository,
-                       UserRepository userRepository,
-                       CategoryRepository categoryRepository,
-                       PostImageRepository postImageRepository) {
+            UserRepository userRepository,
+            CategoryRepository categoryRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
-        this.postImageRepository = postImageRepository;
     }
 
     // 1️⃣ Create a new post
@@ -46,15 +43,17 @@ public class PostService {
                 .content(content)
                 .author(author)
                 .category(category)
-                .coverImage(coverImage)  // Set the cover image URL
-                .createdAt(LocalDateTime.now()) // Optionally, you can rely on the entity's @PrePersist instead of manually setting createdAt.
+                .coverImage(coverImage) // Set the cover image URL
+                .createdAt(LocalDateTime.now()) // Optionally, you can rely on the entity's @PrePersist instead of
+                                                // manually setting createdAt.
                 .build();
 
         return postRepository.save(post);
     }
 
     // 2️⃣ Update an existing post
-    public Post updatePost(Long postId, Long requestUserId, String newTitle, String newContent, Long newCategoryId) {
+    public Post updatePost(Long postId, Long requestUserId, String newTitle, String newContent, Long newCategoryId,
+            String newCoverImage) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
 
@@ -62,7 +61,11 @@ public class PostService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id=" + requestUserId));
 
         // Ensure only the owner or an admin can update
-        if (!isAdmin(currentUser) && !post.getAuthor().getId().equals(requestUserId)) {
+        User author = post.getAuthor();
+        if (author == null) {
+            throw new ResourceNotFoundException("Post author missing for post: " + postId);
+        }
+        if (!isAdmin(currentUser) && !author.getId().equals(requestUserId)) {
             throw new AccessDeniedException("You can only update your own posts!");
         }
 
@@ -76,6 +79,9 @@ public class PostService {
             Category category = categoryRepository.findById(newCategoryId)
                     .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + newCategoryId));
             post.setCategory(category);
+        }
+        if (newCoverImage != null && !newCoverImage.isBlank()) {
+            post.setCoverImage(newCoverImage);
         }
 
         post.setUpdatedAt(LocalDateTime.now());
@@ -91,8 +97,12 @@ public class PostService {
         User currentUser = userRepository.findById(requestUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id=" + requestUserId));
 
+        User author = post.getAuthor();
+        if (author == null) {
+            throw new ResourceNotFoundException("Post author missing for post: " + postId);
+        }
         // Ensure only the owner or an admin can delete
-        if (!isAdmin(currentUser) && !post.getAuthor().getId().equals(requestUserId)) {
+        if (!isAdmin(currentUser) && !author.getId().equals(requestUserId)) {
             throw new AccessDeniedException("You can only delete your own posts!");
         }
 
@@ -114,7 +124,6 @@ public class PostService {
     public Page<Post> getPosts(Pageable pageable) {
         return postRepository.findAll(pageable);
     }
-
 
     // Utility: Check if the user is an admin
     private boolean isAdmin(User user) {

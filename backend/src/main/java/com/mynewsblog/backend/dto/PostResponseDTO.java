@@ -13,6 +13,7 @@ public class PostResponseDTO {
     private String title;
     private String content;
     private String coverImage;
+    private Long categoryId;
     private String categoryName;
     private String authorUsername;
     private LocalDateTime createdAt;

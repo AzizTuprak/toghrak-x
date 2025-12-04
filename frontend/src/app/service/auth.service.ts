@@ -13,13 +13,21 @@ export class AuthService {
 
   login(payload: LoginRequest): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${environment.apiBaseUrl}/auth/login`, payload)
+      .post<LoginResponse>(
+        `${environment.apiBaseUrl}/auth/login`,
+        payload,
+        { withCredentials: true }
+      )
       .pipe(tap((res) => this.setToken(res.token)));
   }
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     this.loggedIn$.next(false);
+    // clear refresh cookie on backend
+    this.http
+      .post(`${environment.apiBaseUrl}/auth/logout`, {}, { withCredentials: true })
+      .subscribe({ next: () => {}, error: () => {} });
   }
 
   isLoggedIn(): Observable<boolean> {
@@ -28,6 +36,12 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
+  }
+
+  refresh(): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${environment.apiBaseUrl}/auth/refresh`, {}, { withCredentials: true })
+      .pipe(tap((res) => this.setToken(res.token)));
   }
 
   private setToken(token: string) {
