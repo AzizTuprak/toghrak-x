@@ -36,7 +36,8 @@ public class PostController {
                 request.getContent(),
                 currentUser.getId(), // Get ID from UserPrincipal
                 request.getCategoryId(),
-                request.getCoverImage() // Include the cover image URL
+                request.getCoverImage(), // Include the cover image URL
+                request.getImageUrls()
         );
         return ResponseEntity.ok(toPostResponseDTO(newPost));
     }
@@ -84,7 +85,8 @@ public class PostController {
                 request.getTitle(),
                 request.getContent(),
                 request.getCategoryId(),
-                request.getCoverImage());
+                request.getCoverImage(),
+                request.getImageUrls());
         return ResponseEntity.ok(toPostResponseDTO(updatedPost));
     }
 

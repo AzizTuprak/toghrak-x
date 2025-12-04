@@ -1,0 +1,57 @@
+<div class="container mt-4">
+  <h4>Categories</h4>
+  <div *ngIf="loading" class="alert alert-info">Loading...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <form class="row g-2 mb-3" (ngSubmit)="save()">
+    <div class="col-sm-4">
+      <input
+        class="form-control"
+        [(ngModel)]="form.name"
+        name="name"
+        placeholder="Category name"
+        required
+      />
+    </div>
+    <div class="col-sm-6">
+      <input
+        class="form-control"
+        [(ngModel)]="form.description"
+        name="description"
+        placeholder="Description (optional)"
+      />
+    </div>
+    <div class="col-sm-2 d-grid">
+      <button class="btn btn-primary btn-sm" type="submit" [disabled]="saving">
+        {{ saving ? "..." : (editingId ? "Update" : "Add") }}
+      </button>
+    </div>
+    <div class="col-sm-2" *ngIf="editingId">
+      <button type="button" class="btn btn-outline-secondary btn-sm w-100" (click)="cancelEdit()">
+        Cancel
+      </button>
+    </div>
+  </form>
+
+  <table class="table table-sm align-middle">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th style="width: 140px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of categories">
+        <td>{{ c.name }}</td>
+        <td>{{ c.description }}</td>
+        <td>
+          <div class="d-flex gap-1">
+            <button class="btn btn-outline-secondary btn-sm" (click)="startEdit(c)">Edit</button>
+            <button class="btn btn-outline-danger btn-sm" (click)="remove(c.id)">Delete</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class CreatePostRequest {
@@ -21,9 +23,6 @@ public class CreatePostRequest {
     // Optional cover image URL returned by the image upload endpoint
     private String coverImage;
 
-//    // Optional list of image URLs
-//    private List<String> imageUrls;
-
-//    public CreatePostRequest() {
-//    }
+    // Optional list of gallery image URLs
+    private List<String> imageUrls;
 }

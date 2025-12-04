@@ -33,6 +33,12 @@
             routerLink="/admin/users"
             >Add / Manage Users</a
           >
+          <a
+            *ngIf="isAdmin"
+            class="btn btn-outline-primary btn-sm"
+            routerLink="/admin/categories"
+            >Manage Categories</a
+          >
 
           <a class="btn btn-outline-primary btn-sm" routerLink="/posts/new"
             >New Post</a

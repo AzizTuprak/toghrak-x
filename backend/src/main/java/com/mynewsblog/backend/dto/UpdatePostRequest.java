@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class UpdatePostRequest {
@@ -20,9 +22,6 @@ public class UpdatePostRequest {
     // Optional cover image URL
     private String coverImage;
 
-//    // Optional: list of image URLs to update/replace the existing images
-//    private List<String> imageUrls;
-
-//    public UpdatePostRequest() {
-//    }
+    // Optional: list of image URLs to update/replace the existing images
+    private List<String> imageUrls;
 }

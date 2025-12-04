@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @Transactional
@@ -31,7 +32,7 @@ public class PostService {
     }
 
     // 1️⃣ Create a new post
-    public Post createPost(String title, String content, Long authorId, Long categoryId, String coverImage) {
+    public Post createPost(String title, String content, Long authorId, Long categoryId, String coverImage, List<String> imageUrls) {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found with id=" + authorId));
 
@@ -43,17 +44,18 @@ public class PostService {
                 .content(content)
                 .author(author)
                 .category(category)
-                .coverImage(coverImage) // Set the cover image URL
-                .createdAt(LocalDateTime.now()) // Optionally, you can rely on the entity's @PrePersist instead of
-                                                // manually setting createdAt.
+                .coverImage(coverImage)
+                .createdAt(LocalDateTime.now())
                 .build();
+
+        setImages(post, imageUrls);
 
         return postRepository.save(post);
     }
 
     // 2️⃣ Update an existing post
     public Post updatePost(Long postId, Long requestUserId, String newTitle, String newContent, Long newCategoryId,
-            String newCoverImage) {
+            String newCoverImage, List<String> imageUrls) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
 
@@ -82,6 +84,10 @@ public class PostService {
         }
         if (newCoverImage != null && !newCoverImage.isBlank()) {
             post.setCoverImage(newCoverImage);
+        }
+
+        if (imageUrls != null) {
+            setImages(post, imageUrls);
         }
 
         post.setUpdatedAt(LocalDateTime.now());
@@ -131,5 +137,23 @@ public class PostService {
     // Utility: Check if the user is an admin
     private boolean isAdmin(User user) {
         return user.getRole() != null && "ADMIN".equals(user.getRole().getName());
+    }
+
+    private void setImages(Post post, List<String> imageUrls) {
+        post.getImages().clear();
+        if (imageUrls == null) {
+            return;
+        }
+        List<PostImage> newImages = new ArrayList<>();
+        for (String url : imageUrls) {
+            if (url == null || url.isBlank()) {
+                continue;
+            }
+            newImages.add(PostImage.builder()
+                    .imageUrl(url)
+                    .post(post)
+                    .build());
+        }
+        post.getImages().addAll(newImages);
     }
 }

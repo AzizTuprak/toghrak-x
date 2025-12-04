@@ -46,10 +46,8 @@ export class AppComponent implements OnInit {
         }
       });
 
-    this.categoriesService.list().subscribe({
-      next: (cats) => (this.categories = cats),
-      error: () => (this.categories = []),
-    });
+    this.categoriesService.categories$.subscribe((cats) => (this.categories = cats));
+    this.categoriesService.refresh();
   }
 
   logout() {

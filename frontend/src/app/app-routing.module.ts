@@ -5,6 +5,7 @@ import { PostDetailComponent } from './features/posts/post-detail/post-detail.co
 import { PostFormComponent } from './features/posts/post-form/post-form.component';
 import { ProfileComponent } from './features/user/profile/profile.component';
 import { AdminUsersComponent } from './features/user/admin/admin-users/admin-users.component';
+import { AdminCategoriesComponent } from './features/admin/admin-categories/admin-categories.component';
 import { AuthGuard } from './guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RoleGuard } from './guards/role.guard';
@@ -24,6 +25,12 @@ const routes: Routes = [
   {
     path: 'admin/users',
     component: AdminUsersComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'admin/categories',
+    component: AdminCategoriesComponent,
     canActivate: [RoleGuard],
     data: { roles: ['ADMIN'] },
   },

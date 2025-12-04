@@ -23,6 +23,8 @@ export class PostFormComponent implements OnInit {
   saving = false;
   error: string | null = null;
   uploadError: string | null = null;
+  imageUrls: string[] = [];
+  uploadingGallery = false;
 
   form = this.fb.group({
     title: ['', Validators.required],
@@ -67,6 +69,7 @@ export class PostFormComponent implements OnInit {
           categoryId: p.categoryId ?? null,
           coverImage: p.coverImage || '',
         });
+        this.imageUrls = [...(p.imageUrls || [])];
         this.loading = false;
       },
       error: () => {
@@ -81,7 +84,10 @@ export class PostFormComponent implements OnInit {
     this.saving = true;
     this.error = null;
 
-    const payload = this.form.value as CreatePostRequest | UpdatePostRequest;
+    const payload = {
+      ...(this.form.value as any),
+      imageUrls: this.imageUrls,
+    } as CreatePostRequest | UpdatePostRequest;
     const request$ =
       this.isEdit && this.postId
         ? this.postsService.update(this.postId, payload as UpdatePostRequest)
@@ -105,5 +111,29 @@ export class PostFormComponent implements OnInit {
       next: (resp) => this.form.patchValue({ coverImage: resp.imageUrl }),
       error: () => (this.uploadError = 'Upload failed.'),
     });
+  }
+
+  onGallerySelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const files = Array.from(input.files);
+    this.uploadingGallery = true;
+    let remaining = files.length;
+    files.forEach((file) => {
+      this.imagesService.upload(file).subscribe({
+        next: (resp) => this.imageUrls.push(resp.imageUrl),
+        error: () => (this.uploadError = 'One or more gallery uploads failed.'),
+        complete: () => {
+          remaining -= 1;
+          if (remaining === 0) {
+            this.uploadingGallery = false;
+          }
+        },
+      });
+    });
+  }
+
+  removeGalleryImage(url: string) {
+    this.imageUrls = this.imageUrls.filter((u) => u !== url);
   }
 }

@@ -14,6 +14,7 @@ import { PostFormComponent } from './features/posts/post-form/post-form.componen
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ProfileComponent } from './features/user/profile/profile.component';
 import { AdminUsersComponent } from './features/user/admin/admin-users/admin-users.component';
+import { AdminCategoriesComponent } from './features/admin/admin-categories/admin-categories.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { AdminUsersComponent } from './features/user/admin/admin-users/admin-use
     PostFormComponent,
     ProfileComponent,
     AdminUsersComponent,
+    AdminCategoriesComponent,
   ],
   imports: [
     BrowserModule,

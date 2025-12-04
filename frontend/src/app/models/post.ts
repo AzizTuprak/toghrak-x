@@ -17,10 +17,13 @@ export interface CreatePostRequest {
   content: string;
   categoryId: number;
   coverImage?: string | null;
+  imageUrls?: string[];
 }
 
 export interface UpdatePostRequest {
   title?: string;
   content?: string;
   categoryId?: number;
+  coverImage?: string | null;
+  imageUrls?: string[];
 }
