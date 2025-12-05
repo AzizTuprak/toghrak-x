@@ -3,14 +3,21 @@ package com.mynewsblog.backend.config;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.model.Role;
 import com.mynewsblog.backend.model.User;
+import com.mynewsblog.backend.model.Page;
+import com.mynewsblog.backend.model.SocialLink;
 import com.mynewsblog.backend.repository.RoleRepository;
 import com.mynewsblog.backend.repository.UserRepository;
+import com.mynewsblog.backend.repository.PageRepository;
+import com.mynewsblog.backend.repository.SocialLinkRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Configuration
 @Slf4j
@@ -28,7 +35,9 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initDatabase(RoleRepository roleRepo,
                                           UserRepository userRepo,
-                                          PasswordEncoder passwordEncoder) {
+                                          PasswordEncoder passwordEncoder,
+                                          PageRepository pageRepository,
+                                          SocialLinkRepository socialLinkRepository) {
         return args -> {
             // Seed roles if they do not exist
             if (roleRepo.findByName("ADMIN").isEmpty()) {
@@ -60,6 +69,29 @@ public class DataInitializer {
 
                 userRepo.save(admin);
                 log.info("DataInitializer: Default admin user seeded successfully.");
+            }
+
+            // Seed default pages if missing
+            List<Page> defaults = List.of(
+                    Page.builder().slug("about").title("About").content("Tell readers about TuprakNews.").updatedAt(LocalDateTime.now()).build(),
+                    Page.builder().slug("contact").title("Contact").content("Email: hello@tupraknews.example").updatedAt(LocalDateTime.now()).build(),
+                    Page.builder().slug("how-it-works").title("How It Works").content("Explain how TuprakNews works for creators and readers.").updatedAt(LocalDateTime.now()).build(),
+                    Page.builder().slug("faq").title("FAQ").content("Add common questions and answers.").updatedAt(LocalDateTime.now()).build(),
+                    Page.builder().slug("privacy").title("Privacy Policy").content("Describe how user data is handled.").updatedAt(LocalDateTime.now()).build(),
+                    Page.builder().slug("terms").title("Terms of Use").content("Outline acceptable use and responsibilities.").updatedAt(LocalDateTime.now()).build()
+            );
+            defaults.forEach(p -> {
+                if (!pageRepository.existsBySlug(p.getSlug())) {
+                    pageRepository.save(p);
+                }
+            });
+
+            if (socialLinkRepository.count() == 0) {
+                socialLinkRepository.saveAll(List.of(
+                        SocialLink.builder().label("Twitter").url("https://twitter.com/tupraknews").icon("x").build(),
+                        SocialLink.builder().label("Facebook").url("https://facebook.com/tupraknews").icon("f").build(),
+                        SocialLink.builder().label("LinkedIn").url("https://linkedin.com/company/tupraknews").icon("in").build()
+                ));
             }
         };
     }

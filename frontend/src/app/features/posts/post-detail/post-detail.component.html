@@ -1,26 +1,37 @@
-<div class="container mt-4" *ngIf="post; else loadingTpl">
-  <div class="mb-3">
-    <a routerLink="/" class="btn btn-outline-secondary btn-sm">Back</a>
-  </div>
-  <div class="d-flex gap-2 mb-3" *ngIf="isAdmin || isOwner">
-    <a class="btn btn-outline-primary btn-sm" [routerLink]="['/posts', post.id, 'edit']">Edit</a>
-    <button class="btn btn-outline-danger btn-sm" (click)="deletePost()" [disabled]="deleting">
-      {{ deleting ? "Deleting..." : "Delete" }}
-    </button>
-  </div>
-  <h3>{{ post.title }}</h3>
-  <div class="text-muted mb-2">
-    {{ post.categoryName }} | {{ post.authorUsername }}
-  </div>
-  <img *ngIf="post.coverImage" [src]="post.coverImage" class="img-fluid cover-img mb-3" alt="cover" />
-  <p style="white-space: pre-line">{{ post.content }}</p>
-
-  <div *ngIf="post.imageUrls.length">
-    <h6>Gallery</h6>
-    <div class="d-flex flex-wrap gap-2">
-      <img *ngFor="let img of post.imageUrls" [src]="img" class="img-thumbnail gallery-thumb" />
+<div class="post-shell" *ngIf="post; else loadingTpl">
+  <div class="post-header">
+    <button class="btn btn-outline-secondary btn-sm" routerLink="/">Back</button>
+    <div class="post-actions" *ngIf="isAdmin || isOwner">
+      <a class="btn btn-outline-primary btn-sm" [routerLink]="['/posts', post.id, 'edit']">Edit</a>
+      <button class="btn btn-outline-danger btn-sm" (click)="deletePost()" [disabled]="deleting">
+        {{ deleting ? 'Deleting...' : 'Delete' }}
+      </button>
     </div>
   </div>
+
+  <article class="post-card">
+    <h1>{{ post.title }}</h1>
+    <div class="post-meta">
+      <span class="badge bg-light text-dark">{{ post.categoryName }}</span>
+      <span>By {{ post.authorUsername }}</span>
+      <span *ngIf="post.createdAt">{{ post.createdAt | date: 'mediumDate' }}</span>
+    </div>
+
+    <div class="post-cover" *ngIf="post.coverImage">
+      <img [src]="post.coverImage" alt="cover image" />
+    </div>
+
+    <div class="post-body">
+      <p class="post-content">{{ post.content }}</p>
+    </div>
+
+    <div class="post-gallery" *ngIf="post.imageUrls.length">
+      <h5>Gallery</h5>
+      <div class="gallery-grid">
+        <img *ngFor="let img of post.imageUrls" [src]="img" alt="gallery item" />
+      </div>
+    </div>
+  </article>
 </div>
 
 <ng-template #loadingTpl>

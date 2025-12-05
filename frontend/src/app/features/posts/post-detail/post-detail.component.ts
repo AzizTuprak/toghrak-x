@@ -10,6 +10,7 @@ import { User } from '../../../models/user';
 @Component({
   selector: 'app-post-detail',
   templateUrl: './post-detail.component.html',
+  styleUrls: ['./post-detail.component.css'],
 })
 export class PostDetailComponent implements OnInit {
   post?: PostResponse;

@@ -1,0 +1,150 @@
+.bbc-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.bbc-hero {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.hero-left {
+  background: #f5f5f5;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.hero-left img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.hero-left h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 6px 0;
+}
+
+.hero-meta {
+  color: #555;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.hero-desc {
+  font-size: 14px;
+  color: #222;
+}
+
+.hero-center {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+}
+
+.hero-tile {
+  background: #f5f5f5;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hero-tile img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.hero-tile h4 {
+  font-size: 16px;
+  margin: 0;
+  font-weight: 700;
+}
+
+.hero-right {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.side-item {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+  cursor: pointer;
+}
+
+.side-item h5 {
+  font-size: 16px;
+  margin: 0 0 4px;
+}
+
+.side-meta {
+  font-size: 12px;
+  color: #555;
+}
+
+.bbc-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.list-card {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 6px;
+}
+
+.list-thumb img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.list-body h5 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.list-meta {
+  margin: 0 0 6px;
+  color: #666;
+  font-size: 12px;
+}
+
+.list-desc {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #333;
+}
+
+.list-actions {
+  display: flex;
+  gap: 6px;
+}
+
+@media (max-width: 900px) {
+  .bbc-hero {
+    grid-template-columns: 1fr;
+  }
+  .hero-center {
+    grid-template-rows: auto;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hero-left img {
+    height: 200px;
+  }
+}

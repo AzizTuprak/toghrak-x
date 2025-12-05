@@ -11,6 +11,7 @@ import { User } from '../../../models/user';
 @Component({
   selector: 'app-posts-list',
   templateUrl: './posts-list.component.html',
+  styleUrls: ['./posts-list.component.css'],
 })
 export class PostsListComponent implements OnInit {
   page?: Page<PostResponse>;
@@ -22,13 +23,17 @@ export class PostsListComponent implements OnInit {
   currentCategoryId?: number;
 
   constructor(
-    private posts: PostsService,
+    private postsService: PostsService,
     private auth: AuthService,
     private users: UserService,
     private route: ActivatedRoute,
-    private router: Router
+    public router: Router
   ) {
     this.isLoggedIn$ = this.auth.isLoggedIn();
+  }
+
+  get posts(): PostResponse[] {
+    return this.page?.content ?? [];
   }
 
   ngOnInit(): void {
@@ -59,8 +64,8 @@ export class PostsListComponent implements OnInit {
     this.currentCategoryId = categoryId;
     this.loading = true;
     this.error = null;
-    this.posts.list(page, 10, categoryId).subscribe({
-      next: (res) => {
+    this.postsService.list(page, 10, categoryId).subscribe({
+      next: (res: Page<PostResponse>) => {
         this.page = res;
         this.loading = false;
       },

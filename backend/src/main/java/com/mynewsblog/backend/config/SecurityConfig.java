@@ -107,6 +107,21 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("EDITOR","ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/posts/**").hasAnyRole("EDITOR","ADMIN")
 
+                        // Pages
+                        .requestMatchers(HttpMethod.GET, "/api/pages/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/pages/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/pages/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/pages/**").hasRole("ADMIN")
+
+                        // Social links
+                        .requestMatchers(HttpMethod.GET, "/api/social-links/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/social-links/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/social-links/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/social-links/**").hasRole("ADMIN")
+
+                        // Search
+                        .requestMatchers(HttpMethod.GET, "/api/search").permitAll()
+
                         // User profile
                         .requestMatchers("/api/users/me").authenticated()
 

@@ -9,6 +9,11 @@ import { AdminCategoriesComponent } from './features/admin/admin-categories/admi
 import { AuthGuard } from './guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RoleGuard } from './guards/role.guard';
+import { AdminFooterComponent } from './features/admin/admin-footer/admin-footer.component';
+import { PageViewComponent } from './features/static/page-view/page-view.component';
+import { AdminPagesComponent } from './features/admin/admin-pages/admin-pages.component';
+import { AdminSocialLinksComponent } from './features/admin/admin-social-links/admin-social-links.component';
+import { SearchComponent } from './features/static/search/search.component';
 
 const routes: Routes = [
   { path: '', component: PostsListComponent }, //Home
@@ -34,6 +39,26 @@ const routes: Routes = [
     canActivate: [RoleGuard],
     data: { roles: ['ADMIN'] },
   },
+  {
+    path: 'admin/footer',
+    component: AdminFooterComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'admin/pages',
+    component: AdminPagesComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'admin/social-links',
+    component: AdminSocialLinksComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  { path: 'page/:slug', component: PageViewComponent },
+  { path: 'search', component: SearchComponent },
 ];
 
 @NgModule({

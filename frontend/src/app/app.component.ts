@@ -4,6 +4,9 @@ import { Observable, of, switchMap } from 'rxjs';
 import { AuthService } from './service/auth.service';
 import { UserService } from './service/user.service';
 import { CategoriesService } from './service/categories.service';
+import { FooterService, FooterLink } from './service/footer.service';
+import { SocialLinksService } from './service/social-links.service';
+import { SocialLink } from './models/social-link';
 import { User } from './models/user';
 import { Category } from './models/category';
 
@@ -17,11 +20,16 @@ export class AppComponent implements OnInit {
   currentUser?: User;
   isAdmin = false;
   categories: Category[] = [];
+  footerSearch = '';
+  footerLinks: FooterLink[] = [];
+  socialLinks: SocialLink[] = [];
 
   constructor(
     private auth: AuthService,
     private users: UserService,
     private categoriesService: CategoriesService,
+    private footerService: FooterService,
+    private socialLinksService: SocialLinksService,
     private router: Router
   ) {
     this.isLoggedIn$ = this.auth.isLoggedIn();
@@ -48,6 +56,10 @@ export class AppComponent implements OnInit {
 
     this.categoriesService.categories$.subscribe((cats) => (this.categories = cats));
     this.categoriesService.refresh();
+
+    this.footerService.links$.subscribe((links) => (this.footerLinks = links));
+    this.socialLinksService.links$.subscribe((links) => (this.socialLinks = links));
+    this.socialLinksService.load();
   }
 
   logout() {
@@ -63,5 +75,9 @@ export class AppComponent implements OnInit {
     } else {
       this.router.navigate(['/'], { queryParams: { category: id } });
     }
+  }
+
+  goToSearch() {
+    this.router.navigate(['/search'], { queryParams: { q: this.footerSearch || null } });
   }
 }

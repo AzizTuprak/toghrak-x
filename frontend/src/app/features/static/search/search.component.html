@@ -1,0 +1,34 @@
+<div class="container py-4">
+  <h4>Search</h4>
+  <div class="input-group mb-3">
+    <input
+      class="form-control"
+      [(ngModel)]="query"
+      (keyup.enter)="runSearch()"
+      placeholder="Search posts, pages, or socials"
+    />
+    <button class="btn btn-primary" type="button" (click)="runSearch()">Search</button>
+  </div>
+
+  <div *ngIf="loading" class="alert alert-info">Searching...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && !error && !results.length" class="text-muted">No results.</div>
+
+  <div class="list-group" *ngIf="results.length">
+    <a
+      *ngFor="let r of results"
+      class="list-group-item list-group-item-action"
+      [href]="r.type === 'SOCIAL' ? r.url : null"
+      [routerLink]="r.type !== 'SOCIAL' ? r.url : null"
+      [attr.target]="r.type === 'SOCIAL' ? '_blank' : null"
+    >
+      <div class="d-flex justify-content-between">
+        <h6 class="mb-1">{{ r.title }}</h6>
+        <span class="badge bg-secondary">{{ r.type }}</span>
+      </div>
+      <small class="text-muted">{{ r.url }}</small>
+      <p class="mb-1" *ngIf="r.snippet">{{ r.snippet }}</p>
+    </a>
+  </div>
+</div>

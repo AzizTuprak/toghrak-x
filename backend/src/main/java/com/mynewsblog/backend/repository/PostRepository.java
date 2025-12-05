@@ -35,4 +35,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     boolean existsByCategoryId(Long categoryId);
 
     long countByCategoryId(Long categoryId);
+
+    @org.springframework.data.jpa.repository.Query(
+            value = """
+                    SELECT * FROM posts p
+                    WHERE lower(p.title) LIKE lower(concat('%', :term, '%'))
+                       OR lower(p.content) LIKE lower(concat('%', :term, '%'))
+                    ORDER BY p.created_at DESC
+                    LIMIT 10
+                    """,
+            nativeQuery = true)
+    List<Post> searchTop10(@org.springframework.data.repository.query.Param("term") String term);
 }

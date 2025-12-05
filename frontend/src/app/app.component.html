@@ -1,66 +1,64 @@
-<nav class="navbar navbar-expand-lg bg-light">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/">TuprakNews</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" [routerLink]="['/']" [queryParams]="{ category: null }">Home</a>
-        </li>
-        <li class="nav-item" *ngFor="let c of categories">
-          <a
-            class="nav-link"
-            [routerLink]="['/']"
-            [queryParams]="{ category: c.id }"
-          >
-            {{ c.name }}
-          </a>
-        </li>
-      </ul>
-      <div class="d-flex align-items-center gap-2">
-        <ng-container *ngIf="isLoggedIn$ | async; else loggedOut">
-          <a
-            *ngIf="isAdmin"
-            class="btn btn-primary btn-sm"
-            routerLink="/admin/users"
-            >Add / Manage Users</a
-          >
-          <a
-            *ngIf="isAdmin"
-            class="btn btn-outline-primary btn-sm"
-            routerLink="/admin/categories"
-            >Manage Categories</a
-          >
-
-          <a class="btn btn-outline-primary btn-sm" routerLink="/posts/new"
-            >New Post</a
-          >
-          <a class="btn btn-outline-secondary btn-sm" routerLink="/profile"
-            >Profile</a
-          >
-
-          <button class="btn btn-outline-secondary btn-sm" (click)="logout()">
-            Logout
-          </button>
-        </ng-container>
-        <ng-template #loggedOut>
-          <a class="btn btn-primary btn-sm" routerLink="/login">Login</a>
-        </ng-template>
-      </div>
-    </div>
+<header class="app-header">
+  <div class="brand-block text-center">
+    <a class="brand-link" routerLink="/">
+      <img src="assets/tn.png" alt="TuprakNews" class="brand-logo" />
+      TuprakNews
+    </a>
+    <p class="brand-tagline">Stories that matter, in one place.</p>
   </div>
-</nav>
+  <nav class="menu">
+    <div class="menu-links">
+      <a class="menu-item" [routerLink]="['/']" [queryParams]="{ category: null }">Home</a>
+      <a
+        class="menu-item"
+        *ngFor="let c of categories"
+        [routerLink]="['/']"
+        [queryParams]="{ category: c.id }"
+        >{{ c.name }}</a
+      >
+    </div>
+    <div class="menu-actions">
+      <ng-container *ngIf="isLoggedIn$ | async; else loggedOut">
+        <a *ngIf="isAdmin" class="btn btn-primary btn-sm" routerLink="/admin/users">Manage Users</a>
+        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/categories">Manage Categories</a>
+        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/footer">Manage Footer</a>
+        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/pages">Manage Pages</a>
+        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/social-links">Manage Socials</a>
+        <a class="btn btn-outline-primary btn-sm" routerLink="/posts/new">New Post</a>
+        <a class="btn btn-outline-secondary btn-sm" routerLink="/profile">Profile</a>
+        <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
+      </ng-container>
+      <ng-template #loggedOut>
+        <a class="btn btn-primary btn-sm" routerLink="/login">Login</a>
+      </ng-template>
+    </div>
+  </nav>
+</header>
 
 <router-outlet></router-outlet>
 
 <footer class="mt-3">
-  <p class="text-center">&copy; 2025 TuprakNews</p>
+  <div class="footer-shell">
+    <div class="footer-left">
+      <div class="footer-brand">
+        <img src="assets/tn.png" alt="TuprakNews" class="footer-logo-img" />
+        <span class="footer-title">TuprakNews</span>
+      </div>
+      <div class="footer-search">
+        <input type="text" placeholder="Search topics you want" (keyup.enter)="goToSearch()" [(ngModel)]="footerSearch" />
+        <button type="button" (click)="goToSearch()">Search</button>
+      </div>
+      <div class="footer-contact">
+        <div>Contact with us</div>
+        <div class="socials">
+          <a *ngFor="let s of socialLinks" [href]="s.url" target="_blank" rel="noreferrer" [attr.aria-label]="s.label">
+            {{ s.icon || s.label.slice(0, 2) }}
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-links" *ngIf="footerLinks.length">
+      <a *ngFor="let link of footerLinks" [routerLink]="link.route">{{ link.label }}</a>
+    </div>
+  </div>
 </footer>
