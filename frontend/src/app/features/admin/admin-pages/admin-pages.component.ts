@@ -2,15 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { PageService } from '../../../service/page.service';
 import { ContentPage, UpsertContentPageRequest } from '../../../models/content-page';
 
-const DEFAULT_SLUGS = [
-  { slug: 'about', title: 'About' },
-  { slug: 'contact', title: 'Contact' },
-  { slug: 'how-it-works', title: 'How It Works' },
-  { slug: 'faq', title: 'FAQ' },
-  { slug: 'privacy', title: 'Privacy Policy' },
-  { slug: 'terms', title: 'Terms of Use' },
-];
-
 @Component({
   selector: 'app-admin-pages',
   templateUrl: './admin-pages.component.html',
@@ -20,10 +11,11 @@ export class AdminPagesComponent implements OnInit {
   loading = false;
   saving = false;
   error: string | null = null;
+  info: string | null = null;
 
   current: UpsertContentPageRequest = {
-    slug: 'about',
-    title: 'About',
+    slug: '',
+    title: '',
     content: '',
   };
 
@@ -38,6 +30,9 @@ export class AdminPagesComponent implements OnInit {
     this.pageService.list().subscribe({
       next: (pages) => {
         this.pages = pages;
+        if (!this.current.slug && this.pages.length) {
+          this.edit(this.pages[0]);
+        }
         this.loading = false;
       },
       error: () => {
@@ -47,21 +42,40 @@ export class AdminPagesComponent implements OnInit {
     });
   }
 
-  loadSlug(slug: string) {
-    const existing = this.pages.find((p) => p.slug === slug);
-    if (existing) {
-      this.current = { slug: existing.slug, title: existing.title, content: existing.content };
-    } else {
-      const preset = DEFAULT_SLUGS.find((d) => d.slug === slug);
-      this.current = { slug, title: preset?.title || slug, content: '' };
+  edit(page: ContentPage) {
+    this.current = { slug: page.slug, title: page.title, content: page.content };
+    this.info = null;
+    this.error = null;
+  }
+
+  newPage() {
+    this.current = { slug: '', title: '', content: '' };
+    this.info = 'Drafting a new page. Set slug/title/content, then click Save.';
+    this.error = null;
+  }
+
+  onSlugBlur() {
+    if (this.current.slug) {
+      this.current.slug = this.normalizeSlug(this.current.slug);
     }
+  }
+
+  private normalizeSlug(slug: string) {
+    return slug ? slug.trim().toLowerCase().replace(/\s+/g, '-') : '';
   }
 
   save() {
     if (this.saving) return;
+    const normalized = this.normalizeSlug(this.current.slug);
+    if (!normalized || !this.current.title.trim()) {
+      this.error = 'Slug and title are required.';
+      return;
+    }
+    this.current.slug = normalized;
+    this.info = null;
     this.saving = true;
     this.error = null;
-    const exists = this.pages.find((p) => p.slug === this.current.slug);
+    const exists = this.pages.find((p) => p.slug === normalized);
     const req$ = exists
       ? this.pageService.update(exists.slug, this.current)
       : this.pageService.create(this.current);
@@ -69,6 +83,7 @@ export class AdminPagesComponent implements OnInit {
       next: () => {
         this.saving = false;
         this.fetch();
+        this.info = exists ? 'Page updated.' : 'Page created.';
       },
       error: () => {
         this.error = 'Failed to save page.';
@@ -80,12 +95,11 @@ export class AdminPagesComponent implements OnInit {
   remove(slug: string) {
     if (!confirm('Delete this page?')) return;
     this.pageService.delete(slug).subscribe({
-      next: () => this.fetch(),
+      next: () => {
+        this.info = 'Page deleted.';
+        this.fetch();
+      },
       error: () => (this.error = 'Failed to delete page.'),
     });
-  }
-
-  presetSlugs() {
-    return DEFAULT_SLUGS;
   }
 }

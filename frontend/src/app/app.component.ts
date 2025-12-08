@@ -4,11 +4,12 @@ import { Observable, of, switchMap } from 'rxjs';
 import { AuthService } from './service/auth.service';
 import { UserService } from './service/user.service';
 import { CategoriesService } from './service/categories.service';
-import { FooterService, FooterLink } from './service/footer.service';
+import { PageService } from './service/page.service';
 import { SocialLinksService } from './service/social-links.service';
 import { SocialLink } from './models/social-link';
 import { User } from './models/user';
 import { Category } from './models/category';
+import { ContentPage } from './models/content-page';
 
 @Component({
   selector: 'app-root',
@@ -21,14 +22,14 @@ export class AppComponent implements OnInit {
   isAdmin = false;
   categories: Category[] = [];
   footerSearch = '';
-  footerLinks: FooterLink[] = [];
+  footerPages: ContentPage[] = [];
   socialLinks: SocialLink[] = [];
 
   constructor(
     private auth: AuthService,
     private users: UserService,
     private categoriesService: CategoriesService,
-    private footerService: FooterService,
+    private pageService: PageService,
     private socialLinksService: SocialLinksService,
     private router: Router
   ) {
@@ -57,7 +58,8 @@ export class AppComponent implements OnInit {
     this.categoriesService.categories$.subscribe((cats) => (this.categories = cats));
     this.categoriesService.refresh();
 
-    this.footerService.links$.subscribe((links) => (this.footerLinks = links));
+    this.pageService.pages$.subscribe((pages) => (this.footerPages = pages));
+    this.pageService.load();
     this.socialLinksService.links$.subscribe((links) => (this.socialLinks = links));
     this.socialLinksService.load();
   }
@@ -71,9 +73,9 @@ export class AppComponent implements OnInit {
 
   goToCategory(id?: number) {
     if (id === undefined || id === null) {
-      this.router.navigate(['/'], { queryParams: { category: null } });
+      this.router.navigate(['/'], { queryParams: { category: null, page: 0 } });
     } else {
-      this.router.navigate(['/'], { queryParams: { category: id } });
+      this.router.navigate(['/'], { queryParams: { category: id, page: 0 } });
     }
   }
 

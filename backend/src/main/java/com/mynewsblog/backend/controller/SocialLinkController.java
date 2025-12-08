@@ -3,6 +3,7 @@ package com.mynewsblog.backend.controller;
 import com.mynewsblog.backend.dto.SocialLinkDto;
 import com.mynewsblog.backend.model.SocialLink;
 import com.mynewsblog.backend.service.SocialLinkService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,14 +28,14 @@ public class SocialLinkController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SocialLinkDto> create(@RequestBody SocialLinkDto dto) {
+    public ResponseEntity<SocialLinkDto> create(@Valid @RequestBody SocialLinkDto dto) {
         SocialLink created = service.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(created));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SocialLinkDto> update(@PathVariable Long id, @RequestBody SocialLinkDto dto) {
+    public ResponseEntity<SocialLinkDto> update(@PathVariable Long id, @Valid @RequestBody SocialLinkDto dto) {
         SocialLink updated = service.update(id, dto);
         return ResponseEntity.ok(toDto(updated));
     }

@@ -15,7 +15,6 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ProfileComponent } from './features/user/profile/profile.component';
 import { AdminUsersComponent } from './features/user/admin/admin-users/admin-users.component';
 import { AdminCategoriesComponent } from './features/admin/admin-categories/admin-categories.component';
-import { AdminFooterComponent } from './features/admin/admin-footer/admin-footer.component';
 import { PageViewComponent } from './features/static/page-view/page-view.component';
 import { AdminPagesComponent } from './features/admin/admin-pages/admin-pages.component';
 import { AdminSocialLinksComponent } from './features/admin/admin-social-links/admin-social-links.component';
@@ -31,7 +30,6 @@ import { SearchComponent } from './features/static/search/search.component';
     ProfileComponent,
     AdminUsersComponent,
     AdminCategoriesComponent,
-    AdminFooterComponent,
     PageViewComponent,
     AdminPagesComponent,
     AdminSocialLinksComponent,

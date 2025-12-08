@@ -8,12 +8,12 @@
   </div>
   <nav class="menu">
     <div class="menu-links">
-      <a class="menu-item" [routerLink]="['/']" [queryParams]="{ category: null }">Home</a>
+      <a class="menu-item" [routerLink]="['/']" [queryParams]="{ category: null, page: 0 }">Home</a>
       <a
         class="menu-item"
         *ngFor="let c of categories"
         [routerLink]="['/']"
-        [queryParams]="{ category: c.id }"
+        [queryParams]="{ category: c.id, page: 0 }"
         >{{ c.name }}</a
       >
     </div>
@@ -21,7 +21,6 @@
       <ng-container *ngIf="isLoggedIn$ | async; else loggedOut">
         <a *ngIf="isAdmin" class="btn btn-primary btn-sm" routerLink="/admin/users">Manage Users</a>
         <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/categories">Manage Categories</a>
-        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/footer">Manage Footer</a>
         <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/pages">Manage Pages</a>
         <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/social-links">Manage Socials</a>
         <a class="btn btn-outline-primary btn-sm" routerLink="/posts/new">New Post</a>
@@ -57,8 +56,8 @@
         </div>
       </div>
     </div>
-    <div class="footer-links" *ngIf="footerLinks.length">
-      <a *ngFor="let link of footerLinks" [routerLink]="link.route">{{ link.label }}</a>
+    <div class="footer-links" *ngIf="footerPages.length">
+      <a *ngFor="let p of footerPages" [routerLink]="['/page', p.slug]">{{ p.title }}</a>
     </div>
   </div>
 </footer>

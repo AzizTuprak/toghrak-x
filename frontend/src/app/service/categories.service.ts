@@ -13,7 +13,7 @@ export class CategoriesService {
   constructor(private http: HttpClient) {}
 
   list(): Observable<Category[]> {
-    return this.http.get<Category[]>(this.base);
+    return this.http.get<Category[]>(this.base).pipe(tap((cats) => this.categoriesSubject.next(cats)));
   }
 
   get(id: number): Observable<Category> {

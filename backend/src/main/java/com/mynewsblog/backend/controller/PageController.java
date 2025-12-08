@@ -29,7 +29,6 @@ public class PageController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public List<PageResponse> list() {
         return pageService.list().stream().map(this::toResponse).toList();
     }

@@ -27,6 +27,11 @@ export class PostsService {
     return this.http.get<PostResponse>(`${this.base}/${id}`);
   }
 
+  popular(limit = 6): Observable<PostResponse[]> {
+    const params = new HttpParams().set('limit', limit);
+    return this.http.get<PostResponse[]>(`${this.base}/popular`, { params });
+  }
+
   create(payload: CreatePostRequest): Observable<PostResponse> {
     return this.http.post<PostResponse>(this.base, payload);
   }

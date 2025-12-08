@@ -10,6 +10,8 @@ import com.mynewsblog.backend.model.Post;
 import com.mynewsblog.backend.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -117,8 +119,11 @@ public class PostService {
 
     // 4️⃣ Retrieve a single post
     public Post getPost(Long postId) {
-        return postRepository.findById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
+        long currentViews = post.getViewCount() == null ? 0 : post.getViewCount();
+        post.setViewCount(currentViews + 1);
+        return postRepository.save(post);
     }
 
     // 5️⃣ List all posts
@@ -132,6 +137,16 @@ public class PostService {
             return postRepository.findByCategoryId(categoryId, pageable);
         }
         return postRepository.findAll(pageable);
+    }
+
+    public List<Post> getPopular(int limit) {
+        int size = Math.min(Math.max(limit, 1), 20);
+        Pageable p = PageRequest.of(0, size, Sort.by(
+                Sort.Order.desc("viewCount"),
+                Sort.Order.desc("updatedAt"),
+                Sort.Order.desc("createdAt")
+        ));
+        return postRepository.findAll(p).getContent();
     }
 
     // Utility: Check if the user is an admin

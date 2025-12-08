@@ -17,6 +17,9 @@ export class PostsListComponent implements OnInit {
   page?: Page<PostResponse>;
   loading = false;
   error: string | null = null;
+  popular: PostResponse[] = [];
+  popularLoading = false;
+  currentPage = 0;
   isLoggedIn$: Observable<boolean>;
   currentUser?: User;
   isAdmin = false;
@@ -50,9 +53,14 @@ export class PostsListComponent implements OnInit {
     this.route.queryParamMap.subscribe((params) => {
       const categoryIdParam = params.get('category');
       const categoryId = categoryIdParam ? Number(categoryIdParam) : undefined;
+      const pageParam = params.get('page');
+      const pageNum = pageParam ? Number(pageParam) : 0;
       this.currentCategoryId = categoryId;
-      this.load(0, categoryId);
+      this.currentPage = pageNum;
+      this.load(this.currentPage, categoryId);
     });
+
+    this.loadPopular();
   }
 
   canEdit(post: PostResponse): boolean {
@@ -62,6 +70,7 @@ export class PostsListComponent implements OnInit {
 
   load(page: number, categoryId: number | undefined = this.currentCategoryId) {
     this.currentCategoryId = categoryId;
+    this.currentPage = page;
     this.loading = true;
     this.error = null;
     this.postsService.list(page, 10, categoryId).subscribe({
@@ -77,6 +86,32 @@ export class PostsListComponent implements OnInit {
   }
 
   clearCategory() {
-    this.router.navigate([], { relativeTo: this.route, queryParams: { category: null }, queryParamsHandling: 'merge' });
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { category: null, page: 0 },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  goToPage(page: number) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page, category: this.currentCategoryId ?? null },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  private loadPopular() {
+    this.popularLoading = true;
+    this.postsService.popular(6).subscribe({
+      next: (res) => {
+        this.popular = res;
+        this.popularLoading = false;
+      },
+      error: () => {
+        this.popular = [];
+        this.popularLoading = false;
+      },
+    });
   }
 }

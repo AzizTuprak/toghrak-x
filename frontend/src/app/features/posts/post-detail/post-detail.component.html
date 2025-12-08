@@ -18,7 +18,7 @@
     </div>
 
     <div class="post-cover" *ngIf="post.coverImage">
-      <img [src]="post.coverImage" alt="cover image" />
+      <img [src]="post.coverImage" alt="cover image" loading="lazy" />
     </div>
 
     <div class="post-body">
@@ -28,7 +28,7 @@
     <div class="post-gallery" *ngIf="post.imageUrls.length">
       <h5>Gallery</h5>
       <div class="gallery-grid">
-        <img *ngFor="let img of post.imageUrls" [src]="img" alt="gallery item" />
+        <img *ngFor="let img of post.imageUrls" [src]="img" alt="gallery item" loading="lazy" />
       </div>
     </div>
   </article>

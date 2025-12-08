@@ -66,6 +66,15 @@ public class PostController {
         return ResponseEntity.ok(page);
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<java.util.List<PostResponseDTO>> getPopular(
+            @RequestParam(value = "limit", defaultValue = "6") int limit) {
+        var popular = postService.getPopular(limit).stream()
+                .map(this::toPostResponseDTO)
+                .toList();
+        return ResponseEntity.ok(popular);
+    }
+
     // 3) GET single post by ID
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDTO> getPost(@PathVariable Long id) {
@@ -111,6 +120,7 @@ public class PostController {
         dto.setAuthorUsername(post.getAuthor().getUsername());
         dto.setCreatedAt(post.getCreatedAt());
         dto.setUpdatedAt(post.getUpdatedAt());
+        dto.setViewCount(post.getViewCount());
         dto.setImageUrls(
                 post.getImages().stream()
                         .map(PostImage::getImageUrl)

@@ -8,6 +8,7 @@ export interface PostResponse {
   authorUsername: string;
   createdAt: string;
   updatedAt?: string | null;
+  viewCount?: number;
   imageUrls: string[];
 }
 

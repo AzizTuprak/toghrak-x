@@ -1,0 +1,10 @@
+.admin-pages-grid {
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .admin-pages-grid .row {
+    margin: 0;
+  }
+}

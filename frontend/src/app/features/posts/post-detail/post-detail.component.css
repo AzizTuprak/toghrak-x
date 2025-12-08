@@ -81,4 +81,40 @@
     align-items: flex-start;
     gap: 8px;
   }
+  .post-card {
+    padding: 12px;
+  }
+  .post-card h1 {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .post-meta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .post-body {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 540px) {
+  .post-shell {
+    padding: 0 12px 20px;
+  }
+  .post-card {
+    padding: 10px;
+  }
+  .post-card h1 {
+    font-size: 20px;
+  }
+  .post-cover img {
+    max-height: 260px;
+  }
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
 }

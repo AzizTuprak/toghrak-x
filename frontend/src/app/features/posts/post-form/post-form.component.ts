@@ -80,9 +80,14 @@ export class PostFormComponent implements OnInit {
   }
 
   submit() {
-    if (this.form.invalid || this.saving) return;
-    this.saving = true;
+    if (this.saving) return;
     this.error = null;
+    if (this.form.invalid) {
+      this.error = 'Please fill in title, content, and choose a category.';
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.saving = true;
 
     const payload = {
       ...(this.form.value as any),

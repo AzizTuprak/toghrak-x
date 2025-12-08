@@ -2,31 +2,29 @@
   <h4>Manage Pages</h4>
   <div *ngIf="loading" class="alert alert-info">Loading...</div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="info" class="alert alert-secondary">{{ info }}</div>
 
-  <div class="row g-3 align-items-end">
+  <div class="row g-3 align-items-end admin-pages-grid">
     <div class="col-sm-4">
       <label class="form-label">Slug</label>
-      <select class="form-select" [(ngModel)]="current.slug" (change)="loadSlug(current.slug)">
-        <option *ngFor="let preset of presetSlugs()" [ngValue]="preset.slug">{{ preset.title }} ({{ preset.slug }})</option>
-        <option disabled>────────</option>
-        <option *ngFor="let p of pages" [ngValue]="p.slug">Existing: {{ p.slug }}</option>
-      </select>
+      <input class="form-control" [(ngModel)]="current.slug" (blur)="onSlugBlur()" placeholder="e.g. about-us" />
+      <small class="text-muted">Lowercase, hyphen-separated. This becomes the URL.</small>
     </div>
     <div class="col-sm-4">
       <label class="form-label">Title</label>
-      <input class="form-control" [(ngModel)]="current.title" />
+      <input class="form-control" [(ngModel)]="current.title" placeholder="Page title" />
     </div>
     <div class="col-sm-4 d-flex gap-2">
-      <button class="btn btn-success" type="button" (click)="save()" [disabled]="saving">
+      <button class="btn btn-success" type="button" (click)="save()" [disabled]="saving || !current.slug || !current.title">
         {{ saving ? 'Saving...' : 'Save' }}
       </button>
-      <button class="btn btn-outline-secondary" type="button" (click)="loadSlug(current.slug)">Reload</button>
+      <button class="btn btn-outline-secondary" type="button" (click)="newPage()">New page</button>
     </div>
   </div>
 
   <div class="mt-3">
     <label class="form-label">Content</label>
-    <textarea class="form-control" rows="10" [(ngModel)]="current.content"></textarea>
+    <textarea class="form-control" rows="10" [(ngModel)]="current.content" placeholder="Page content"></textarea>
   </div>
 
   <div class="mt-3">
@@ -35,7 +33,7 @@
       <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let p of pages">
         <span>{{ p.title }} ({{ p.slug }})</span>
         <div class="d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm" type="button" (click)="loadSlug(p.slug)">Edit</button>
+          <button class="btn btn-outline-primary btn-sm" type="button" (click)="edit(p)">Edit</button>
           <button class="btn btn-outline-danger btn-sm" type="button" (click)="remove(p.slug)">Delete</button>
         </div>
       </li>

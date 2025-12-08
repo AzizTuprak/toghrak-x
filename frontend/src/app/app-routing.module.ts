@@ -9,7 +9,6 @@ import { AdminCategoriesComponent } from './features/admin/admin-categories/admi
 import { AuthGuard } from './guards/auth.guard';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RoleGuard } from './guards/role.guard';
-import { AdminFooterComponent } from './features/admin/admin-footer/admin-footer.component';
 import { PageViewComponent } from './features/static/page-view/page-view.component';
 import { AdminPagesComponent } from './features/admin/admin-pages/admin-pages.component';
 import { AdminSocialLinksComponent } from './features/admin/admin-social-links/admin-social-links.component';
@@ -40,12 +39,6 @@ const routes: Routes = [
     data: { roles: ['ADMIN'] },
   },
   {
-    path: 'admin/footer',
-    component: AdminFooterComponent,
-    canActivate: [RoleGuard],
-    data: { roles: ['ADMIN'] },
-  },
-  {
     path: 'admin/pages',
     component: AdminPagesComponent,
     canActivate: [RoleGuard],
@@ -62,7 +55,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { onSameUrlNavigation: 'reload' })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

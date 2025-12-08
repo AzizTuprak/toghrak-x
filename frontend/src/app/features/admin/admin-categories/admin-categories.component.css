@@ -1,0 +1,10 @@
+.admin-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .admin-table-wrap table {
+    min-width: 520px;
+  }
+}

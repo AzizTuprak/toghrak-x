@@ -10,6 +10,7 @@ export class AdminSocialLinksComponent implements OnInit {
   links: SocialLink[] = [];
   saving = false;
   error: string | null = null;
+  info: string | null = null;
 
   constructor(private socialLinks: SocialLinksService) {}
 
@@ -28,12 +29,16 @@ export class AdminSocialLinksComponent implements OnInit {
       return;
     }
     this.error = null;
+    this.info = null;
     this.saving = true;
     const req$ = link.id
       ? this.socialLinks.update(link.id, link)
       : this.socialLinks.create(link);
     req$.subscribe({
-      next: () => (this.saving = false),
+      next: () => {
+        this.saving = false;
+        this.info = 'Link saved.';
+      },
       error: () => {
         this.error = 'Failed to save link.';
         this.saving = false;
@@ -42,11 +47,15 @@ export class AdminSocialLinksComponent implements OnInit {
   }
 
   remove(link: SocialLink) {
+    this.info = null;
+    this.error = null;
+    if (!confirm('Delete this link?')) return;
     if (!link.id) {
       this.links = this.links.filter((l) => l !== link);
       return;
     }
     this.socialLinks.delete(link.id).subscribe({
+      next: () => (this.info = 'Link deleted.'),
       error: () => (this.error = 'Failed to delete link.'),
     });
   }

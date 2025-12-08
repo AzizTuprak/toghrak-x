@@ -1,3 +1,12 @@
 .social-table input {
   width: 100%;
 }
+
+@media (max-width: 768px) {
+  .social-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+

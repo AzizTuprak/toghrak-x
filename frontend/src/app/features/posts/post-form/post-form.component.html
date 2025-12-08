@@ -8,10 +8,16 @@
     <div class="mb-3">
       <label class="form-label">Title</label>
       <input class="form-control" formControlName="title" />
+      <div class="text-danger small" *ngIf="form.controls.title.invalid && form.controls.title.touched">
+        Title is required.
+      </div>
     </div>
     <div class="mb-3">
       <label class="form-label">Content</label>
       <textarea class="form-control" rows="8" formControlName="content"></textarea>
+      <div class="text-danger small" *ngIf="form.controls.content.invalid && form.controls.content.touched">
+        Content is required.
+      </div>
     </div>
     <div class="mb-3">
       <label class="form-label">Category</label>
@@ -21,6 +27,9 @@
           {{ c.name }}
         </option>
       </select>
+      <div class="text-danger small" *ngIf="form.controls.categoryId.invalid && form.controls.categoryId.touched">
+        Please choose a category.
+      </div>
     </div>
     <div class="mb-3">
       <label class="form-label">Cover Image URL</label>

@@ -11,6 +11,7 @@ export class AdminCategoriesComponent implements OnInit {
   loading = false;
   saving = false;
   error: string | null = null;
+  info: string | null = null;
 
   form: { name: string; description: string } = {
     name: '',
@@ -29,6 +30,7 @@ export class AdminCategoriesComponent implements OnInit {
     this.categoriesService.list().subscribe({
       next: (cats) => {
         this.categories = cats;
+        this.categoriesService.refresh();
         this.loading = false;
       },
       error: () => {
@@ -42,12 +44,14 @@ export class AdminCategoriesComponent implements OnInit {
     if (this.saving || !this.form.name.trim()) return;
     this.saving = true;
     this.error = null;
+    this.info = null;
     const payload = {
       name: this.form.name.trim(),
       description: this.form.description.trim(),
     };
 
-    const request$ = this.editingId
+    const isEditing = this.editingId !== null;
+    const request$ = isEditing && this.editingId !== null
       ? this.categoriesService.update(this.editingId, payload)
       : this.categoriesService.create(payload);
 
@@ -58,6 +62,7 @@ export class AdminCategoriesComponent implements OnInit {
         this.fetch();
         this.categoriesService.refresh();
         this.saving = false;
+        this.info = isEditing ? 'Category updated.' : 'Category created.';
       },
       error: () => {
         this.error = this.editingId ? 'Failed to update category.' : 'Failed to create category.';
@@ -68,10 +73,13 @@ export class AdminCategoriesComponent implements OnInit {
 
   remove(id: number) {
     if (!confirm('Delete this category?')) return;
+    this.error = null;
+    this.info = null;
     this.categoriesService.delete(id).subscribe({
       next: () => {
         this.fetch();
         this.categoriesService.refresh();
+        this.info = 'Category deleted.';
       },
       error: (err) => {
         // surface backend message (e.g., if posts still exist)

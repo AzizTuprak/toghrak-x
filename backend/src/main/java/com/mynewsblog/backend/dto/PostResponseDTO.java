@@ -18,6 +18,7 @@ public class PostResponseDTO {
     private String authorUsername;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long viewCount;
     private List<String> imageUrls;
     // ... any other fields you want to expose
 }

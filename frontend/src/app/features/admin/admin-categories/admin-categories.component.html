@@ -2,6 +2,7 @@
   <h4>Categories</h4>
   <div *ngIf="loading" class="alert alert-info">Loading...</div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="info" class="alert alert-success">{{ info }}</div>
 
   <form class="row g-2 mb-3" (ngSubmit)="save()">
     <div class="col-sm-4">
@@ -33,25 +34,27 @@
     </div>
   </form>
 
-  <table class="table table-sm align-middle">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th style="width: 140px"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let c of categories">
-        <td>{{ c.name }}</td>
-        <td>{{ c.description }}</td>
-        <td>
-          <div class="d-flex gap-1">
-            <button class="btn btn-outline-secondary btn-sm" (click)="startEdit(c)">Edit</button>
-            <button class="btn btn-outline-danger btn-sm" (click)="remove(c.id)">Delete</button>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="admin-table-wrap">
+    <table class="table table-sm align-middle">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th style="width: 140px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of categories">
+          <td>{{ c.name }}</td>
+          <td>{{ c.description }}</td>
+          <td>
+            <div class="d-flex gap-1">
+              <button class="btn btn-outline-secondary btn-sm" (click)="startEdit(c)">Edit</button>
+              <button class="btn btn-outline-danger btn-sm" (click)="remove(c.id)">Delete</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
