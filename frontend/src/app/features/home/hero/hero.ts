@@ -1,10 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'nb-hero',
-  imports: [RouterLink],
+  imports: [CommonModule, RouterLink],
   template: `
     <section class="hero" *ngIf="image">
       <img [src]="image" alt="" />

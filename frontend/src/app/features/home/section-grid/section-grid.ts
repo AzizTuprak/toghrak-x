@@ -1,10 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'nb-section-grid',
-  imports: [RouterLink],
+  imports: [CommonModule, RouterLink],
   template: `
     <h3 class="section-title">{{ title }}</h3>
     <div class="grid">

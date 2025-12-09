@@ -1,10 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'nb-featured-list',
-  imports: [RouterLink],
+  imports: [CommonModule, RouterLink],
   template: `
     <ul class="featured">
       <li *ngFor="let f of items">
