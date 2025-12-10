@@ -30,6 +30,12 @@ public class Page {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @ElementCollection
+    @CollectionTable(name = "page_images", joinColumns = @JoinColumn(name = "page_id"))
+    @Column(name = "image_url")
+    @Builder.Default
+    private java.util.List<String> images = new java.util.ArrayList<>();
+
     private LocalDateTime updatedAt;
 
     @PrePersist

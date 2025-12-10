@@ -1,11 +1,27 @@
-<div class="container py-4">
+<div class="page-shell">
   <div *ngIf="loading" class="alert alert-info">Loading...</div>
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
   <ng-container *ngIf="page && !loading">
-    <h3>{{ page.title }}</h3>
-    <div class="text-muted small mb-3" *ngIf="page.updatedAt">
-      Updated: {{ page.updatedAt | date: 'medium' }}
-    </div>
-    <div class="page-content">{{ page.content }}</div>
+    <section class="page-hero">
+      <div class="hero-image" *ngIf="page.images as imgs">
+        <img [src]="imgs[0]" alt="Page hero image" loading="lazy" />
+      </div>
+      <div class="hero-copy">
+        <div class="accent"></div>
+        <h1 class="page-title">{{ page.title }}</h1>
+        <div class="page-meta" *ngIf="page.updatedAt">Updated: {{ page.updatedAt | date: 'mediumDate' }}</div>
+        <div class="page-content">{{ page.content }}</div>
+      </div>
+    </section>
+
+    <section class="page-gallery" *ngIf="page.images as imgs">
+      <ng-container *ngIf="imgs.length > 1">
+        <div class="gallery-header">Gallery</div>
+        <div class="page-gallery-grid">
+          <img *ngFor="let img of imgs.slice(1)" [src]="img" alt="Page gallery image" loading="lazy" />
+        </div>
+      </ng-container>
+    </section>
   </ng-container>
 </div>

@@ -61,6 +61,7 @@ public class PageController {
         res.setTitle(page.getTitle());
         res.setContent(page.getContent());
         res.setUpdatedAt(page.getUpdatedAt());
+        res.setImages(page.getImages());
         return res;
     }
 }

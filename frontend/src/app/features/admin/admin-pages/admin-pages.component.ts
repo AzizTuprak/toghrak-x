@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PageService } from '../../../service/page.service';
+import { ImagesService } from '../../../service/images.service';
 import { ContentPage, UpsertContentPageRequest } from '../../../models/content-page';
 
 @Component({
@@ -17,9 +18,12 @@ export class AdminPagesComponent implements OnInit {
     slug: '',
     title: '',
     content: '',
+    images: [],
   };
+  uploadError: string | null = null;
+  uploading = false;
 
-  constructor(private pageService: PageService) {}
+  constructor(private pageService: PageService, private imagesService: ImagesService) {}
 
   ngOnInit(): void {
     this.fetch();
@@ -43,13 +47,13 @@ export class AdminPagesComponent implements OnInit {
   }
 
   edit(page: ContentPage) {
-    this.current = { slug: page.slug, title: page.title, content: page.content };
+    this.current = { slug: page.slug, title: page.title, content: page.content, images: page.images || [] };
     this.info = null;
     this.error = null;
   }
 
   newPage() {
-    this.current = { slug: '', title: '', content: '' };
+    this.current = { slug: '', title: '', content: '', images: [] };
     this.info = 'Drafting a new page. Set slug/title/content, then click Save.';
     this.error = null;
   }
@@ -100,6 +104,37 @@ export class AdminPagesComponent implements OnInit {
         this.fetch();
       },
       error: () => (this.error = 'Failed to delete page.'),
+    });
+  }
+
+  addImageUrl(url: string) {
+    if (!url) return;
+    const trimmed = url.trim();
+    if (!trimmed) return;
+    const images = this.current.images || [];
+    this.current = { ...this.current, images: [...images, trimmed] };
+  }
+
+  removeImage(url: string) {
+    const images = (this.current.images || []).filter((u) => u !== url);
+    this.current = { ...this.current, images };
+  }
+
+  onImageFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    this.uploadError = null;
+    this.uploading = true;
+    this.imagesService.upload(file).subscribe({
+      next: (resp) => {
+        this.addImageUrl(resp.imageUrl);
+        this.uploading = false;
+      },
+      error: () => {
+        this.uploadError = 'Upload failed.';
+        this.uploading = false;
+      },
     });
   }
 }
