@@ -1,27 +1,56 @@
 # TuprakNews
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.3.
+Full-stack news/blog platform with categories, posts, pages, footer links, and admin workflows.
+Stack: Angular (frontend) + Spring Boot (backend) + PostgreSQL + JWT.
 
-## Development server
+## Features
+- Public: browse posts by recency/popularity/category, view post detail with images, static pages (About/Contact/FAQ/Terms/Privacy) with galleries, footer links & social links, responsive UI.
+- Auth: JWT login.
+- Admin: manage posts (with images/categories), categories (CRUD + navbar updates), static pages (CRUD + gallery images), footer links, social links, users/roles.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Tech
+- Frontend: Angular, RxJS, Angular Router, Bootstrap styles, custom CSS/SCSS.
+- Backend: Spring Boot 3, Spring Security (JWT), Spring Data JPA, Hibernate, PostgreSQL.
+- Extras: Simple rate limiter on public endpoints, server-side HTML escaping for page content, image upload endpoint for galleries.
 
-## Code scaffolding
+## Prerequisites
+- Node 18+ / npm, Angular CLI
+- Java 21, Maven 3.9+
+- PostgreSQL 14+ (or compatible)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Backend setup
+1) Create a PostgreSQL DB/user.
+2) Set `backend/src/main/resources/application.properties`:
 
-## Build
+spring.datasource.url=jdbc:postgresql://localhost:5432/tupraknews
+spring.datasource.username=YOUR_DB_USER
+spring.datasource.password=YOUR_DB_PASS
+app.jwt.secret=CHANGE_ME
+app.jwt.expiration=3600000
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+3) Run: `cd backend && mvn clean package -DskipTests && mvn spring-boot:run`
+4) Swagger: http://localhost:8080/swagger-ui/index.html
 
-## Running unit tests
+## Frontend setup
+1) `cd frontend && npm install`
+2) Dev: `ng serve --open` (expects backend at http://localhost:8080; change in `src/environments/environment.ts` if needed)
+3) Prod build: `ng build`
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Local run
+- Backend: `mvn spring-boot:run` (8080)
+- Frontend: `ng serve` (4200)
 
-## Running end-to-end tests
+## Deployment notes
+- Set `app.jwt.secret` securely.
+- Adjust CORS in SecurityConfig if hosting frontend separately.
+- Configure image storage/CDN for uploads.
+- Consider adding Flyway/Liquibase migrations in production.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Scripts
+- Backend tests: `mvn test`
+- Frontend lint: `ng lint`
+- Frontend tests: `ng test`
 
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Troubleshooting
+- “Unused file” warnings in Angular are cosmetic; exclude in tsconfig if desired.
+- If you see schema errors, add DB migrations or align DB with JPA entities.
