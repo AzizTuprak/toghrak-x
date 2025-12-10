@@ -1,4 +1,4 @@
-﻿<div class="bbc-container">
+<div class="bbc-container">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <a *ngIf="isLoggedIn$ | async" class="btn btn-primary btn-sm" routerLink="/posts/new">New Post</a>
   </div>
@@ -59,7 +59,9 @@
               </p>
               <div class="list-actions">
                 <a class="btn btn-sm btn-outline-primary" [routerLink]="['/posts', p.id]">Read</a>
-                <a *ngIf="canEdit(p)" class="btn btn-sm btn-outline-secondary" [routerLink]="['/posts', p.id, 'edit']">Edit</a>
+                <a *ngIf="canEdit(p)" class="btn btn-sm btn-outline-secondary" [routerLink]="['/posts', p.id, 'edit']">
+                  Edit
+                </a>
               </div>
             </div>
           </div>
@@ -68,7 +70,7 @@
         <nav *ngIf="page" class="mt-3">
           <ul class="pagination">
             <li class="page-item" [class.disabled]="page.first">
-              <button class="page-link" (click)="goToPage(page.number - 1)" [disabled]="page.first">
+              <button class="page-link" aria-label="Previous page" (click)="goToPage(page.number - 1)" [disabled]="page.first">
                 Prev
               </button>
             </li>
@@ -76,7 +78,7 @@
               <span class="page-link">Page {{ page.number + 1 }} of {{ page.totalPages }}</span>
             </li>
             <li class="page-item" [class.disabled]="page.last">
-              <button class="page-link" (click)="goToPage(page.number + 1)" [disabled]="page.last">
+              <button class="page-link" aria-label="Next page" (click)="goToPage(page.number + 1)" [disabled]="page.last">
                 Next
               </button>
             </li>
@@ -106,4 +108,3 @@
     </div>
   </ng-container>
 </div>
-

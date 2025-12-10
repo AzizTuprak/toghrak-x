@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.util.HtmlUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,7 +44,7 @@ public class PostService {
 
         Post post = Post.builder()
                 .title(title)
-                .content(content)
+                .content(sanitize(content))
                 .author(author)
                 .category(category)
                 .coverImage(coverImage)
@@ -77,7 +78,7 @@ public class PostService {
             post.setTitle(newTitle);
         }
         if (newContent != null && !newContent.isBlank()) {
-            post.setContent(newContent);
+            post.setContent(sanitize(newContent));
         }
         if (newCategoryId != null) {
             Category category = categoryRepository.findById(newCategoryId)
@@ -170,5 +171,9 @@ public class PostService {
                     .build());
         }
         post.getImages().addAll(newImages);
+    }
+
+    private String sanitize(String html) {
+        return html == null ? "" : HtmlUtils.htmlEscape(html);
     }
 }

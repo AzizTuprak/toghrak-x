@@ -1,9 +1,9 @@
 <div class="post-shell" *ngIf="post; else loadingTpl">
   <div class="post-header">
-    <button class="btn btn-outline-secondary btn-sm" routerLink="/">Back</button>
+    <button class="btn btn-outline-secondary btn-sm" routerLink="/" aria-label="Back to home">Back</button>
     <div class="post-actions" *ngIf="isAdmin || isOwner">
-      <a class="btn btn-outline-primary btn-sm" [routerLink]="['/posts', post.id, 'edit']">Edit</a>
-      <button class="btn btn-outline-danger btn-sm" (click)="deletePost()" [disabled]="deleting">
+      <a class="btn btn-outline-primary btn-sm" [routerLink]="['/posts', post.id, 'edit']" aria-label="Edit post">Edit</a>
+      <button class="btn btn-outline-danger btn-sm" (click)="deletePost()" [disabled]="deleting" aria-label="Delete post">
         {{ deleting ? 'Deleting...' : 'Delete' }}
       </button>
     </div>

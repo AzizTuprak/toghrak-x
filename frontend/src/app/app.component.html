@@ -44,8 +44,8 @@
         <span class="footer-title">TuprakNews</span>
       </div>
       <div class="footer-search">
-        <input type="text" placeholder="Search topics you want" (keyup.enter)="goToSearch()" [(ngModel)]="footerSearch" />
-        <button type="button" (click)="goToSearch()">Search</button>
+        <input type="text" aria-label="Search topics" placeholder="Search topics you want" (keyup.enter)="goToSearch()" [(ngModel)]="footerSearch" />
+        <button type="button" (click)="goToSearch()" aria-label="Run search">Search</button>
       </div>
       <div class="footer-contact">
         <div>Contact with us</div>
