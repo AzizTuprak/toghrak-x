@@ -94,11 +94,11 @@ export class AppComponent implements OnInit {
     this.router.navigateByUrl('/'); // go to home
   }
 
-  goToCategory(id?: number) {
-    if (id === undefined || id === null) {
-      this.router.navigate(['/'], { queryParams: { category: null, page: 0 } });
+  goToCategory(cat?: Category) {
+    if (!cat) {
+      this.router.navigate(['/'], { queryParams: { page: 0 } });
     } else {
-      this.router.navigate(['/'], { queryParams: { category: id, page: 0 } });
+      this.router.navigate(['/', cat.slug], { queryParams: { page: 0 } });
     }
   }
 

@@ -8,12 +8,12 @@
   </div>
   <nav class="menu">
     <div class="menu-links">
-      <a class="menu-item" [routerLink]="['/']" [queryParams]="{ category: null, page: 0 }">Home</a>
+      <a class="menu-item" [routerLink]="['/']" [queryParams]="{ page: 0 }">Home</a>
       <a
         class="menu-item"
         *ngFor="let c of categories"
-        [routerLink]="['/']"
-        [queryParams]="{ category: c.id, page: 0 }"
+        [routerLink]="['/', c.slug]"
+        [queryParams]="{ page: 0 }"
         >{{ c.name }}</a
       >
     </div>

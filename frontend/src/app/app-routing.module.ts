@@ -57,8 +57,12 @@ const routes: Routes = [
     canActivate: [RoleGuard],
     data: { roles: ['ADMIN'] },
   },
+  { path: 'home', redirectTo: '', pathMatch: 'full' },
   { path: 'page/:slug', component: PageViewComponent },
   { path: 'search', component: SearchComponent },
+  // Category slug route (e.g., /events)
+  { path: ':slug', component: PostsListComponent },
+  { path: '**', redirectTo: '', pathMatch: 'full' },
 ];
 
 @NgModule({

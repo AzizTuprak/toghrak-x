@@ -25,6 +25,9 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;  // e.g. "Events", "Problems", etc.
 
+    @Column(unique = true, length = 150)
+    private String slug;
+
     // Optional description for the category
     private String description;
 

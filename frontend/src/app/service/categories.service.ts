@@ -20,6 +20,10 @@ export class CategoriesService {
     return this.http.get<Category>(`${this.base}/${id}`);
   }
 
+  getBySlug(slug: string): Observable<Category> {
+    return this.http.get<Category>(`${this.base}/slug/${slug}`);
+  }
+
   refresh(): void {
     this.list().subscribe({
       next: (cats) => this.categoriesSubject.next(cats),

@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap, combineLatest } from 'rxjs';
 import { PostsService } from '../../../service/posts.service';
 import { AuthService } from '../../../service/auth.service';
 import { UserService } from '../../../service/user.service';
 import { PostResponse } from '../../../models/post';
 import { Page } from '../../../models/page';
 import { User } from '../../../models/user';
+import { CategoriesService } from '../../../service/categories.service';
+import { Category } from '../../../models/category';
 
 @Component({
   selector: 'app-posts-list',
@@ -24,11 +26,13 @@ export class PostsListComponent implements OnInit {
   currentUser?: User;
   isAdmin = false;
   currentCategoryId?: number;
+  currentCategorySlug?: string | null;
 
   constructor(
     private postsService: PostsService,
     private auth: AuthService,
     private users: UserService,
+    private categoriesService: CategoriesService,
     private route: ActivatedRoute,
     public router: Router
   ) {
@@ -49,16 +53,25 @@ export class PostsListComponent implements OnInit {
         this.isAdmin = user?.roleName === 'ADMIN';
       });
 
-    // react to category filter in query params
-    this.route.queryParamMap.subscribe((params) => {
-      const categoryIdParam = params.get('category');
-      const categoryId = categoryIdParam ? Number(categoryIdParam) : undefined;
-      const pageParam = params.get('page');
-      const pageNum = pageParam ? Number(pageParam) : 0;
-      this.currentCategoryId = categoryId;
-      this.currentPage = pageNum;
-      this.load(this.currentPage, categoryId);
-    });
+    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(
+      ([params, q]) => {
+        const slug = params.get('slug');
+        const pageParam = q.get('page');
+        const pageNum = pageParam ? Number(pageParam) : 0;
+
+        if (slug) {
+          this.currentCategorySlug = slug;
+          this.resolveCategoryBySlug(slug, pageNum);
+        } else {
+          const categoryIdParam = q.get('category');
+          const categoryId = categoryIdParam ? Number(categoryIdParam) : undefined;
+          this.currentCategorySlug = null;
+          this.currentCategoryId = categoryId;
+          this.currentPage = pageNum;
+          this.load(this.currentPage, categoryId);
+        }
+      }
+    );
 
     this.loadPopular();
   }
@@ -86,19 +99,21 @@ export class PostsListComponent implements OnInit {
   }
 
   clearCategory() {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { category: null, page: 0 },
-      queryParamsHandling: 'merge',
-    });
+    this.router.navigate(['/'], { queryParams: { page: 0 } });
   }
 
   goToPage(page: number) {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { page, category: this.currentCategoryId ?? null },
-      queryParamsHandling: 'merge',
-    });
+    if (this.currentCategorySlug) {
+      this.router.navigate(['/', this.currentCategorySlug], {
+        queryParams: { page },
+      });
+    } else {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { page, category: this.currentCategoryId ?? null },
+        queryParamsHandling: 'merge',
+      });
+    }
   }
 
   private loadPopular() {
@@ -111,6 +126,22 @@ export class PostsListComponent implements OnInit {
       error: () => {
         this.popular = [];
         this.popularLoading = false;
+      },
+    });
+  }
+
+  private resolveCategoryBySlug(slug: string, pageNum: number) {
+    this.categoriesService.getBySlug(slug).subscribe({
+      next: (cat: Category) => {
+        this.currentCategoryId = cat.id;
+        this.currentPage = pageNum;
+        this.load(pageNum, cat.id);
+      },
+      error: () => {
+        this.error = null;
+        this.page = undefined;
+        // Unknown slug: fall back to home with no filter
+        this.router.navigate(['/'], { queryParams: { page: 0 } });
       },
     });
   }

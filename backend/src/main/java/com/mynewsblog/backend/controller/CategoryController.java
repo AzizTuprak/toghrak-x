@@ -34,6 +34,13 @@ public class CategoryController {
         return ResponseEntity.ok(responses);
     }
 
+    // GET by slug (public)
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<CategoryResponse> getCategoryBySlug(@PathVariable String slug) {
+        Category category = categoryService.getCategoryBySlug(slug);
+        return ResponseEntity.ok(mapToResponse(category));
+    }
+
     // GET a single category by ID (public)
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
@@ -71,6 +78,7 @@ public class CategoryController {
         CategoryResponse response = new CategoryResponse();
         response.setId(category.getId());
         response.setName(category.getName());
+        response.setSlug(category.getSlug());
         response.setDescription(category.getDescription());
         return response;
     }

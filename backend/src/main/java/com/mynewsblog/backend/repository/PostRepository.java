@@ -5,7 +5,6 @@ import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.model.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.NonNull;
 
@@ -22,10 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // This method leverages property path navigation (author.id)
     List<Post> findByAuthorId(Long authorId);
 
-    @EntityGraph(attributePaths = { "author", "category", "images" })
     @NonNull Page<Post> findAll(@NonNull Pageable pageable);
 
-    @EntityGraph(attributePaths = { "author", "category", "images" })
     @NonNull Page<Post> findByCategoryId(Long categoryId, @NonNull Pageable pageable);
 
     boolean existsByAuthorId(Long authorId);
