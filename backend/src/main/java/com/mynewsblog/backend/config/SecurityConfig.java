@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod; // <-- Important for requestMatchers with methods
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,10 +34,14 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     @SuppressWarnings("unused")
     private final UserDetailsServiceImpl userDetailsService;
+    private final boolean swaggerPublic;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, UserDetailsServiceImpl userDetailsService) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          UserDetailsServiceImpl userDetailsService,
+                          @org.springframework.beans.factory.annotation.Value("${app.security.swagger-public:true}") boolean swaggerPublic) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
+        this.swaggerPublic = swaggerPublic;
     }
 
     /**
@@ -45,14 +50,17 @@ public class SecurityConfig {
      */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(
-                // OpenAPI/Swagger endpoints
-                "/swagger-ui.html",
-                "/swagger-ui/**",
-                "/v3/api-docs",
-                "/v3/api-docs/**",
-                "/v3/api-docs/swagger-config"
-        );
+        return (web) -> {
+            if (swaggerPublic) {
+                web.ignoring().requestMatchers(
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/v3/api-docs/swagger-config"
+                );
+            }
+        };
     }
 
     @Bean
@@ -77,7 +85,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(restAuthenticationEntryPoint())
                         .accessDeniedHandler(restAccessDeniedHandler())
                 )
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(registry -> registry
 
                         // Static resources ((common locations) css, js, images, webjars, favicon, etc.)
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
@@ -90,7 +98,9 @@ public class SecurityConfig {
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",
                                 "/v3/api-docs/swagger-config"
-                        ).permitAll()
+                        ).access((authentication, ctx) -> new AuthorizationDecision(
+                                swaggerPublic || authentication.get().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
+                        ))
 
 
                         // Authentication endpoints
