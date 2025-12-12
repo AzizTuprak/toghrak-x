@@ -1,10 +1,10 @@
 <header class="app-header">
   <div class="brand-block text-center">
     <a class="brand-link" routerLink="/">
-      <img src="assets/tn.png" alt="TuprakNews" class="brand-logo" />
-      TuprakNews
+      <img [src]="brandLogo" [alt]="brandTitle" class="brand-logo" />
+      {{ brandTitle }}
     </a>
-    <p class="brand-tagline">Stories that matter, in one place.</p>
+    <p class="brand-tagline">{{ brandTagline }}</p>
   </div>
   <nav class="menu">
     <div class="menu-links">
@@ -23,12 +23,13 @@
         <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/categories">Manage Categories</a>
         <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/pages">Manage Pages</a>
         <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/social-links">Manage Socials</a>
+        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/branding">Manage Branding</a>
         <a class="btn btn-outline-primary btn-sm" routerLink="/posts/new">New Post</a>
         <a class="btn btn-outline-secondary btn-sm" routerLink="/profile">Profile</a>
         <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
       </ng-container>
       <ng-template #loggedOut>
-        <a class="btn btn-primary btn-sm" routerLink="/login">Login</a>
+        <!-- Login available via direct URL (/login); hidden from public header -->
       </ng-template>
     </div>
   </nav>
@@ -40,8 +41,8 @@
   <div class="footer-shell">
     <div class="footer-left">
       <div class="footer-brand">
-        <img src="assets/tn.png" alt="TuprakNews" class="footer-logo-img" />
-        <span class="footer-title">TuprakNews</span>
+        <img [src]="brandLogo" [alt]="brandTitle" class="footer-logo-img" />
+        <span class="footer-title">{{ brandTitle }}</span>
       </div>
       <div class="footer-search">
         <input type="text" aria-label="Search topics" placeholder="Search topics you want" (keyup.enter)="goToSearch()" [(ngModel)]="footerSearch" />

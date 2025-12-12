@@ -13,6 +13,7 @@ import { PageViewComponent } from './features/static/page-view/page-view.compone
 import { AdminPagesComponent } from './features/admin/admin-pages/admin-pages.component';
 import { AdminSocialLinksComponent } from './features/admin/admin-social-links/admin-social-links.component';
 import { SearchComponent } from './features/static/search/search.component';
+import { AdminBrandingComponent } from './features/admin/admin-branding/admin-branding.component';
 
 const routes: Routes = [
   { path: '', component: PostsListComponent }, //Home
@@ -47,6 +48,12 @@ const routes: Routes = [
   {
     path: 'admin/social-links',
     component: AdminSocialLinksComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'admin/branding',
+    component: AdminBrandingComponent,
     canActivate: [RoleGuard],
     data: { roles: ['ADMIN'] },
   },

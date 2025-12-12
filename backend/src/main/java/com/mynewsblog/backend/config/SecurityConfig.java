@@ -120,6 +120,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/social-links/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/social-links/**").hasRole("ADMIN")
 
+                        // Site settings (logo/slogan)
+                        .requestMatchers(HttpMethod.GET, "/api/site-settings").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/site-settings").hasRole("ADMIN")
+
                         // Search
                         .requestMatchers(HttpMethod.GET, "/api/search").permitAll()
 

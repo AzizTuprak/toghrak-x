@@ -10,6 +10,7 @@ import { SocialLink } from './models/social-link';
 import { User } from './models/user';
 import { Category } from './models/category';
 import { ContentPage } from './models/content-page';
+import { SiteSettingsService } from './service/site-settings.service';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +25,9 @@ export class AppComponent implements OnInit {
   footerSearch = '';
   footerPages: ContentPage[] = [];
   socialLinks: SocialLink[] = [];
+  brandLogo = 'assets/tn.png';
+  brandTitle = 'TuprakNews';
+  brandTagline = 'Stories that matter, in one place.';
 
   constructor(
     private auth: AuthService,
@@ -31,6 +35,7 @@ export class AppComponent implements OnInit {
     private categoriesService: CategoriesService,
     private pageService: PageService,
     private socialLinksService: SocialLinksService,
+    private siteSettingsService: SiteSettingsService,
     private router: Router
   ) {
     this.isLoggedIn$ = this.auth.isLoggedIn();
@@ -62,6 +67,24 @@ export class AppComponent implements OnInit {
     this.pageService.load();
     this.socialLinksService.links$.subscribe((links) => (this.socialLinks = links));
     this.socialLinksService.load();
+    this.siteSettingsService.settings$.subscribe((settings) => {
+      if (settings?.title) {
+        this.brandTitle = settings.title;
+      } else {
+        this.brandTitle = 'TuprakNews';
+      }
+      if (settings?.logoUrl) {
+        this.brandLogo = settings.logoUrl;
+      } else {
+        this.brandLogo = 'assets/tn.png';
+      }
+      if (settings?.slogan) {
+        this.brandTagline = settings.slogan;
+      } else {
+        this.brandTagline = 'Stories that matter, in one place.';
+      }
+    });
+    this.siteSettingsService.load();
   }
 
   logout() {

@@ -1,0 +1,37 @@
+.admin-branding {
+  max-width: 820px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.logo-preview {
+  width: 100%;
+  max-width: 260px;
+  min-height: 120px;
+  border: 1px dashed #d6d6d6;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  margin-bottom: 8px;
+}
+
+.logo-preview img {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+}
+
+.placeholder {
+  color: #888;
+  font-size: 14px;
+}
+
+.btn-row {
+  margin-bottom: 8px;
+}

@@ -19,6 +19,7 @@ import { PageViewComponent } from './features/static/page-view/page-view.compone
 import { AdminPagesComponent } from './features/admin/admin-pages/admin-pages.component';
 import { AdminSocialLinksComponent } from './features/admin/admin-social-links/admin-social-links.component';
 import { SearchComponent } from './features/static/search/search.component';
+import { AdminBrandingComponent } from './features/admin/admin-branding/admin-branding.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { SearchComponent } from './features/static/search/search.component';
     PageViewComponent,
     AdminPagesComponent,
     AdminSocialLinksComponent,
+    AdminBrandingComponent,
     SearchComponent,
   ],
   imports: [
