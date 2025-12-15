@@ -20,6 +20,7 @@ import { AdminPagesComponent } from './features/admin/admin-pages/admin-pages.co
 import { AdminSocialLinksComponent } from './features/admin/admin-social-links/admin-social-links.component';
 import { SearchComponent } from './features/static/search/search.component';
 import { AdminBrandingComponent } from './features/admin/admin-branding/admin-branding.component';
+import { AlreadyAuthGuard } from './guards/already-auth.guard';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { AdminBrandingComponent } from './features/admin/admin-branding/admin-br
     HttpClientModule,
   ],
   providers: [
+    AlreadyAuthGuard,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],

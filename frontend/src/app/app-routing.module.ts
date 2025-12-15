@@ -14,6 +14,7 @@ import { AdminPagesComponent } from './features/admin/admin-pages/admin-pages.co
 import { AdminSocialLinksComponent } from './features/admin/admin-social-links/admin-social-links.component';
 import { SearchComponent } from './features/static/search/search.component';
 import { AdminBrandingComponent } from './features/admin/admin-branding/admin-branding.component';
+import { AlreadyAuthGuard } from './guards/already-auth.guard';
 
 const routes: Routes = [
   { path: '', component: PostsListComponent }, //Home
@@ -25,7 +26,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   { path: 'posts/:id', component: PostDetailComponent },
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: LoginComponent, canActivate: [AlreadyAuthGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   {
     path: 'admin/users',
