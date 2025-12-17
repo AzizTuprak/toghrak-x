@@ -6,6 +6,7 @@ import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.repository.RefreshTokenRepository;
 import com.mynewsblog.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +59,24 @@ public class RefreshTokenService {
             rt.setRevoked(true);
             refreshTokenRepository.save(rt);
         });
+    }
+
+    public void revokeAllForUser(Long userId) {
+        refreshTokenRepository.revokeAllByUserId(userId);
+    }
+
+    /**
+     * Cleanup job to purge expired or revoked refresh tokens.
+     * Intended to be called on a schedule (e.g., nightly).
+     */
+    public int cleanupExpiredOrRevoked() {
+        return refreshTokenRepository.deleteExpiredOrRevoked(LocalDateTime.now());
+    }
+
+    // Run nightly at 03:00 server time
+    @Scheduled(cron = "0 0 3 * * *")
+    public void scheduledCleanup() {
+        cleanupExpiredOrRevoked();
     }
 
     private void validate(RefreshToken token) {
