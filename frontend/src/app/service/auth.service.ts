@@ -18,12 +18,16 @@ export class AuthService {
         payload,
         { withCredentials: true }
       )
-      .pipe(tap((res) => this.setToken(res.token)));
+      .pipe(
+        tap((res) => {
+          this.clearToken();
+          this.setToken(res.token);
+        })
+      );
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
-    this.loggedIn$.next(false);
+    this.clearToken();
     // clear refresh cookie on backend
     this.http
       .post(`${environment.apiBaseUrl}/auth/logout`, {}, { withCredentials: true })
@@ -47,5 +51,10 @@ export class AuthService {
   private setToken(token: string) {
     localStorage.setItem(this.tokenKey, token);
     this.loggedIn$.next(true);
+  }
+
+  clearToken(): void {
+    localStorage.removeItem(this.tokenKey);
+    this.loggedIn$.next(false);
   }
 }

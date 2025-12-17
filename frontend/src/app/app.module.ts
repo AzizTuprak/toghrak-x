@@ -21,6 +21,7 @@ import { AdminSocialLinksComponent } from './features/admin/admin-social-links/a
 import { SearchComponent } from './features/static/search/search.component';
 import { AdminBrandingComponent } from './features/admin/admin-branding/admin-branding.component';
 import { AlreadyAuthGuard } from './guards/already-auth.guard';
+import { NotFoundComponent } from './features/static/not-found/not-found.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { AlreadyAuthGuard } from './guards/already-auth.guard';
     AdminSocialLinksComponent,
     AdminBrandingComponent,
     SearchComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,

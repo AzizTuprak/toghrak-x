@@ -1,0 +1,27 @@
+.not-found-shell {
+  min-height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.not-found-card {
+  text-align: center;
+  padding: 24px 32px;
+  border-radius: 12px;
+  background: #f7f9fb;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.not-found-card .code {
+  font-size: 48px;
+  font-weight: 800;
+  color: #0b3c4c;
+  margin-bottom: 8px;
+}
+
+.not-found-card h2 {
+  margin: 0 0 8px;
+}

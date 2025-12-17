@@ -6,32 +6,37 @@
     </a>
     <p class="brand-tagline">{{ brandTagline }}</p>
   </div>
-  <nav class="menu">
-    <div class="menu-links">
-      <a class="menu-item" [routerLink]="['/']" [queryParams]="{ page: 0 }">Home</a>
-      <a
-        class="menu-item"
-        *ngFor="let c of categories"
-        [routerLink]="['/', c.slug]"
-        [queryParams]="{ page: 0 }"
-        >{{ c.name }}</a
+<button class="menu-toggle d-md-none" type="button" (click)="toggleMenu()" aria-label="Toggle navigation">
+  ☰ Menu
+</button>
+
+<nav class="menu" [class.open]="isMenuOpen">
+  <div class="menu-links">
+    <a class="menu-item" [routerLink]="['/']" [queryParams]="{ page: 0 }">Home</a>
+    <a
+      class="menu-item"
+      *ngFor="let c of categories"
+      [routerLink]="['/', c.slug]"
+      [queryParams]="{ page: 0 }"
+      (click)="closeMenu()"
+      >{{ c.name }}</a
       >
-    </div>
-    <div class="menu-actions">
-      <ng-container *ngIf="isLoggedIn$ | async; else loggedOut">
-        <a *ngIf="isAdmin" class="btn btn-primary btn-sm" routerLink="/admin/users">Manage Users</a>
-        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/categories">Manage Categories</a>
-        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/pages">Manage Pages</a>
-        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/social-links">Manage Socials</a>
-        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/branding">Manage Branding</a>
-        <a class="btn btn-outline-primary btn-sm" routerLink="/posts/new">New Post</a>
-        <a class="btn btn-outline-secondary btn-sm" routerLink="/profile">Profile</a>
-        <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
-      </ng-container>
-      <ng-template #loggedOut>
-        <!-- Login available via direct URL (/login); hidden from public header -->
-      </ng-template>
-    </div>
+  </div>
+  <div class="menu-actions">
+    <ng-container *ngIf="isLoggedIn$ | async; else loggedOut">
+      <a *ngIf="isAdmin" class="btn btn-primary btn-sm" routerLink="/admin/users" (click)="closeMenu()">Manage Users</a>
+      <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/categories" (click)="closeMenu()">Manage Categories</a>
+      <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/pages" (click)="closeMenu()">Manage Pages</a>
+      <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/social-links" (click)="closeMenu()">Manage Socials</a>
+      <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/branding" (click)="closeMenu()">Manage Branding</a>
+      <a class="btn btn-outline-primary btn-sm" routerLink="/posts/new" (click)="closeMenu()">New Post</a>
+      <a class="btn btn-outline-secondary btn-sm" routerLink="/profile" (click)="closeMenu()">Profile</a>
+      <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
+    </ng-container>
+    <ng-template #loggedOut>
+      <!-- Login available via direct URL (/login); hidden from public header -->
+    </ng-template>
+  </div>
   </nav>
 </header>
 

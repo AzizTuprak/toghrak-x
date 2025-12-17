@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
   brandLogo = 'assets/tn.png';
   brandTitle = 'TuprakNews';
   brandTagline = 'Stories that matter, in one place.';
+  isMenuOpen = false;
 
   constructor(
     private auth: AuthService,
@@ -92,6 +93,7 @@ export class AppComponent implements OnInit {
     this.currentUser = undefined;
     this.isAdmin = false;
     this.router.navigateByUrl('/'); // go to home
+    this.isMenuOpen = false;
   }
 
   goToCategory(cat?: Category) {
@@ -100,9 +102,19 @@ export class AppComponent implements OnInit {
     } else {
       this.router.navigate(['/', cat.slug], { queryParams: { page: 0 } });
     }
+    this.isMenuOpen = false;
   }
 
   goToSearch() {
     this.router.navigate(['/search'], { queryParams: { q: this.footerSearch || null } });
+    this.isMenuOpen = false;
+  }
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
   }
 }

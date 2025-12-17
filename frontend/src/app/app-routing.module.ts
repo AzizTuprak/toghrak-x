@@ -15,6 +15,7 @@ import { AdminSocialLinksComponent } from './features/admin/admin-social-links/a
 import { SearchComponent } from './features/static/search/search.component';
 import { AdminBrandingComponent } from './features/admin/admin-branding/admin-branding.component';
 import { AlreadyAuthGuard } from './guards/already-auth.guard';
+import { NotFoundComponent } from './features/static/not-found/not-found.component';
 
 const routes: Routes = [
   { path: '', component: PostsListComponent }, //Home
@@ -63,7 +64,7 @@ const routes: Routes = [
   { path: 'search', component: SearchComponent },
   // Category slug route (e.g., /events)
   { path: ':slug', component: PostsListComponent },
-  { path: '**', redirectTo: '', pathMatch: 'full' },
+  { path: '**', component: NotFoundComponent },
 ];
 
 @NgModule({

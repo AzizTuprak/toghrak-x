@@ -72,19 +72,17 @@ public class DataInitializer {
             }
 
             // Seed default pages if missing
-            List<Page> defaults = List.of(
-                    Page.builder().slug("about").title("About").content("Tell readers about TuprakNews.").updatedAt(LocalDateTime.now()).build(),
-                    Page.builder().slug("contact").title("Contact").content("Email: hello@tupraknews.example").updatedAt(LocalDateTime.now()).build(),
-                    Page.builder().slug("how-it-works").title("How It Works").content("Explain how TuprakNews works for creators and readers.").updatedAt(LocalDateTime.now()).build(),
-                    Page.builder().slug("faq").title("FAQ").content("Add common questions and answers.").updatedAt(LocalDateTime.now()).build(),
-                    Page.builder().slug("privacy").title("Privacy Policy").content("Describe how user data is handled.").updatedAt(LocalDateTime.now()).build(),
-                    Page.builder().slug("terms").title("Terms of Use").content("Outline acceptable use and responsibilities.").updatedAt(LocalDateTime.now()).build()
-            );
-            defaults.forEach(p -> {
-                if (!pageRepository.existsBySlug(p.getSlug())) {
-                    pageRepository.save(p);
-                }
-            });
+            if (pageRepository.count() == 0) {
+                List<Page> defaults = List.of(
+                        Page.builder().slug("about").title("About").content("Tell readers about TuprakNews.").updatedAt(LocalDateTime.now()).build(),
+                        Page.builder().slug("contact").title("Contact").content("Email: hello@tupraknews.example").updatedAt(LocalDateTime.now()).build(),
+                        Page.builder().slug("how-it-works").title("How It Works").content("Explain how TuprakNews works for creators and readers.").updatedAt(LocalDateTime.now()).build(),
+                        Page.builder().slug("faq").title("FAQ").content("Add common questions and answers.").updatedAt(LocalDateTime.now()).build(),
+                        Page.builder().slug("privacy").title("Privacy Policy").content("Describe how user data is handled.").updatedAt(LocalDateTime.now()).build(),
+                        Page.builder().slug("terms").title("Terms of Use").content("Outline acceptable use and responsibilities.").updatedAt(LocalDateTime.now()).build()
+                );
+                defaults.forEach(pageRepository::save);
+            }
 
             if (socialLinkRepository.count() == 0) {
                 socialLinkRepository.saveAll(List.of(

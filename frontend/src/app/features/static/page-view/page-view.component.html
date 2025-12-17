@@ -4,7 +4,7 @@
 
   <ng-container *ngIf="page && !loading">
     <section class="page-hero">
-      <div class="hero-image" *ngIf="page.images as imgs">
+      <div class="hero-image" *ngIf="page.images as imgs" [class.hidden]="imgs.length === 0">
         <img [src]="imgs[0]" alt="Page hero image" loading="lazy" />
       </div>
       <div class="hero-copy">

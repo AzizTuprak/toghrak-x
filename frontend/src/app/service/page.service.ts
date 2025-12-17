@@ -15,6 +15,7 @@ export class PageService {
   load(): void {
     this.list().subscribe({
       next: (pages) => this.pagesSubject.next(pages),
+      error: () => this.pagesSubject.next([]),
     });
   }
 
