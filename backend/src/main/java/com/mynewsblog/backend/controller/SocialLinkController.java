@@ -29,14 +29,14 @@ public class SocialLinkController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SocialLinkDto> create(@Valid @RequestBody SocialLinkDto dto) {
-        SocialLink created = service.create(dto);
+        SocialLink created = service.create(dto.getLabel(), dto.getUrl(), dto.getIcon());
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(created));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SocialLinkDto> update(@PathVariable Long id, @Valid @RequestBody SocialLinkDto dto) {
-        SocialLink updated = service.update(id, dto);
+        SocialLink updated = service.update(id, dto.getLabel(), dto.getUrl(), dto.getIcon());
         return ResponseEntity.ok(toDto(updated));
     }
 

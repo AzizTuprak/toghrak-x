@@ -77,7 +77,7 @@ public class UserController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        User updatedUser = userService.updateUser(id, currentUser, request);
+        User updatedUser = userService.updateUser(id, currentUser.getId(), isAdmin(currentUser), request);
         if (isAdmin(currentUser)) {
             return ResponseEntity.ok(mapToAdminDTO(updatedUser));
         } else {

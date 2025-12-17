@@ -1,6 +1,5 @@
 package com.mynewsblog.backend.service;
 
-import com.mynewsblog.backend.dto.SiteSettingsDto;
 import com.mynewsblog.backend.model.SiteSettings;
 import com.mynewsblog.backend.repository.SiteSettingsRepository;
 import jakarta.transaction.Transactional;
@@ -16,28 +15,18 @@ public class SiteSettingsService {
     }
 
     @Transactional
-    public SiteSettingsDto update(SiteSettingsDto dto) {
+    public SiteSettings update(String title, String logoUrl, String slogan) {
         SiteSettings settings = repository.findTopByOrderByIdAsc().orElseGet(SiteSettings::new);
-        settings.setTitle(dto.getTitle());
-        settings.setLogoUrl(dto.getLogoUrl());
-        settings.setSlogan(dto.getSlogan());
-        SiteSettings saved = repository.save(settings);
-        return toDto(saved);
+        settings.setTitle(title);
+        settings.setLogoUrl(logoUrl);
+        settings.setSlogan(slogan);
+        return repository.save(settings);
     }
 
     @Transactional
-    public SiteSettingsDto get() {
+    public SiteSettings get() {
         SiteSettings settings = repository.findTopByOrderByIdAsc()
                 .orElseGet(() -> repository.save(new SiteSettings()));
-        return toDto(settings);
-    }
-
-    private SiteSettingsDto toDto(SiteSettings settings) {
-        SiteSettingsDto dto = new SiteSettingsDto();
-        dto.setId(settings.getId());
-        dto.setTitle(settings.getTitle());
-        dto.setLogoUrl(settings.getLogoUrl());
-        dto.setSlogan(settings.getSlogan());
-        return dto;
+        return settings;
     }
 }

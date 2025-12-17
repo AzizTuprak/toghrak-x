@@ -1,6 +1,5 @@
 package com.mynewsblog.backend.service;
 
-import com.mynewsblog.backend.dto.UpsertPageRequest;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.model.Page;
 import com.mynewsblog.backend.repository.PageRepository;
@@ -23,24 +22,24 @@ public class PageService {
     }
 
     @Transactional
-    public Page create(UpsertPageRequest request) {
+    public Page create(String slug, String title, String content, List<String> images) {
         Page page = Page.builder()
-                .slug(request.getSlug())
-                .title(request.getTitle())
-                .content(sanitize(request.getContent()))
-                .images(cleanImages(request.getImages()))
+                .slug(slug)
+                .title(title)
+                .content(sanitize(content))
+                .images(cleanImages(images))
                 .build();
         return pageRepository.save(page);
     }
 
     @Transactional
-    public Page update(String slug, UpsertPageRequest request) {
+    public Page update(String slug, String newSlug, String title, String content, List<String> images) {
         Page existing = pageRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Page not found: " + slug));
-        existing.setSlug(request.getSlug());
-        existing.setTitle(request.getTitle());
-        existing.setContent(sanitize(request.getContent()));
-        existing.setImages(cleanImages(request.getImages()));
+        existing.setSlug(newSlug);
+        existing.setTitle(title);
+        existing.setContent(sanitize(content));
+        existing.setImages(cleanImages(images));
         return pageRepository.save(existing);
     }
 

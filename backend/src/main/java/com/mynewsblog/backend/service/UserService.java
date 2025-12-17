@@ -9,7 +9,6 @@ import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.repository.RoleRepository;
 import com.mynewsblog.backend.repository.UserRepository;
 import com.mynewsblog.backend.repository.PostRepository;
-import com.mynewsblog.backend.security.UserPrincipal;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -75,12 +74,12 @@ public class UserService {
 
     // 4️⃣ Update user (Users can update their own profile, Admins can update any
     // user)
-    public User updateUser(Long userId, UserPrincipal currentUser, UpdateUserRequest request) {
+    public User updateUser(Long userId, Long currentUserId, boolean currentUserAdmin, UpdateUserRequest request) {
         // Fetch the existing user
         User user = getUser(userId);
 
         // Ensure that only the user themselves or an admin can update
-        if (!currentUser.getId().equals(userId) && !isAdmin(currentUser)) {
+        if (!currentUserId.equals(userId) && !currentUserAdmin) {
             throw new AccessDeniedException("You can only update your own account!");
         }
 
@@ -107,7 +106,7 @@ public class UserService {
         }
 
         // Update role only if current user is admin
-        if (isAdmin(currentUser)) {
+        if (currentUserAdmin) {
             if (request.getRoleName() != null && !request.getRoleName().isBlank()) {
                 Role newRole = roleRepository.findByName(request.getRoleName())
                         .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRoleName()));
@@ -147,8 +146,5 @@ public class UserService {
     }
 
     // Utility: Check if the current user has admin privileges
-    private boolean isAdmin(UserPrincipal user) {
-        return user.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-    }
+    // Authorization decisions should be made at the controller/security layer.
 }

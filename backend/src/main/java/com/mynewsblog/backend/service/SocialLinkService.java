@@ -1,6 +1,5 @@
 package com.mynewsblog.backend.service;
 
-import com.mynewsblog.backend.dto.SocialLinkDto;
 import com.mynewsblog.backend.model.SocialLink;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.repository.SocialLinkRepository;
@@ -23,21 +22,21 @@ public class SocialLinkService {
         return repo.findAll();
     }
 
-    public SocialLink create(SocialLinkDto dto) {
+    public SocialLink create(String label, String url, String icon) {
         SocialLink link = SocialLink.builder()
-                .label(dto.getLabel())
-                .url(dto.getUrl())
-                .icon(dto.getIcon())
+                .label(label)
+                .url(url)
+                .icon(icon)
                 .build();
         return repo.save(link);
     }
 
-    public SocialLink update(Long id, SocialLinkDto dto) {
+    public SocialLink update(Long id, String label, String url, String icon) {
         SocialLink existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Social link not found: " + id));
-        existing.setLabel(dto.getLabel());
-        existing.setUrl(dto.getUrl());
-        existing.setIcon(dto.getIcon());
+        existing.setLabel(label);
+        existing.setUrl(url);
+        existing.setIcon(icon);
         return repo.save(existing);
     }
 

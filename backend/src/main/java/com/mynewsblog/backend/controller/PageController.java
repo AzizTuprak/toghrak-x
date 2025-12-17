@@ -36,7 +36,12 @@ public class PageController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageResponse> create(@Valid @RequestBody UpsertPageRequest request) {
-        Page created = pageService.create(request);
+        Page created = pageService.create(
+                request.getSlug(),
+                request.getTitle(),
+                request.getContent(),
+                request.getImages()
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(created));
     }
 
@@ -44,7 +49,13 @@ public class PageController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageResponse> update(@PathVariable String slug,
                                                @Valid @RequestBody UpsertPageRequest request) {
-        Page updated = pageService.update(slug, request);
+        Page updated = pageService.update(
+                slug,
+                request.getSlug(),
+                request.getTitle(),
+                request.getContent(),
+                request.getImages()
+        );
         return ResponseEntity.ok(toResponse(updated));
     }
 

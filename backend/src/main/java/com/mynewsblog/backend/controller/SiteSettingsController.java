@@ -1,6 +1,7 @@
 package com.mynewsblog.backend.controller;
 
 import com.mynewsblog.backend.dto.SiteSettingsDto;
+import com.mynewsblog.backend.model.SiteSettings;
 import com.mynewsblog.backend.service.SiteSettingsService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,21 @@ public class SiteSettingsController {
 
     @GetMapping
     public ResponseEntity<SiteSettingsDto> get() {
-        return ResponseEntity.ok(service.get());
+        return ResponseEntity.ok(toDto(service.get()));
     }
 
     @PutMapping
     public ResponseEntity<SiteSettingsDto> update(@Valid @RequestBody SiteSettingsDto dto) {
-        return ResponseEntity.ok(service.update(dto));
+        SiteSettings updated = service.update(dto.getTitle(), dto.getLogoUrl(), dto.getSlogan());
+        return ResponseEntity.ok(toDto(updated));
+    }
+
+    private SiteSettingsDto toDto(SiteSettings settings) {
+        SiteSettingsDto dto = new SiteSettingsDto();
+        dto.setId(settings.getId());
+        dto.setTitle(settings.getTitle());
+        dto.setLogoUrl(settings.getLogoUrl());
+        dto.setSlogan(settings.getSlogan());
+        return dto;
     }
 }
