@@ -25,6 +25,9 @@ public class Post {
     @Column(nullable = false, length = 200)
     private String title;
 
+    @Column(nullable = false, unique = true, length = 255)
+    private String slug;
+
     @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;

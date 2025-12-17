@@ -42,8 +42,11 @@ public class PostService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + categoryId));
 
+        String slug = generateUniqueSlug(title, null);
+
         Post post = Post.builder()
                 .title(title)
+                .slug(slug)
                 .content(sanitize(content))
                 .author(author)
                 .category(category)
@@ -76,6 +79,7 @@ public class PostService {
 
         if (newTitle != null && !newTitle.isBlank()) {
             post.setTitle(newTitle);
+            post.setSlug(generateUniqueSlug(newTitle, postId));
         }
         if (newContent != null && !newContent.isBlank()) {
             post.setContent(sanitize(newContent));
@@ -129,7 +133,7 @@ public class PostService {
 
     // 5️⃣ List all posts
     public List<Post> getAllPosts() {
-        return postRepository.findAll();
+        return postRepository.findAllBy(Pageable.unpaged()).getContent();
     }
 
     // NEW: paginated listing
@@ -137,22 +141,55 @@ public class PostService {
         if (categoryId != null) {
             return postRepository.findByCategoryId(categoryId, pageable);
         }
-        return postRepository.findAll(pageable);
+        return postRepository.findAllBy(pageable);
     }
 
     public List<Post> getPopular(int limit) {
         int size = Math.min(Math.max(limit, 1), 20);
-        Pageable p = PageRequest.of(0, size, Sort.by(
-                Sort.Order.desc("viewCount"),
-                Sort.Order.desc("updatedAt"),
-                Sort.Order.desc("createdAt")
-        ));
-        return postRepository.findAll(p).getContent();
+        // Dedicated fetch graph method protects against lazy-loading issues
+        List<Post> popular = postRepository.findTop6ByOrderByViewCountDescUpdatedAtDescCreatedAtDesc();
+        if (popular.size() > size) {
+            return popular.subList(0, size);
+        }
+        return popular;
     }
 
     // Utility: Check if the user is an admin
     private boolean isAdmin(User user) {
         return user.getRole() != null && "ADMIN".equals(user.getRole().getName());
+    }
+
+    private String generateUniqueSlug(String title, Long excludeId) {
+        String base = slugify(title);
+        String candidate = base;
+        int counter = 1;
+        while (slugExists(candidate, excludeId)) {
+            candidate = base + "-" + counter++;
+        }
+        return candidate;
+    }
+
+    private boolean slugExists(String slug, Long excludeId) {
+        if (excludeId != null) {
+            return postRepository.existsBySlug(slug) && postRepository.findBySlug(slug)
+                    .map(p -> !p.getId().equals(excludeId))
+                    .orElse(false);
+        }
+        return postRepository.existsBySlug(slug);
+    }
+
+    private String slugify(String input) {
+        if (input == null || input.isBlank()) {
+            return "post-" + java.util.UUID.randomUUID().toString().substring(0, 8);
+        }
+        String slug = input.toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("-{2,}", "-")
+                .replaceAll("(^-|-$)", "");
+        if (slug.isBlank()) {
+            slug = "post-" + java.util.UUID.randomUUID().toString().substring(0, 8);
+        }
+        return slug;
     }
 
     private void setImages(Post post, List<String> imageUrls) {

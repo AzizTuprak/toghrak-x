@@ -4,9 +4,9 @@ import com.mynewsblog.backend.dto.UpsertPageRequest;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.model.Page;
 import com.mynewsblog.backend.repository.PageRepository;
-import org.springframework.web.util.HtmlUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +22,7 @@ public class PageService {
         this.pageRepository = pageRepository;
     }
 
+    @Transactional
     public Page create(UpsertPageRequest request) {
         Page page = Page.builder()
                 .slug(request.getSlug())
@@ -32,6 +33,7 @@ public class PageService {
         return pageRepository.save(page);
     }
 
+    @Transactional
     public Page update(String slug, UpsertPageRequest request) {
         Page existing = pageRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Page not found: " + slug));
@@ -42,17 +44,20 @@ public class PageService {
         return pageRepository.save(existing);
     }
 
+    @Transactional
     public void delete(String slug) {
         Page existing = pageRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Page not found: " + slug));
         pageRepository.delete(existing);
     }
 
+    @Transactional(readOnly = true)
     public Page getBySlug(String slug) {
         return pageRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Page not found: " + slug));
     }
 
+    @Transactional(readOnly = true)
     public List<Page> list() {
         return pageRepository.findAll();
     }

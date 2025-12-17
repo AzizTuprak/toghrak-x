@@ -51,6 +51,10 @@ public class UserController {
     // 3️⃣ Get user profile (Only authenticated user can see their own info)
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal currentUser) {
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(java.util.Map.of("error", "unauthorized"));
+        }
         User user = userService.getUser(currentUser.getId());
         if (isAdmin(currentUser)) {
             return ResponseEntity.ok(mapToAdminDTO(user));

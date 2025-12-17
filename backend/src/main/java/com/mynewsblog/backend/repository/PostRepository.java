@@ -1,14 +1,16 @@
 package com.mynewsblog.backend.repository;
 
+import com.mynewsblog.backend.model.Category;
 import com.mynewsblog.backend.model.Post;
 import com.mynewsblog.backend.model.User;
-import com.mynewsblog.backend.model.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     // Find all posts created by a given author (using the User entity)
@@ -21,9 +23,22 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // This method leverages property path navigation (author.id)
     List<Post> findByAuthorId(Long authorId);
 
-    @NonNull Page<Post> findAll(@NonNull Pageable pageable);
+    @EntityGraph(attributePaths = {"category", "author", "images"})
+    @NonNull Page<Post> findAllBy(@NonNull Pageable pageable);
 
+    @EntityGraph(attributePaths = {"category", "author", "images"})
     @NonNull Page<Post> findByCategoryId(Long categoryId, @NonNull Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category", "author", "images"})
+    Optional<Post> findById(Long id);
+
+    @EntityGraph(attributePaths = {"category", "author", "images"})
+    Optional<Post> findBySlug(String slug);
+
+    @EntityGraph(attributePaths = {"category", "author", "images"})
+    List<Post> findTop6ByOrderByViewCountDescUpdatedAtDescCreatedAtDesc();
+
+    boolean existsBySlug(String slug);
 
     boolean existsByAuthorId(Long authorId);
 

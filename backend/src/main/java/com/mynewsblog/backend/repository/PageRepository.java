@@ -1,6 +1,7 @@
 package com.mynewsblog.backend.repository;
 
 import com.mynewsblog.backend.model.Page;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.List;
 
 public interface PageRepository extends JpaRepository<Page, Long> {
+    @EntityGraph(attributePaths = "images")
     Optional<Page> findBySlug(String slug);
     boolean existsBySlug(String slug);
 

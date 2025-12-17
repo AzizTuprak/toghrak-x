@@ -58,6 +58,7 @@ public class AuthController {
 
                 // Issue refresh token cookie
                 Long userId = ((UserPrincipal) authentication.getPrincipal()).getId();
+                refreshTokenService.revokeAllForUser(userId);
                 var refresh = refreshTokenService.create(userId);
                 ResponseCookie cookie = buildRefreshCookie(refresh.getPlainToken(), refreshExpiryMs);
 

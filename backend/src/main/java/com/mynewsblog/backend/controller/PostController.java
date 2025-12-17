@@ -113,6 +113,7 @@ public class PostController {
         PostResponseDTO dto = new PostResponseDTO();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
+        dto.setSlug(post.getSlug());
         dto.setContent(post.getContent());
         dto.setCoverImage(post.getCoverImage());
         dto.setCategoryId(post.getCategory().getId());

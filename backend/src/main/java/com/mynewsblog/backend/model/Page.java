@@ -30,7 +30,7 @@ public class Page {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "page_images", joinColumns = @JoinColumn(name = "page_id"))
     @Column(name = "image_url")
     @Builder.Default

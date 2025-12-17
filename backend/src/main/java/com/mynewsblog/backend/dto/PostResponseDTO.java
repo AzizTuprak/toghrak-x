@@ -11,6 +11,7 @@ import java.util.List;
 public class PostResponseDTO {
     private Long id;
     private String title;
+    private String slug;
     private String content;
     private String coverImage;
     private Long categoryId;
