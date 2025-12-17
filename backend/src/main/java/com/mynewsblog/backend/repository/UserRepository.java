@@ -14,8 +14,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @EntityGraph(attributePaths = "role")
     Optional<User> findById(Long id);
 
+    @Override
+    @EntityGraph(attributePaths = "role")
+    List<User> findAll();
+
     Optional<User> findByEmail(String email); // Get user email
 
     // Get users by role (using property path notation to access role's name)
+    @EntityGraph(attributePaths = "role")
     List<User> findByRole_Name(String roleName);  // Useful for admins listing editors, etc.
 }

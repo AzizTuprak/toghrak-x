@@ -3,9 +3,9 @@ package com.mynewsblog.backend.service;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.model.Page;
 import com.mynewsblog.backend.repository.PageRepository;
+import com.mynewsblog.backend.service.support.ContentSanitizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,9 +16,11 @@ import java.util.ArrayList;
 public class PageService {
 
     private final PageRepository pageRepository;
+    private final ContentSanitizer sanitizer;
 
-    public PageService(PageRepository pageRepository) {
+    public PageService(PageRepository pageRepository, ContentSanitizer sanitizer) {
         this.pageRepository = pageRepository;
+        this.sanitizer = sanitizer;
     }
 
     @Transactional
@@ -26,7 +28,7 @@ public class PageService {
         Page page = Page.builder()
                 .slug(slug)
                 .title(title)
-                .content(sanitize(content))
+                .content(sanitizer.sanitize(content))
                 .images(cleanImages(images))
                 .build();
         return pageRepository.save(page);
@@ -38,7 +40,7 @@ public class PageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Page not found: " + slug));
         existing.setSlug(newSlug);
         existing.setTitle(title);
-        existing.setContent(sanitize(content));
+        existing.setContent(sanitizer.sanitize(content));
         existing.setImages(cleanImages(images));
         return pageRepository.save(existing);
     }
@@ -61,9 +63,7 @@ public class PageService {
         return pageRepository.findAll();
     }
 
-    private String sanitize(String html) {
-        return html == null ? "" : HtmlUtils.htmlEscape(html);
-    }
+    // Sanitization handled by ContentSanitizer component.
 
     private List<String> cleanImages(List<String> images) {
         if (images == null) return new ArrayList<>();

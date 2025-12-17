@@ -1,6 +1,6 @@
 package com.mynewsblog.backend.service;
 
-import com.mynewsblog.backend.dto.UpdateUserRequest;
+import com.mynewsblog.backend.service.command.UpdateUserCommand;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.exception.UsernameAlreadyExistsException;
 import com.mynewsblog.backend.exception.EmailAlreadyExistsException;
@@ -74,7 +74,7 @@ public class UserService {
 
     // 4️⃣ Update user (Users can update their own profile, Admins can update any
     // user)
-    public User updateUser(Long userId, Long currentUserId, boolean currentUserAdmin, UpdateUserRequest request) {
+    public User updateUser(Long userId, Long currentUserId, boolean currentUserAdmin, UpdateUserCommand request) {
         // Fetch the existing user
         User user = getUser(userId);
 

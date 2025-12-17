@@ -7,6 +7,8 @@ import com.mynewsblog.backend.model.Post;
 import com.mynewsblog.backend.model.PostImage;
 import com.mynewsblog.backend.security.UserPrincipal;
 import com.mynewsblog.backend.service.PostService;
+import com.mynewsblog.backend.service.command.CreatePostCommand;
+import com.mynewsblog.backend.service.command.UpdatePostCommand;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -30,26 +32,16 @@ public class PostController {
     public ResponseEntity<PostResponseDTO> createPost(
             @Valid @RequestBody CreatePostRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        log.info("Current User ID = {}", currentUser.getId()); // this line can be deleted, it was only for testing
-        Post newPost = postService.createPost(
+        CreatePostCommand command = new CreatePostCommand(
                 request.getTitle(),
                 request.getContent(),
-                currentUser.getId(), // Get ID from UserPrincipal
                 request.getCategoryId(),
-                request.getCoverImage(), // Include the cover image URL
-                request.getImageUrls()
-        );
+                request.getCoverImage(),
+                request.getImageUrls());
+        Post newPost = postService.createPost(currentUser.getId(), command);
         return ResponseEntity.ok(toPostResponseDTO(newPost));
     }
 
-    // // 2) GET all posts
-    // @GetMapping
-    // public List<PostResponseDTO> getAllPosts() {
-    // List<Post> posts = postService.getAllPosts();
-    // return posts.stream()
-    // .map(this::toPostResponseDTO)
-    // .toList();
-    // }
     // paginated GET /api/posts
     @GetMapping
     public ResponseEntity<Page<PostResponseDTO>> getPosts(
@@ -88,14 +80,13 @@ public class PostController {
             @PathVariable Long id,
             @Valid @RequestBody UpdatePostRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        Post updatedPost = postService.updatePost(
-                id,
-                currentUser.getId(),
+        UpdatePostCommand command = new UpdatePostCommand(
                 request.getTitle(),
                 request.getContent(),
                 request.getCategoryId(),
                 request.getCoverImage(),
                 request.getImageUrls());
+        Post updatedPost = postService.updatePost(id, currentUser.getId(), isAdmin(currentUser), command);
         return ResponseEntity.ok(toPostResponseDTO(updatedPost));
     }
 
@@ -104,8 +95,13 @@ public class PostController {
     public ResponseEntity<Void> deletePost(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        postService.deletePost(id, currentUser.getId());
+        postService.deletePost(id, currentUser.getId(), isAdmin(currentUser));
         return ResponseEntity.noContent().build();
+    }
+
+    private boolean isAdmin(UserPrincipal currentUser) {
+        return currentUser != null && currentUser.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     // Unified converter method to transform Post entity to PostResponseDTO

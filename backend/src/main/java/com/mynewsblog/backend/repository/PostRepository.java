@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
@@ -23,10 +25,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // This method leverages property path navigation (author.id)
     List<Post> findByAuthorId(Long authorId);
 
-    @EntityGraph(attributePaths = {"category", "author", "images"})
+    @EntityGraph(attributePaths = {"category", "author"})
     @NonNull Page<Post> findAllBy(@NonNull Pageable pageable);
 
-    @EntityGraph(attributePaths = {"category", "author", "images"})
+    @EntityGraph(attributePaths = {"category", "author"})
     @NonNull Page<Post> findByCategoryId(Long categoryId, @NonNull Pageable pageable);
 
     @EntityGraph(attributePaths = {"category", "author", "images"})
@@ -39,6 +41,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findTop6ByOrderByViewCountDescUpdatedAtDescCreatedAtDesc();
 
     boolean existsBySlug(String slug);
+
+    boolean existsBySlugAndIdNot(String slug, Long id);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update Post p set p.viewCount = coalesce(p.viewCount, 0) + 1 where p.id = :id")
+    int incrementViewCount(Long id);
+
+    @EntityGraph(attributePaths = {"category", "author", "images"})
+    List<Post> findTop20ByOrderByViewCountDescUpdatedAtDescCreatedAtDesc();
 
     boolean existsByAuthorId(Long authorId);
 

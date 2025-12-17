@@ -1,22 +1,25 @@
 package com.mynewsblog.backend.service;
 
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
-import org.springframework.security.access.AccessDeniedException;
-import com.mynewsblog.backend.model.*;
-import com.mynewsblog.backend.repository.*;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.mynewsblog.backend.model.Category;
 import com.mynewsblog.backend.model.Post;
+import com.mynewsblog.backend.model.PostImage;
+import com.mynewsblog.backend.model.User;
+import com.mynewsblog.backend.repository.CategoryRepository;
 import com.mynewsblog.backend.repository.PostRepository;
+import com.mynewsblog.backend.repository.UserRepository;
+import com.mynewsblog.backend.service.command.CreatePostCommand;
+import com.mynewsblog.backend.service.command.UpdatePostCommand;
+import com.mynewsblog.backend.service.support.ContentSanitizer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.web.util.HtmlUtils;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -25,64 +28,68 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ContentSanitizer sanitizer;
 
     public PostService(PostRepository postRepository,
             UserRepository userRepository,
-            CategoryRepository categoryRepository) {
+            CategoryRepository categoryRepository,
+            ContentSanitizer sanitizer) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.sanitizer = sanitizer;
     }
 
-    // 1️⃣ Create a new post
-    public Post createPost(String title, String content, Long authorId, Long categoryId, String coverImage, List<String> imageUrls) {
+    public Post createPost(Long authorId, CreatePostCommand command) {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found with id=" + authorId));
 
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + categoryId));
+        Category category = categoryRepository.findById(command.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + command.getCategoryId()));
 
-        String slug = generateUniqueSlug(title, null);
+        String slug = generateUniqueSlug(command.getTitle(), null);
 
         Post post = Post.builder()
-                .title(title)
+                .title(command.getTitle())
                 .slug(slug)
-                .content(sanitize(content))
+                .content(sanitizer.sanitize(command.getContent()))
                 .author(author)
                 .category(category)
-                .coverImage(coverImage)
+                .coverImage(command.getCoverImage())
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        setImages(post, imageUrls);
+        setImages(post, command.getImageUrls());
 
         return postRepository.save(post);
     }
 
+    // 1️⃣ Create a new post
     // 2️⃣ Update an existing post
-    public Post updatePost(Long postId, Long requestUserId, String newTitle, String newContent, Long newCategoryId,
-            String newCoverImage, List<String> imageUrls) {
+    public Post updatePost(Long postId, Long requestUserId, boolean requestUserAdmin, UpdatePostCommand command) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
 
-        User currentUser = userRepository.findById(requestUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id=" + requestUserId));
-
-        // Ensure only the owner or an admin can update
         User author = post.getAuthor();
         if (author == null) {
             throw new ResourceNotFoundException("Post author missing for post: " + postId);
         }
-        if (!isAdmin(currentUser) && !author.getId().equals(requestUserId)) {
+        if (!requestUserAdmin && !author.getId().equals(requestUserId)) {
             throw new AccessDeniedException("You can only update your own posts!");
         }
+
+        String newTitle = command.getTitle();
+        String newContent = command.getContent();
+        Long newCategoryId = command.getCategoryId();
+        String newCoverImage = command.getCoverImage();
+        List<String> imageUrls = command.getImageUrls();
 
         if (newTitle != null && !newTitle.isBlank()) {
             post.setTitle(newTitle);
             post.setSlug(generateUniqueSlug(newTitle, postId));
         }
         if (newContent != null && !newContent.isBlank()) {
-            post.setContent(sanitize(newContent));
+            post.setContent(sanitizer.sanitize(newContent));
         }
         if (newCategoryId != null) {
             Category category = categoryRepository.findById(newCategoryId)
@@ -99,23 +106,24 @@ public class PostService {
 
         post.setUpdatedAt(LocalDateTime.now());
         return postRepository.save(post);
-
     }
 
     // 3️⃣ Delete a post
-    public void deletePost(Long postId, Long requestUserId) {
+    // Clean-architecture overload: authorization decided at controller/security layer.
+    public void deletePost(Long postId, Long requestUserId, boolean requestUserAdmin) {
+        if (requestUserAdmin) {
+            postRepository.deleteById(postId);
+            return;
+        }
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot delete. Post not found: " + postId));
-
-        User currentUser = userRepository.findById(requestUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id=" + requestUserId));
 
         User author = post.getAuthor();
         if (author == null) {
             throw new ResourceNotFoundException("Post author missing for post: " + postId);
         }
-        // Ensure only the owner or an admin can delete
-        if (!isAdmin(currentUser) && !author.getId().equals(requestUserId)) {
+        if (!author.getId().equals(requestUserId)) {
             throw new AccessDeniedException("You can only delete your own posts!");
         }
 
@@ -124,39 +132,32 @@ public class PostService {
 
     // 4️⃣ Retrieve a single post
     public Post getPost(Long postId) {
-        Post post = postRepository.findById(postId)
+        int updated = postRepository.incrementViewCount(postId);
+        if (updated == 0) {
+            throw new ResourceNotFoundException("Post not found: " + postId);
+        }
+        return postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
-        long currentViews = post.getViewCount() == null ? 0 : post.getViewCount();
-        post.setViewCount(currentViews + 1);
-        return postRepository.save(post);
     }
 
     // 5️⃣ List all posts
-    public List<Post> getAllPosts() {
-        return postRepository.findAllBy(Pageable.unpaged()).getContent();
-    }
-
     // NEW: paginated listing
     public Page<Post> getPosts(Pageable pageable, Long categoryId) {
         if (categoryId != null) {
-            return postRepository.findByCategoryId(categoryId, pageable);
+            Page<Post> page = postRepository.findByCategoryId(categoryId, pageable);
+            page.getContent().forEach(p -> p.getImages().size());
+            return page;
         }
-        return postRepository.findAllBy(pageable);
+        Page<Post> page = postRepository.findAllBy(pageable);
+        page.getContent().forEach(p -> p.getImages().size());
+        return page;
     }
 
     public List<Post> getPopular(int limit) {
         int size = Math.min(Math.max(limit, 1), 20);
         // Dedicated fetch graph method protects against lazy-loading issues
-        List<Post> popular = postRepository.findTop6ByOrderByViewCountDescUpdatedAtDescCreatedAtDesc();
-        if (popular.size() > size) {
-            return popular.subList(0, size);
-        }
-        return popular;
-    }
-
-    // Utility: Check if the user is an admin
-    private boolean isAdmin(User user) {
-        return user.getRole() != null && "ADMIN".equals(user.getRole().getName());
+        List<Post> popular = postRepository.findTop20ByOrderByViewCountDescUpdatedAtDescCreatedAtDesc();
+        return popular.size() > size ? popular.subList(0, size) : popular;
     }
 
     private String generateUniqueSlug(String title, Long excludeId) {
@@ -171,9 +172,7 @@ public class PostService {
 
     private boolean slugExists(String slug, Long excludeId) {
         if (excludeId != null) {
-            return postRepository.existsBySlug(slug) && postRepository.findBySlug(slug)
-                    .map(p -> !p.getId().equals(excludeId))
-                    .orElse(false);
+            return postRepository.existsBySlugAndIdNot(slug, excludeId);
         }
         return postRepository.existsBySlug(slug);
     }
@@ -210,7 +209,5 @@ public class PostService {
         post.getImages().addAll(newImages);
     }
 
-    private String sanitize(String html) {
-        return html == null ? "" : HtmlUtils.htmlEscape(html);
-    }
+    // Sanitization handled by ContentSanitizer component.
 }
