@@ -7,7 +7,11 @@ import org.hibernate.Hibernate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "pages")
+@Table(
+        name = "pages",
+        indexes = {
+                @Index(name = "idx_pages_updated_at", columnList = "updated_at")
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,8 +33,13 @@ public class Page {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "page_images", joinColumns = @JoinColumn(name = "page_id"))
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "page_images",
+            joinColumns = @JoinColumn(name = "page_id"),
+            indexes = {
+                    @Index(name = "idx_page_images_page_id", columnList = "page_id")
+            })
     @Column(name = "image_url")
     @Builder.Default
     private java.util.List<String> images = new java.util.ArrayList<>();

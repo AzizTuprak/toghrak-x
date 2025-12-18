@@ -2,8 +2,8 @@ package com.mynewsblog.backend.service;
 
 import com.mynewsblog.backend.model.SiteSettings;
 import com.mynewsblog.backend.repository.SiteSettingsRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SiteSettingsService {

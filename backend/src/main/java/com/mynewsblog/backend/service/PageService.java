@@ -36,7 +36,10 @@ public class PageService {
                 .content(sanitizer.sanitize(content))
                 .images(cleanImages(images))
                 .build();
-        return pageRepository.save(page);
+        pageRepository.save(page);
+        // Ensure images are initialized for response mapping (Open-in-view is disabled)
+        return pageRepository.findBySlug(normalizedSlug)
+                .orElseThrow(() -> new ResourceNotFoundException("Page not found: " + normalizedSlug));
     }
 
     @Transactional
@@ -51,7 +54,10 @@ public class PageService {
         existing.setTitle(title);
         existing.setContent(sanitizer.sanitize(content));
         existing.setImages(cleanImages(images));
-        return pageRepository.save(existing);
+        pageRepository.save(existing);
+        // Ensure images are initialized for response mapping (Open-in-view is disabled)
+        return pageRepository.findBySlug(normalizedSlug)
+                .orElseThrow(() -> new ResourceNotFoundException("Page not found: " + normalizedSlug));
     }
 
     @Transactional
@@ -69,7 +75,8 @@ public class PageService {
 
     @Transactional(readOnly = true)
     public List<Page> list() {
-        return pageRepository.findAll();
+        // Fetch images explicitly to avoid LazyInitializationException in controllers
+        return pageRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     // Sanitization handled by UserContentSanitizer component.

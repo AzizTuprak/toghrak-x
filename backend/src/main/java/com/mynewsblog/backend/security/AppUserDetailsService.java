@@ -27,7 +27,7 @@ public class AppUserDetailsService implements UserDetailsService {
 
     @Transactional
     public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
-        User user = userRepository.findById(id)
+        User user = userRepository.findWithRoleById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
         return UserPrincipal.create(user);
     }

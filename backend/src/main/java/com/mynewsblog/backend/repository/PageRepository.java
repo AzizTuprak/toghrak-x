@@ -14,6 +14,9 @@ public interface PageRepository extends JpaRepository<Page, Long> {
     Optional<Page> findBySlug(String slug);
     boolean existsBySlug(String slug);
 
+    @EntityGraph(attributePaths = "images")
+    List<Page> findAllByOrderByUpdatedAtDesc();
+
     @Query(value = """
             SELECT * FROM pages p
             WHERE lower(p.title) LIKE lower(concat('%', :term, '%'))

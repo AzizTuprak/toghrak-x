@@ -5,7 +5,11 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 @Entity
-@Table(name = "post_images")
+@Table(
+        name = "post_images",
+        indexes = {
+                @Index(name = "idx_post_images_post_id", columnList = "post_id")
+        })
 @Getter
 @Setter
 @NoArgsConstructor

@@ -10,7 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "posts")
+@Table(
+        name = "posts",
+        indexes = {
+                @Index(name = "idx_posts_category_id", columnList = "category_id"),
+                @Index(name = "idx_posts_user_id", columnList = "user_id"),
+                @Index(name = "idx_posts_view_count", columnList = "view_count"),
+                @Index(name = "idx_posts_created_at", columnList = "created_at")
+        })
 @Getter
 @Setter
 @NoArgsConstructor

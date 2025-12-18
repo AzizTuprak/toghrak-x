@@ -61,7 +61,9 @@ public class PostService {
 
         setImages(post, request.getImageUrls());
 
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        return postRepository.findWithImagesById(saved.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + saved.getId()));
     }
 
     // 1️⃣ Create a new post
@@ -105,7 +107,9 @@ public class PostService {
         }
 
         post.setUpdatedAt(LocalDateTime.now());
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        return postRepository.findWithImagesById(saved.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + saved.getId()));
     }
 
     // 3️⃣ Delete a post
@@ -136,12 +140,13 @@ public class PostService {
         if (updated == 0) {
             throw new ResourceNotFoundException("Post not found: " + postId);
         }
-        return postRepository.findById(postId)
+        return postRepository.findWithImagesById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
     }
 
     // 5️⃣ List all posts
     // NEW: paginated listing
+    @Transactional(readOnly = true)
     public Page<Post> getPosts(Pageable pageable, Long categoryId) {
         if (categoryId != null) {
             Page<Post> page = postRepository.findByCategoryId(categoryId, pageable);
@@ -153,6 +158,7 @@ public class PostService {
         return page;
     }
 
+    @Transactional(readOnly = true)
     public List<Post> getPopular(int limit) {
         int size = Math.min(Math.max(limit, 1), 20);
         // Dedicated fetch graph method protects against lazy-loading issues

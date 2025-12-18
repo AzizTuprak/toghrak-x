@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "categories")
 @Getter
@@ -28,11 +25,6 @@ public class Category {
 
     // Optional description for the category
     private String description;
-
-    // One category can have multiple posts
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Post> posts = new ArrayList<>();
 
     @Override
     public final boolean equals(Object o) {

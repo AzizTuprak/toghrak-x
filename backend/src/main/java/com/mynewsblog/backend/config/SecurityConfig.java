@@ -10,7 +10,6 @@ import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -32,36 +31,22 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    @SuppressWarnings("unused")
-    private final AppUserDetailsService userDetailsService;
     private final boolean swaggerPublic;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
                           AppUserDetailsService userDetailsService,
                           @org.springframework.beans.factory.annotation.Value("${app.security.swagger-public:true}") boolean swaggerPublic) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.userDetailsService = userDetailsService;
         this.swaggerPublic = swaggerPublic;
     }
 
-    /**
-     * Completely bypass Spring Security for Swagger/OpenAPI endpoints.
-     * This guarantees no 401 from security filters on the docs UI/assets.
-     */
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> {
-            if (swaggerPublic) {
-                web.ignoring().requestMatchers(
-                        "/swagger-ui.html",
-                        "/swagger-ui/**",
-                        "/v3/api-docs",
-                        "/v3/api-docs/**",
-                        "/v3/api-docs/swagger-config"
-                );
-            }
-        };
-    }
+    private static final String[] SWAGGER_ENDPOINTS = {
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/v3/api-docs/swagger-config"
+    };
 
     @Bean
     AuthenticationEntryPoint restAuthenticationEntryPoint() {
@@ -91,14 +76,8 @@ public class SecurityConfig {
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        // Swagger / OpenAPI (all must be public) Keep permitAll for Swagger as a second guard
-                        .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs",
-                                "/v3/api-docs/**",
-                                "/v3/api-docs/swagger-config"
-                        ).access((authentication, ctx) -> new AuthorizationDecision(
+                        // Swagger / OpenAPI
+                        .requestMatchers(SWAGGER_ENDPOINTS).access((authentication, ctx) -> new AuthorizationDecision(
                                 swaggerPublic || authentication.get().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
                         ))
 

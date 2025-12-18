@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @NonNull Page<Post> findByCategoryId(Long categoryId, @NonNull Pageable pageable);
 
     @EntityGraph(attributePaths = {"category", "author", "images"})
-    Optional<Post> findById(Long id);
+    @Query("select p from Post p where p.id = :id")
+    Optional<Post> findWithImagesById(@Param("id") Long id);
 
     @EntityGraph(attributePaths = {"category", "author", "images"})
     Optional<Post> findBySlug(String slug);

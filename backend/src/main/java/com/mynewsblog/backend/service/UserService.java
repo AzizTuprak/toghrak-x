@@ -63,13 +63,13 @@ public class UserService {
 
     // 2️⃣ Find user by ID
     public User getUser(Long id) {
-        return userRepository.findById(id)
+        return userRepository.findWithRoleById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
     // 3️⃣ List all users
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllWithRole();
     }
 
     // 4️⃣ Update user (Users can update their own profile, Admins can update any
