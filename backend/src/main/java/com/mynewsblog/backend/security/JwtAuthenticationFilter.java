@@ -17,11 +17,11 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
-    private final UserDetailsServiceImpl userDetailsService; // Inject our custom service directly
+    private final JwtTokenService jwtTokenService;
+    private final AppUserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) {
-        this.jwtUtil = jwtUtil;
+    public JwtAuthenticationFilter(JwtTokenService jwtTokenService, AppUserDetailsService userDetailsService) {
+        this.jwtTokenService = jwtTokenService;
         this.userDetailsService = userDetailsService;
     }
 
@@ -33,8 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = getTokenFromRequest(request);
 
         if (token != null) {
-            if (jwtUtil.validateToken(token)) {
-                Long userId = jwtUtil.getUserIdFromToken(token);
+            if (jwtTokenService.validateToken(token)) {
+                Long userId = jwtTokenService.getUserIdFromToken(token);
                 try {
                     UserDetails userDetails = userDetailsService.loadUserById(userId);
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

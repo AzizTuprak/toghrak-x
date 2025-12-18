@@ -22,19 +22,18 @@ public class CategoryService {
         this.postRepository = postRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<Category> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        categories.forEach(this::ensureSlug);
-        return categories;
+        return categoryRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Category getCategoryById(Long id) {
-        Category category = categoryRepository.findById(id)
+        return categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + id));
-        ensureSlug(category);
-        return category;
     }
 
+    @Transactional(readOnly = true)
     public Category getCategoryBySlug(String slug) {
         return categoryRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with slug=" + slug));

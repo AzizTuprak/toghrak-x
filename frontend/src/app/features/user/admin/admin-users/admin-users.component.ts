@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../../../../service/user.service';
+import { UsersService } from '../../../../services/users.service';
 import { User, CreateUserRequest } from '../../../../models/user';
 
 @Component({
@@ -19,7 +19,7 @@ export class AdminUsersComponent implements OnInit {
   };
   saving = false;
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UsersService) {}
 
   ngOnInit(): void {
     this.fetch();

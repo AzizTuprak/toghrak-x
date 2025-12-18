@@ -3,7 +3,8 @@ package com.mynewsblog.backend.service;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.model.Page;
 import com.mynewsblog.backend.repository.PageRepository;
-import com.mynewsblog.backend.service.support.ContentSanitizer;
+import com.mynewsblog.backend.service.support.UserContentSanitizer;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,17 +17,21 @@ import java.util.ArrayList;
 public class PageService {
 
     private final PageRepository pageRepository;
-    private final ContentSanitizer sanitizer;
+    private final UserContentSanitizer sanitizer;
 
-    public PageService(PageRepository pageRepository, ContentSanitizer sanitizer) {
+    public PageService(PageRepository pageRepository, UserContentSanitizer sanitizer) {
         this.pageRepository = pageRepository;
         this.sanitizer = sanitizer;
     }
 
     @Transactional
     public Page create(String slug, String title, String content, List<String> images) {
+        String normalizedSlug = normalizeSlug(slug);
+        if (pageRepository.existsBySlug(normalizedSlug)) {
+            throw new DataIntegrityViolationException("Page slug already exists: " + normalizedSlug);
+        }
         Page page = Page.builder()
-                .slug(slug)
+                .slug(normalizedSlug)
                 .title(title)
                 .content(sanitizer.sanitize(content))
                 .images(cleanImages(images))
@@ -38,7 +43,11 @@ public class PageService {
     public Page update(String slug, String newSlug, String title, String content, List<String> images) {
         Page existing = pageRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Page not found: " + slug));
-        existing.setSlug(newSlug);
+        String normalizedSlug = normalizeSlug(newSlug);
+        if (!normalizedSlug.equals(existing.getSlug()) && pageRepository.existsBySlug(normalizedSlug)) {
+            throw new DataIntegrityViolationException("Page slug already exists: " + normalizedSlug);
+        }
+        existing.setSlug(normalizedSlug);
         existing.setTitle(title);
         existing.setContent(sanitizer.sanitize(content));
         existing.setImages(cleanImages(images));
@@ -63,7 +72,7 @@ public class PageService {
         return pageRepository.findAll();
     }
 
-    // Sanitization handled by ContentSanitizer component.
+    // Sanitization handled by UserContentSanitizer component.
 
     private List<String> cleanImages(List<String> images) {
         if (images == null) return new ArrayList<>();
@@ -73,5 +82,25 @@ public class PageService {
                 .filter(s -> !s.isEmpty())
                 .toList();
         return new ArrayList<>(list);
+    }
+
+    private String normalizeSlug(String slug) {
+        if (slug == null) {
+            throw new IllegalArgumentException("Slug is required");
+        }
+        String normalized = slug.toLowerCase().trim();
+        normalized = normalized.replaceAll("[^a-z0-9]+", "-");
+        normalized = normalized.replaceAll("-{2,}", "-");
+        normalized = normalized.replaceAll("(^-+|-+$)", "");
+        if (normalized.isBlank()) {
+            throw new IllegalArgumentException("Slug is invalid");
+        }
+        if (normalized.length() > 100) {
+            normalized = normalized.substring(0, 100).replaceAll("-+$", "");
+        }
+        if (normalized.isBlank()) {
+            throw new IllegalArgumentException("Slug is invalid");
+        }
+        return normalized;
     }
 }

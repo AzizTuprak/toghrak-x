@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SocialLinksService } from '../../../service/social-links.service';
+import { SocialLinksService } from '../../../services/social-links.service';
 import { SocialLink } from '../../../models/social-link';
 
 @Component({

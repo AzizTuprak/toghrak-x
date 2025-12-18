@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PostsService } from '../../../service/posts.service';
+import { PostsService } from '../../../services/posts.service';
 import { PostResponse } from '../../../models/post';
 import { of, switchMap } from 'rxjs';
-import { AuthService } from '../../../service/auth.service';
-import { UserService } from '../../../service/user.service';
+import { AuthService } from '../../../services/auth.service';
+import { UsersService } from '../../../services/users.service';
 import { User } from '../../../models/user';
 
 @Component({
@@ -26,7 +26,7 @@ export class PostDetailComponent implements OnInit {
     private router: Router,
     private posts: PostsService,
     private auth: AuthService,
-    private users: UserService
+    private users: UsersService
   ) {}
 
   ngOnInit(): void {

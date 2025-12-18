@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin")
-public class AdminController {
+public class AdminDashboardController {
 
     // This endpoint is only accessible to users with the ADMIN role.
     @GetMapping("/dashboard")

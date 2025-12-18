@@ -1,12 +1,12 @@
-package com.mynewsblog.backend.service.command;
+package com.mynewsblog.backend.service.input;
 
-public class UpdateUserCommand {
+public class UpdateUserInput {
     private final String username;
     private final String email;
     private final String password;
     private final String roleName;
 
-    public UpdateUserCommand(String username, String email, String password, String roleName) {
+    public UpdateUserInput(String username, String email, String password, String roleName) {
         this.username = username;
         this.email = email;
         this.password = password;

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PageService } from '../../../service/page.service';
+import { PagesService } from '../../../services/pages.service';
 import { ContentPage } from '../../../models/content-page';
 
 @Component({
@@ -13,7 +13,7 @@ export class PageViewComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private route: ActivatedRoute, private pageService: PageService) {}
+  constructor(private route: ActivatedRoute, private pageService: PagesService) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {

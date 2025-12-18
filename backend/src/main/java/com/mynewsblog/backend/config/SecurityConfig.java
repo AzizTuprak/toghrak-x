@@ -1,7 +1,7 @@
 package com.mynewsblog.backend.config;
 
 import com.mynewsblog.backend.security.JwtAuthenticationFilter;
-import com.mynewsblog.backend.security.UserDetailsServiceImpl;
+import com.mynewsblog.backend.security.AppUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod; // <-- Important for requestMatchers with methods
@@ -33,11 +33,11 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     @SuppressWarnings("unused")
-    private final UserDetailsServiceImpl userDetailsService;
+    private final AppUserDetailsService userDetailsService;
     private final boolean swaggerPublic;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          UserDetailsServiceImpl userDetailsService,
+                          AppUserDetailsService userDetailsService,
                           @org.springframework.beans.factory.annotation.Value("${app.security.swagger-public:true}") boolean swaggerPublic) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;

@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { ContentPage, UpsertContentPageRequest } from '../models/content-page';
 
 @Injectable({ providedIn: 'root' })
-export class PageService {
+export class PagesService {
   private base = `${environment.apiBaseUrl}/pages`;
   private pagesSubject = new BehaviorSubject<ContentPage[]>([]);
   pages$ = this.pagesSubject.asObservable();

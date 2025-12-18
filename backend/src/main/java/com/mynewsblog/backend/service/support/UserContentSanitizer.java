@@ -1,5 +1,5 @@
 package com.mynewsblog.backend.service.support;
 
-public interface ContentSanitizer {
+public interface UserContentSanitizer {
     String sanitize(String input);
 }

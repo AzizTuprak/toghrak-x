@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of, switchMap } from 'rxjs';
-import { AuthService } from './service/auth.service';
-import { UserService } from './service/user.service';
-import { CategoriesService } from './service/categories.service';
-import { PageService } from './service/page.service';
-import { SocialLinksService } from './service/social-links.service';
+import { AuthService } from './services/auth.service';
+import { UsersService } from './services/users.service';
+import { CategoriesService } from './services/categories.service';
+import { PagesService } from './services/pages.service';
+import { SocialLinksService } from './services/social-links.service';
 import { SocialLink } from './models/social-link';
 import { User } from './models/user';
 import { Category } from './models/category';
 import { ContentPage } from './models/content-page';
-import { SiteSettingsService } from './service/site-settings.service';
+import { SiteSettingsService } from './services/site-settings.service';
 
 @Component({
   selector: 'app-root',
@@ -32,9 +32,9 @@ export class AppComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private users: UserService,
+    private users: UsersService,
     private categoriesService: CategoriesService,
-    private pageService: PageService,
+    private pageService: PagesService,
     private socialLinksService: SocialLinksService,
     private siteSettingsService: SiteSettingsService,
     private router: Router

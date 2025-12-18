@@ -1,14 +1,14 @@
 package com.mynewsblog.backend.controller;
 
 import com.mynewsblog.backend.dto.CreatePostRequest;
-import com.mynewsblog.backend.dto.PostResponseDTO;
+import com.mynewsblog.backend.dto.PostResponse;
 import com.mynewsblog.backend.dto.UpdatePostRequest;
 import com.mynewsblog.backend.model.Post;
 import com.mynewsblog.backend.model.PostImage;
 import com.mynewsblog.backend.security.UserPrincipal;
 import com.mynewsblog.backend.service.PostService;
-import com.mynewsblog.backend.service.command.CreatePostCommand;
-import com.mynewsblog.backend.service.command.UpdatePostCommand;
+import com.mynewsblog.backend.service.input.CreatePostInput;
+import com.mynewsblog.backend.service.input.UpdatePostInput;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -29,65 +29,65 @@ public class PostController {
 
     // 1) CREATE a new post
     @PostMapping
-    public ResponseEntity<PostResponseDTO> createPost(
+    public ResponseEntity<PostResponse> createPost(
             @Valid @RequestBody CreatePostRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        CreatePostCommand command = new CreatePostCommand(
+        CreatePostInput input = new CreatePostInput(
                 request.getTitle(),
                 request.getContent(),
                 request.getCategoryId(),
                 request.getCoverImage(),
                 request.getImageUrls());
-        Post newPost = postService.createPost(currentUser.getId(), command);
-        return ResponseEntity.ok(toPostResponseDTO(newPost));
+        Post newPost = postService.createPost(currentUser.getId(), input);
+        return ResponseEntity.ok(toPostResponse(newPost));
     }
 
     // paginated GET /api/posts
     @GetMapping
-    public ResponseEntity<Page<PostResponseDTO>> getPosts(
+    public ResponseEntity<Page<PostResponse>> getPosts(
             @org.springframework.data.web.PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(value = "categoryId", required = false) Long categoryId) {
         // hard cap page size to prevent abuse (e.g., max 50)
         int safeSize = Math.min(pageable.getPageSize(), 50);
         Pageable safePageable = PageRequest.of(pageable.getPageNumber(), safeSize, pageable.getSort());
 
-        Page<PostResponseDTO> page = postService
+        Page<PostResponse> page = postService
                 .getPosts(safePageable, categoryId)
-                .map(this::toPostResponseDTO);
+                .map(this::toPostResponse);
 
         return ResponseEntity.ok(page);
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<java.util.List<PostResponseDTO>> getPopular(
+    public ResponseEntity<java.util.List<PostResponse>> getPopular(
             @RequestParam(value = "limit", defaultValue = "6") int limit) {
         var popular = postService.getPopular(limit).stream()
-                .map(this::toPostResponseDTO)
+                .map(this::toPostResponse)
                 .toList();
         return ResponseEntity.ok(popular);
     }
 
     // 3) GET single post by ID
     @GetMapping("/{id}")
-    public ResponseEntity<PostResponseDTO> getPost(@PathVariable Long id) {
+    public ResponseEntity<PostResponse> getPost(@PathVariable Long id) {
         Post post = postService.getPost(id);
-        return ResponseEntity.ok(toPostResponseDTO(post));
+        return ResponseEntity.ok(toPostResponse(post));
     }
 
     // 4) UPDATE a post (Only the owner can update)
     @PutMapping("/{id}")
-    public ResponseEntity<PostResponseDTO> updatePost(
+    public ResponseEntity<PostResponse> updatePost(
             @PathVariable Long id,
             @Valid @RequestBody UpdatePostRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        UpdatePostCommand command = new UpdatePostCommand(
+        UpdatePostInput input = new UpdatePostInput(
                 request.getTitle(),
                 request.getContent(),
                 request.getCategoryId(),
                 request.getCoverImage(),
                 request.getImageUrls());
-        Post updatedPost = postService.updatePost(id, currentUser.getId(), isAdmin(currentUser), command);
-        return ResponseEntity.ok(toPostResponseDTO(updatedPost));
+        Post updatedPost = postService.updatePost(id, currentUser.getId(), isAdmin(currentUser), input);
+        return ResponseEntity.ok(toPostResponse(updatedPost));
     }
 
     // 5) DELETE a post (Only the owner or admin can delete)
@@ -104,25 +104,24 @@ public class PostController {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
-    // Unified converter method to transform Post entity to PostResponseDTO
-    private PostResponseDTO toPostResponseDTO(Post post) {
-        PostResponseDTO dto = new PostResponseDTO();
-        dto.setId(post.getId());
-        dto.setTitle(post.getTitle());
-        dto.setSlug(post.getSlug());
-        dto.setContent(post.getContent());
-        dto.setCoverImage(post.getCoverImage());
-        dto.setCategoryId(post.getCategory().getId());
-        dto.setCategoryName(post.getCategory().getName());
-        dto.setAuthorUsername(post.getAuthor().getUsername());
-        dto.setCreatedAt(post.getCreatedAt());
-        dto.setUpdatedAt(post.getUpdatedAt());
-        dto.setViewCount(post.getViewCount());
-        dto.setImageUrls(
+    private PostResponse toPostResponse(Post post) {
+        PostResponse response = new PostResponse();
+        response.setId(post.getId());
+        response.setTitle(post.getTitle());
+        response.setSlug(post.getSlug());
+        response.setContent(post.getContent());
+        response.setCoverImage(post.getCoverImage());
+        response.setCategoryId(post.getCategory().getId());
+        response.setCategoryName(post.getCategory().getName());
+        response.setAuthorUsername(post.getAuthor().getUsername());
+        response.setCreatedAt(post.getCreatedAt());
+        response.setUpdatedAt(post.getUpdatedAt());
+        response.setViewCount(post.getViewCount());
+        response.setImageUrls(
                 post.getImages().stream()
                         .map(PostImage::getImageUrl)
                         .toList());
-        return dto;
+        return response;
 
     }
 

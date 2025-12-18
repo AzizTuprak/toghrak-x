@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SearchResult {
+public class SearchResultItem {
     private String type;   // POST, PAGE, SOCIAL
     private String title;
     private String url;

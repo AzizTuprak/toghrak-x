@@ -2,12 +2,12 @@ package com.mynewsblog.backend.controller;
 
 import com.mynewsblog.backend.dto.CreateUserRequest;
 import com.mynewsblog.backend.dto.UpdateUserRequest;
-import com.mynewsblog.backend.dto.UserResponseAdminDTO;
-import com.mynewsblog.backend.dto.UserResponseDTO;
+import com.mynewsblog.backend.dto.AdminUserResponse;
+import com.mynewsblog.backend.dto.UserProfileResponse;
 import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.security.UserPrincipal;
 import com.mynewsblog.backend.service.UserService;
-import com.mynewsblog.backend.service.command.UpdateUserCommand;
+import com.mynewsblog.backend.service.input.UpdateUserInput;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,22 +30,22 @@ public class UserController {
     // 1️⃣ Admin can create a new user (Editor/Admin)
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponseAdminDTO> createUser(@Valid @RequestBody CreateUserRequest request) {
+    public ResponseEntity<AdminUserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
         User newUser = userService.createUser(
                 request.getUsername(),
                 request.getEmail(),
                 request.getPassword(),
                 request.getRoleName());
         // Only admins can create users, so we return the admin DTO.
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapToAdminDTO(newUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(toAdminUserResponse(newUser));
     }
 
     // 2️⃣ Get all users (Admins only)
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserResponseAdminDTO> getAllUsers() {
+    public List<AdminUserResponse> getAllUsers() {
         return userService.getAllUsers().stream()
-                .map(this::mapToAdminDTO)
+                .map(this::toAdminUserResponse)
                 .toList();
     }
 
@@ -58,17 +58,17 @@ public class UserController {
         }
         User user = userService.getUser(currentUser.getId());
         if (isAdmin(currentUser)) {
-            return ResponseEntity.ok(mapToAdminDTO(user));
+            return ResponseEntity.ok(toAdminUserResponse(user));
         } else {
-            return ResponseEntity.ok(mapToUserDTO(user));
+            return ResponseEntity.ok(toUserProfileResponse(user));
         }
     }
 
     // 4️⃣ Admins can get any user by ID
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponseAdminDTO> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(mapToAdminDTO(userService.getUser(id)));
+    public ResponseEntity<AdminUserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(toAdminUserResponse(userService.getUser(id)));
     }
 
     // 5️⃣ Update user (Users can update their own profile, Admins can update any
@@ -78,17 +78,17 @@ public class UserController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        UpdateUserCommand cmd = new UpdateUserCommand(
+        UpdateUserInput input = new UpdateUserInput(
                 request.getUsername(),
                 request.getEmail(),
                 request.getPassword(),
                 request.getRoleName()
         );
-        User updatedUser = userService.updateUser(id, currentUser.getId(), isAdmin(currentUser), cmd);
+        User updatedUser = userService.updateUser(id, currentUser.getId(), isAdmin(currentUser), input);
         if (isAdmin(currentUser)) {
-            return ResponseEntity.ok(mapToAdminDTO(updatedUser));
+            return ResponseEntity.ok(toAdminUserResponse(updatedUser));
         } else {
-            return ResponseEntity.ok(mapToUserDTO(updatedUser));
+            return ResponseEntity.ok(toUserProfileResponse(updatedUser));
         }
     }
 
@@ -100,29 +100,29 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // --- Helper Methods for DTO mapping ---
+    // --- Helper Methods for response mapping ---
 
     private boolean isAdmin(UserPrincipal currentUser) {
         return currentUser.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
     }
 
-    private UserResponseAdminDTO mapToAdminDTO(User user) {
-        UserResponseAdminDTO dto = new UserResponseAdminDTO();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
+    private AdminUserResponse toAdminUserResponse(User user) {
+        AdminUserResponse response = new AdminUserResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
         // Include role info for admin users
-        dto.setRoleName(user.getRole().getName());
-        return dto;
+        response.setRoleName(user.getRole().getName());
+        return response;
     }
 
-    private UserResponseDTO mapToUserDTO(User user) {
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
-        dto.setRoleName(user.getRole() != null ? user.getRole().getName() : null);
-        return dto;
+    private UserProfileResponse toUserProfileResponse(User user) {
+        UserProfileResponse response = new UserProfileResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setRoleName(user.getRole() != null ? user.getRole().getName() : null);
+        return response;
     }
 }

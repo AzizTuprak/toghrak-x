@@ -15,12 +15,12 @@ import java.util.Date;
 
 @Component
 @Slf4j
-public class JwtUtil {
+public class JwtTokenService {
 
     private final Key key;
     private final Long jwtExpirationMs;
 
-    public JwtUtil(@Value("${app.jwt.secret}") String secret,
+    public JwtTokenService(@Value("${app.jwt.secret}") String secret,
             @Value("${app.jwt.expiration}") Long jwtExpirationMs) {
         // Convert the secret string to a Key.
         // The secret must be long enough (at least 64 characters for HS512).

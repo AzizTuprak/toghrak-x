@@ -41,6 +41,9 @@ public class SocialLinkService {
     }
 
     public void delete(Long id) {
+        if (!repo.existsById(id)) {
+            throw new ResourceNotFoundException("Social link not found: " + id);
+        }
         repo.deleteById(id);
     }
 }

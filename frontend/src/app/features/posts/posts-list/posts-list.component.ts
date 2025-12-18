@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of, switchMap, combineLatest } from 'rxjs';
-import { PostsService } from '../../../service/posts.service';
-import { AuthService } from '../../../service/auth.service';
-import { UserService } from '../../../service/user.service';
+import { PostsService } from '../../../services/posts.service';
+import { AuthService } from '../../../services/auth.service';
+import { UsersService } from '../../../services/users.service';
 import { PostResponse } from '../../../models/post';
 import { Page } from '../../../models/page';
 import { User } from '../../../models/user';
-import { CategoriesService } from '../../../service/categories.service';
+import { CategoriesService } from '../../../services/categories.service';
 import { Category } from '../../../models/category';
 
 @Component({
@@ -31,7 +31,7 @@ export class PostsListComponent implements OnInit {
   constructor(
     private postsService: PostsService,
     private auth: AuthService,
-    private users: UserService,
+    private users: UsersService,
     private categoriesService: CategoriesService,
     private route: ActivatedRoute,
     public router: Router

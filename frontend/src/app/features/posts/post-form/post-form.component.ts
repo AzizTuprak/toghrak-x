@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CategoriesService } from '../../../service/categories.service';
-import { PostsService } from '../../../service/posts.service';
-import { ImagesService } from '../../../service/images.service';
+import { CategoriesService } from '../../../services/categories.service';
+import { PostsService } from '../../../services/posts.service';
+import { ImagesService } from '../../../services/images.service';
 import { Category } from '../../../models/category';
 import {
   CreatePostRequest,

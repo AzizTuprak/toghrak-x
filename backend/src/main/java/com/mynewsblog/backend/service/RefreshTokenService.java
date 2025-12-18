@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @Transactional
@@ -38,7 +40,7 @@ public class RefreshTokenService {
         RefreshToken token = RefreshToken.builder()
                 .token(hash(raw))
                 .user(user)
-                .expiresAt(LocalDateTime.now().plusNanos(refreshTtlMs * 1_000_000))
+                .expiresAt(LocalDateTime.now().plus(refreshTtlMs, ChronoUnit.MILLIS))
                 .revoked(false)
                 .build();
         token.setPlainToken(raw);
@@ -91,7 +93,7 @@ public class RefreshTokenService {
     private String hash(String token) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] bytes = digest.digest(token.getBytes());
+            byte[] bytes = digest.digest(token.getBytes(StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
             for (byte b : bytes) {
                 sb.append(String.format("%02x", b));

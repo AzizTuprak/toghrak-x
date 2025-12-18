@@ -20,6 +20,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email); // Get user email
 
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
+    long countByRole_Name(String roleName);
+
     // Get users by role (using property path notation to access role's name)
     @EntityGraph(attributePaths = "role")
     List<User> findByRole_Name(String roleName);  // Useful for admins listing editors, etc.

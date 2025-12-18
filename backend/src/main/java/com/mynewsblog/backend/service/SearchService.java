@@ -3,10 +3,10 @@ package com.mynewsblog.backend.service;
 import com.mynewsblog.backend.model.Page;
 import com.mynewsblog.backend.model.Post;
 import com.mynewsblog.backend.model.SocialLink;
+import com.mynewsblog.backend.dto.SearchResultItem;
 import com.mynewsblog.backend.repository.PageRepository;
 import com.mynewsblog.backend.repository.PostRepository;
 import com.mynewsblog.backend.repository.SocialLinkRepository;
-import com.mynewsblog.backend.service.result.SearchHit;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,41 +25,41 @@ public class SearchService {
         this.socialLinkRepository = socialLinkRepository;
     }
 
-    public List<SearchHit> search(String q) {
+    public List<SearchResultItem> search(String q) {
         if (q == null || q.isBlank()) {
             return List.of();
         }
         String term = q.trim();
-        List<SearchHit> results = new ArrayList<>();
+        List<SearchResultItem> results = new ArrayList<>();
 
         List<Post> posts = postRepository.searchTop10(term);
         posts.forEach(p -> {
-            results.add(new SearchHit(
-                    "POST",
-                    p.getTitle(),
-                    "/posts/" + p.getId(),
-                    snippet(p.getContent(), term)
-            ));
+            SearchResultItem item = new SearchResultItem();
+            item.setType("POST");
+            item.setTitle(p.getTitle());
+            item.setUrl("/posts/" + p.getId());
+            item.setSnippet(snippet(p.getContent(), term));
+            results.add(item);
         });
 
         List<Page> pages = pageRepository.searchTop10(term);
         pages.forEach(p -> {
-            results.add(new SearchHit(
-                    "PAGE",
-                    p.getTitle(),
-                    "/page/" + p.getSlug(),
-                    snippet(p.getContent(), term)
-            ));
+            SearchResultItem item = new SearchResultItem();
+            item.setType("PAGE");
+            item.setTitle(p.getTitle());
+            item.setUrl("/page/" + p.getSlug());
+            item.setSnippet(snippet(p.getContent(), term));
+            results.add(item);
         });
 
         List<SocialLink> socials = socialLinkRepository.findTop10ByLabelContainingIgnoreCase(term);
         socials.forEach(s -> {
-            results.add(new SearchHit(
-                    "SOCIAL",
-                    s.getLabel(),
-                    s.getUrl(),
-                    s.getUrl()
-            ));
+            SearchResultItem item = new SearchResultItem();
+            item.setType("SOCIAL");
+            item.setTitle(s.getLabel());
+            item.setUrl(s.getUrl());
+            item.setSnippet(s.getUrl());
+            results.add(item);
         });
 
         return results;

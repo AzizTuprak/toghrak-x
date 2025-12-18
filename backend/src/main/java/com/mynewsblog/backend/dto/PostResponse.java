@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class PostResponseDTO {
+public class PostResponse {
     private Long id;
     private String title;
     private String slug;

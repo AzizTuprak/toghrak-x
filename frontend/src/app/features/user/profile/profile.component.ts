@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../../../service/user.service';
+import { UsersService } from '../../../services/users.service';
 import { User } from '../../../models/user';
 
 @Component({
@@ -11,7 +11,7 @@ export class ProfileComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private users: UserService) {}
+  constructor(private users: UsersService) {}
 
   ngOnInit(): void {
     this.loading = true;

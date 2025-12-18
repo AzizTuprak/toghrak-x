@@ -8,9 +8,9 @@ import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.repository.CategoryRepository;
 import com.mynewsblog.backend.repository.PostRepository;
 import com.mynewsblog.backend.repository.UserRepository;
-import com.mynewsblog.backend.service.command.CreatePostCommand;
-import com.mynewsblog.backend.service.command.UpdatePostCommand;
-import com.mynewsblog.backend.service.support.ContentSanitizer;
+import com.mynewsblog.backend.service.input.CreatePostInput;
+import com.mynewsblog.backend.service.input.UpdatePostInput;
+import com.mynewsblog.backend.service.support.UserContentSanitizer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,45 +28,45 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final ContentSanitizer sanitizer;
+    private final UserContentSanitizer sanitizer;
 
     public PostService(PostRepository postRepository,
             UserRepository userRepository,
             CategoryRepository categoryRepository,
-            ContentSanitizer sanitizer) {
+            UserContentSanitizer sanitizer) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.sanitizer = sanitizer;
     }
 
-    public Post createPost(Long authorId, CreatePostCommand command) {
+    public Post createPost(Long authorId, CreatePostInput input) {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found with id=" + authorId));
 
-        Category category = categoryRepository.findById(command.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + command.getCategoryId()));
+        Category category = categoryRepository.findById(input.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + input.getCategoryId()));
 
-        String slug = generateUniqueSlug(command.getTitle(), null);
+        String slug = generateUniqueSlug(input.getTitle(), null);
 
         Post post = Post.builder()
-                .title(command.getTitle())
+                .title(input.getTitle())
                 .slug(slug)
-                .content(sanitizer.sanitize(command.getContent()))
+                .content(sanitizer.sanitize(input.getContent()))
                 .author(author)
                 .category(category)
-                .coverImage(command.getCoverImage())
+                .coverImage(input.getCoverImage())
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        setImages(post, command.getImageUrls());
+        setImages(post, input.getImageUrls());
 
         return postRepository.save(post);
     }
 
     // 1️⃣ Create a new post
     // 2️⃣ Update an existing post
-    public Post updatePost(Long postId, Long requestUserId, boolean requestUserAdmin, UpdatePostCommand command) {
+    public Post updatePost(Long postId, Long requestUserId, boolean requestUserAdmin, UpdatePostInput input) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
 
@@ -78,11 +78,11 @@ public class PostService {
             throw new AccessDeniedException("You can only update your own posts!");
         }
 
-        String newTitle = command.getTitle();
-        String newContent = command.getContent();
-        Long newCategoryId = command.getCategoryId();
-        String newCoverImage = command.getCoverImage();
-        List<String> imageUrls = command.getImageUrls();
+        String newTitle = input.getTitle();
+        String newContent = input.getContent();
+        Long newCategoryId = input.getCategoryId();
+        String newCoverImage = input.getCoverImage();
+        List<String> imageUrls = input.getImageUrls();
 
         if (newTitle != null && !newTitle.isBlank()) {
             post.setTitle(newTitle);
@@ -209,5 +209,5 @@ public class PostService {
         post.getImages().addAll(newImages);
     }
 
-    // Sanitization handled by ContentSanitizer component.
+    // Sanitization handled by UserContentSanitizer component.
 }

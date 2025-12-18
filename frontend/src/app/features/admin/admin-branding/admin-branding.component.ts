@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { SiteSettingsService } from '../../../service/site-settings.service';
-import { ImagesService } from '../../../service/images.service';
+import { SiteSettingsService } from '../../../services/site-settings.service';
+import { ImagesService } from '../../../services/images.service';
 import { SiteSettings } from '../../../models/site-settings';
 
 @Component({

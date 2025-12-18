@@ -5,9 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserResponseDTO {
+public class AdminUserResponse {
     private Long id;
     private String username;
     private String email;
-    private String roleName;
+    private String roleName; // Only admins see this.
 }

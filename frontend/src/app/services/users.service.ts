@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { User, CreateUserRequest, UpdateUserRequest } from '../models/user';
 
 @Injectable({ providedIn: 'root' })
-export class UserService {
+export class UsersService {
   private base = `${environment.apiBaseUrl}/users`;
 
   constructor(private http: HttpClient) {}

@@ -1,15 +1,15 @@
-package com.mynewsblog.backend.service.command;
+package com.mynewsblog.backend.service.input;
 
 import java.util.List;
 
-public class CreatePostCommand {
+public class CreatePostInput {
     private final String title;
     private final String content;
     private final Long categoryId;
     private final String coverImage;
     private final List<String> imageUrls;
 
-    public CreatePostCommand(String title, String content, Long categoryId, String coverImage, List<String> imageUrls) {
+    public CreatePostInput(String title, String content, Long categoryId, String coverImage, List<String> imageUrls) {
         this.title = title;
         this.content = content;
         this.categoryId = categoryId;

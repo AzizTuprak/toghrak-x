@@ -6,11 +6,11 @@ import {
   UrlTree,
 } from '@angular/router';
 import { Observable, catchError, map, of } from 'rxjs';
-import { UserService } from '../service/user.service';
+import { UsersService } from '../services/users.service';
 
 @Injectable({ providedIn: 'root' })
 export class RoleGuard implements CanActivate {
-  constructor(private users: UserService, private router: Router) {}
+  constructor(private users: UsersService, private router: Router) {}
 
   canActivate(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
     const requiredRoles = route.data['roles'] as string[] | undefined;

@@ -2,7 +2,7 @@ package com.mynewsblog.backend.controller;
 
 import com.mynewsblog.backend.dto.LoginRequest;
 import com.mynewsblog.backend.dto.LoginResponse;
-import com.mynewsblog.backend.security.JwtUtil;
+import com.mynewsblog.backend.security.JwtTokenService;
 import com.mynewsblog.backend.security.UserPrincipal;
 import com.mynewsblog.backend.service.RefreshTokenService;
 import jakarta.validation.Valid;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
         private final AuthenticationManager authenticationManager;
-        private final JwtUtil jwtUtil;
+        private final JwtTokenService jwtTokenService;
         private final RefreshTokenService refreshTokenService;
         private final long refreshExpiryMs;
         private final boolean secureCookie;
@@ -33,13 +33,13 @@ public class AuthController {
 
         @Autowired
         public AuthController(AuthenticationManager authenticationManager,
-                        JwtUtil jwtUtil,
+                        JwtTokenService jwtTokenService,
                         RefreshTokenService refreshTokenService,
                         @Value("${app.refresh.expiration:43200000}") long refreshExpiryMs,
                         @Value("${app.refresh.cookie.secure:false}") boolean secureCookie,
                         @Value("${app.refresh.cookie.domain:}") String cookieDomain) {
                 this.authenticationManager = authenticationManager;
-                this.jwtUtil = jwtUtil;
+                this.jwtTokenService = jwtTokenService;
                 this.refreshTokenService = refreshTokenService;
                 this.refreshExpiryMs = refreshExpiryMs;
                 this.secureCookie = secureCookie;
@@ -54,7 +54,7 @@ public class AuthController {
                                                 loginRequest.getUsername(),
                                                 loginRequest.getPassword()));
                 // If authentication was successful, generate a JWT token
-                String token = jwtUtil.generateToken(authentication);
+                String token = jwtTokenService.generateToken(authentication);
 
                 // Issue refresh token cookie
                 Long userId = ((UserPrincipal) authentication.getPrincipal()).getId();
@@ -74,7 +74,7 @@ public class AuthController {
                         return ResponseEntity.status(401).build();
                 }
                 var rotated = refreshTokenService.rotate(refreshToken);
-                String newAccess = jwtUtil.generateTokenFromUserId(rotated.getUser().getId());
+                String newAccess = jwtTokenService.generateTokenFromUserId(rotated.getUser().getId());
                 ResponseCookie cookie = buildRefreshCookie(rotated.getPlainToken(), refreshExpiryMs);
                 return ResponseEntity.ok()
                         .header(HttpHeaders.SET_COOKIE, cookie.toString())

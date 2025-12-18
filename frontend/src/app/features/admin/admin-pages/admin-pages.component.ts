@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { PageService } from '../../../service/page.service';
-import { ImagesService } from '../../../service/images.service';
+import { PagesService } from '../../../services/pages.service';
+import { ImagesService } from '../../../services/images.service';
 import { ContentPage, UpsertContentPageRequest } from '../../../models/content-page';
 
 @Component({
@@ -23,7 +23,7 @@ export class AdminPagesComponent implements OnInit {
   uploadError: string | null = null;
   uploading = false;
 
-  constructor(private pageService: PageService, private imagesService: ImagesService) {}
+  constructor(private pageService: PagesService, private imagesService: ImagesService) {}
 
   ngOnInit(): void {
     this.fetch();

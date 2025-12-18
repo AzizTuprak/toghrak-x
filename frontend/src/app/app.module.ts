@@ -5,8 +5,6 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { UserService } from './service/user.service';
-import { User, CreateUserRequest } from './models/user';
 import { LoginComponent } from './features/auth/login/login.component';
 import { PostsListComponent } from './features/posts/posts-list/posts-list.component';
 import { PostDetailComponent } from './features/posts/post-detail/post-detail.component';

@@ -1,6 +1,6 @@
 package com.mynewsblog.backend.service;
 
-import com.mynewsblog.backend.service.command.UpdateUserCommand;
+import com.mynewsblog.backend.service.input.UpdateUserInput;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.exception.UsernameAlreadyExistsException;
 import com.mynewsblog.backend.exception.EmailAlreadyExistsException;
@@ -39,10 +39,10 @@ public class UserService {
     // 1️⃣ Create user (Editor/Admin)
     public User createUser(String username, String email, String password, String roleName) {
         // Check for duplicate username
-        if (userRepository.findByUsername(username).isPresent()) {
+        if (userRepository.existsByUsername(username)) {
             throw new UsernameAlreadyExistsException("Username already exists!");
         }
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyExistsException("Email already exists!");
         }
 
@@ -74,7 +74,7 @@ public class UserService {
 
     // 4️⃣ Update user (Users can update their own profile, Admins can update any
     // user)
-    public User updateUser(Long userId, Long currentUserId, boolean currentUserAdmin, UpdateUserCommand request) {
+    public User updateUser(Long userId, Long currentUserId, boolean currentUserAdmin, UpdateUserInput input) {
         // Fetch the existing user
         User user = getUser(userId);
 
@@ -84,22 +84,22 @@ public class UserService {
         }
 
         // Update username if provided and different
-        String newUsername = request.getUsername();
+        String newUsername = input.getUsername();
         if (newUsername != null && !newUsername.isBlank() && !newUsername.equals(user.getUsername())) {
-            if (userRepository.findByUsername(newUsername).isPresent()) {
+            if (userRepository.existsByUsername(newUsername)) {
                 throw new UsernameAlreadyExistsException("Username already exists!");
             }
             user.setUsername(newUsername);
         }
 
         // Update password if provided (after encoding)
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        if (input.getPassword() != null && !input.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(input.getPassword()));
         }
         // Update email if provided and check uniqueness
-        String newEmail = request.getEmail();
+        String newEmail = input.getEmail();
         if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(user.getEmail())) {
-            if (userRepository.findByEmail(newEmail).isPresent()) {
+            if (userRepository.existsByEmail(newEmail)) {
                 throw new EmailAlreadyExistsException("Email already exists!");
             }
             user.setEmail(newEmail);
@@ -107,14 +107,14 @@ public class UserService {
 
         // Update role only if current user is admin
         if (currentUserAdmin) {
-            if (request.getRoleName() != null && !request.getRoleName().isBlank()) {
-                Role newRole = roleRepository.findByName(request.getRoleName())
-                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRoleName()));
+            if (input.getRoleName() != null && !input.getRoleName().isBlank()) {
+                Role newRole = roleRepository.findByName(input.getRoleName())
+                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + input.getRoleName()));
                 user.setRole(newRole);
             }
         } else {
             // Non-admin users are not allowed to update their role.
-            if (request.getRoleName() != null) {
+            if (input.getRoleName() != null) {
                 throw new AccessDeniedException("You cannot change your role.");
             }
         }
@@ -130,7 +130,7 @@ public class UserService {
 
         // Ensure there is at least one admin remaining
         if ("ADMIN".equals(user.getRole().getName()) &&
-                userRepository.findByRole_Name("ADMIN").size() <= 1) {
+                userRepository.countByRole_Name("ADMIN") <= 1) {
             throw new AccessDeniedException("Cannot delete the last admin.");
         }
 

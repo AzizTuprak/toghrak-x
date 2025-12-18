@@ -1,8 +1,7 @@
 package com.mynewsblog.backend.controller;
 
-import com.mynewsblog.backend.dto.SearchResult;
 import com.mynewsblog.backend.service.SearchService;
-import com.mynewsblog.backend.service.result.SearchHit;
+import com.mynewsblog.backend.dto.SearchResultItem;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,17 +19,7 @@ public class SearchController {
     }
 
     @GetMapping("/api/search")
-    public ResponseEntity<List<SearchResult>> search(@RequestParam(name = "q", required = false) String q) {
-        List<SearchResult> out = searchService.search(q).stream().map(this::toDto).toList();
-        return ResponseEntity.ok(out);
-    }
-
-    private SearchResult toDto(SearchHit hit) {
-        SearchResult r = new SearchResult();
-        r.setType(hit.getType());
-        r.setTitle(hit.getTitle());
-        r.setUrl(hit.getUrl());
-        r.setSnippet(hit.getSnippet());
-        return r;
+    public ResponseEntity<List<SearchResultItem>> search(@RequestParam(name = "q", required = false) String q) {
+        return ResponseEntity.ok(searchService.search(q));
     }
 }
