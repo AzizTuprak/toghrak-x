@@ -1,6 +1,6 @@
 package com.mynewsblog.backend.service;
 
-import com.mynewsblog.backend.service.input.UpdateUserInput;
+import com.mynewsblog.backend.dto.UpdateUserRequest;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.exception.UsernameAlreadyExistsException;
 import com.mynewsblog.backend.exception.EmailAlreadyExistsException;
@@ -74,7 +74,7 @@ public class UserService {
 
     // 4️⃣ Update user (Users can update their own profile, Admins can update any
     // user)
-    public User updateUser(Long userId, Long currentUserId, boolean currentUserAdmin, UpdateUserInput input) {
+    public User updateUser(Long userId, Long currentUserId, boolean currentUserAdmin, UpdateUserRequest request) {
         // Fetch the existing user
         User user = getUser(userId);
 
@@ -84,7 +84,7 @@ public class UserService {
         }
 
         // Update username if provided and different
-        String newUsername = input.getUsername();
+        String newUsername = request.getUsername();
         if (newUsername != null && !newUsername.isBlank() && !newUsername.equals(user.getUsername())) {
             if (userRepository.existsByUsername(newUsername)) {
                 throw new UsernameAlreadyExistsException("Username already exists!");
@@ -93,11 +93,11 @@ public class UserService {
         }
 
         // Update password if provided (after encoding)
-        if (input.getPassword() != null && !input.getPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(input.getPassword()));
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
         // Update email if provided and check uniqueness
-        String newEmail = input.getEmail();
+        String newEmail = request.getEmail();
         if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(user.getEmail())) {
             if (userRepository.existsByEmail(newEmail)) {
                 throw new EmailAlreadyExistsException("Email already exists!");
@@ -107,14 +107,14 @@ public class UserService {
 
         // Update role only if current user is admin
         if (currentUserAdmin) {
-            if (input.getRoleName() != null && !input.getRoleName().isBlank()) {
-                Role newRole = roleRepository.findByName(input.getRoleName())
-                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + input.getRoleName()));
+            if (request.getRoleName() != null && !request.getRoleName().isBlank()) {
+                Role newRole = roleRepository.findByName(request.getRoleName())
+                        .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRoleName()));
                 user.setRole(newRole);
             }
         } else {
             // Non-admin users are not allowed to update their role.
-            if (input.getRoleName() != null) {
+            if (request.getRoleName() != null) {
                 throw new AccessDeniedException("You cannot change your role.");
             }
         }

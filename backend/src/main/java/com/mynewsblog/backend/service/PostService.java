@@ -1,5 +1,7 @@
 package com.mynewsblog.backend.service;
 
+import com.mynewsblog.backend.dto.CreatePostRequest;
+import com.mynewsblog.backend.dto.UpdatePostRequest;
 import com.mynewsblog.backend.exception.ResourceNotFoundException;
 import com.mynewsblog.backend.model.Category;
 import com.mynewsblog.backend.model.Post;
@@ -8,8 +10,6 @@ import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.repository.CategoryRepository;
 import com.mynewsblog.backend.repository.PostRepository;
 import com.mynewsblog.backend.repository.UserRepository;
-import com.mynewsblog.backend.service.input.CreatePostInput;
-import com.mynewsblog.backend.service.input.UpdatePostInput;
 import com.mynewsblog.backend.service.support.UserContentSanitizer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,33 +40,33 @@ public class PostService {
         this.sanitizer = sanitizer;
     }
 
-    public Post createPost(Long authorId, CreatePostInput input) {
+    public Post createPost(Long authorId, CreatePostRequest request) {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author not found with id=" + authorId));
 
-        Category category = categoryRepository.findById(input.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + input.getCategoryId()));
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id=" + request.getCategoryId()));
 
-        String slug = generateUniqueSlug(input.getTitle(), null);
+        String slug = generateUniqueSlug(request.getTitle(), null);
 
         Post post = Post.builder()
-                .title(input.getTitle())
+                .title(request.getTitle())
                 .slug(slug)
-                .content(sanitizer.sanitize(input.getContent()))
+                .content(sanitizer.sanitize(request.getContent()))
                 .author(author)
                 .category(category)
-                .coverImage(input.getCoverImage())
+                .coverImage(request.getCoverImage())
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        setImages(post, input.getImageUrls());
+        setImages(post, request.getImageUrls());
 
         return postRepository.save(post);
     }
 
     // 1️⃣ Create a new post
     // 2️⃣ Update an existing post
-    public Post updatePost(Long postId, Long requestUserId, boolean requestUserAdmin, UpdatePostInput input) {
+    public Post updatePost(Long postId, Long requestUserId, boolean requestUserAdmin, UpdatePostRequest request) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
 
@@ -78,11 +78,11 @@ public class PostService {
             throw new AccessDeniedException("You can only update your own posts!");
         }
 
-        String newTitle = input.getTitle();
-        String newContent = input.getContent();
-        Long newCategoryId = input.getCategoryId();
-        String newCoverImage = input.getCoverImage();
-        List<String> imageUrls = input.getImageUrls();
+        String newTitle = request.getTitle();
+        String newContent = request.getContent();
+        Long newCategoryId = request.getCategoryId();
+        String newCoverImage = request.getCoverImage();
+        List<String> imageUrls = request.getImageUrls();
 
         if (newTitle != null && !newTitle.isBlank()) {
             post.setTitle(newTitle);

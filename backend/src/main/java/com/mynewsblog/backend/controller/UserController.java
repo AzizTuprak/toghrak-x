@@ -7,7 +7,6 @@ import com.mynewsblog.backend.dto.UserProfileResponse;
 import com.mynewsblog.backend.model.User;
 import com.mynewsblog.backend.security.UserPrincipal;
 import com.mynewsblog.backend.service.UserService;
-import com.mynewsblog.backend.service.input.UpdateUserInput;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,13 +77,7 @@ public class UserController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        UpdateUserInput input = new UpdateUserInput(
-                request.getUsername(),
-                request.getEmail(),
-                request.getPassword(),
-                request.getRoleName()
-        );
-        User updatedUser = userService.updateUser(id, currentUser.getId(), isAdmin(currentUser), input);
+        User updatedUser = userService.updateUser(id, currentUser.getId(), isAdmin(currentUser), request);
         if (isAdmin(currentUser)) {
             return ResponseEntity.ok(toAdminUserResponse(updatedUser));
         } else {

@@ -7,8 +7,6 @@ import com.mynewsblog.backend.model.Post;
 import com.mynewsblog.backend.model.PostImage;
 import com.mynewsblog.backend.security.UserPrincipal;
 import com.mynewsblog.backend.service.PostService;
-import com.mynewsblog.backend.service.input.CreatePostInput;
-import com.mynewsblog.backend.service.input.UpdatePostInput;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -32,13 +30,7 @@ public class PostController {
     public ResponseEntity<PostResponse> createPost(
             @Valid @RequestBody CreatePostRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        CreatePostInput input = new CreatePostInput(
-                request.getTitle(),
-                request.getContent(),
-                request.getCategoryId(),
-                request.getCoverImage(),
-                request.getImageUrls());
-        Post newPost = postService.createPost(currentUser.getId(), input);
+        Post newPost = postService.createPost(currentUser.getId(), request);
         return ResponseEntity.ok(toPostResponse(newPost));
     }
 
@@ -80,13 +72,7 @@ public class PostController {
             @PathVariable Long id,
             @Valid @RequestBody UpdatePostRequest request,
             @AuthenticationPrincipal UserPrincipal currentUser) {
-        UpdatePostInput input = new UpdatePostInput(
-                request.getTitle(),
-                request.getContent(),
-                request.getCategoryId(),
-                request.getCoverImage(),
-                request.getImageUrls());
-        Post updatedPost = postService.updatePost(id, currentUser.getId(), isAdmin(currentUser), input);
+        Post updatedPost = postService.updatePost(id, currentUser.getId(), isAdmin(currentUser), request);
         return ResponseEntity.ok(toPostResponse(updatedPost));
     }
 
