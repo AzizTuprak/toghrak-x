@@ -26,7 +26,6 @@ export class CategoriesService {
 
   refresh(): void {
     this.list().subscribe({
-      next: (cats) => this.categoriesSubject.next(cats),
       error: () => this.categoriesSubject.next([]),
     });
   }

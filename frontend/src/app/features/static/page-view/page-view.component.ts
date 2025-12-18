@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { PagesService } from '../../../services/pages.service';
 import { ContentPage } from '../../../models/content-page';
 
@@ -8,20 +9,28 @@ import { ContentPage } from '../../../models/content-page';
   templateUrl: './page-view.component.html',
   styleUrls: ['./page-view.component.css'],
 })
-export class PageViewComponent implements OnInit {
+export class PageViewComponent implements OnInit, OnDestroy {
   page?: ContentPage;
   loading = false;
   error: string | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(private route: ActivatedRoute, private pageService: PagesService) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
-      const slug = params.get('slug');
-      if (slug) {
-        this.fetch(slug);
-      }
-    });
+    this.route.paramMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const slug = params.get('slug');
+        if (slug) {
+          this.fetch(slug);
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private fetch(slug: string) {

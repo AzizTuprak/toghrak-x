@@ -10,6 +10,22 @@
   border-radius: 8px;
   background: #f8f9fb;
   font-weight: 700;
+  gap: 6px;
+  align-items: center;
+}
+
+.menu-icon {
+  display: inline-block;
+  width: 18px;
+  height: 12px;
+  background:
+    linear-gradient(#111, #111) 0 0 / 100% 2px no-repeat,
+    linear-gradient(#111, #111) 0 50% / 100% 2px no-repeat,
+    linear-gradient(#111, #111) 0 100% / 100% 2px no-repeat;
+}
+
+.menu-label {
+  display: inline-block;
 }
 
 .brand-block {

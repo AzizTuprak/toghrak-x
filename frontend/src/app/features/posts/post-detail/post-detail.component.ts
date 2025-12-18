@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PostsService } from '../../../services/posts.service';
 import { PostResponse } from '../../../models/post';
-import { of, switchMap } from 'rxjs';
+import { Subject, of, switchMap, takeUntil } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { UsersService } from '../../../services/users.service';
 import { User } from '../../../models/user';
@@ -12,7 +12,7 @@ import { User } from '../../../models/user';
   templateUrl: './post-detail.component.html',
   styleUrls: ['./post-detail.component.css'],
 })
-export class PostDetailComponent implements OnInit {
+export class PostDetailComponent implements OnInit, OnDestroy {
   post?: PostResponse;
   loading = false;
   error: string | null = null;
@@ -20,6 +20,7 @@ export class PostDetailComponent implements OnInit {
   currentUser?: User;
   isAdmin = false;
   isOwner = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -33,7 +34,10 @@ export class PostDetailComponent implements OnInit {
     // Load current user to decide if edit/delete actions should show
     this.auth
       .isLoggedIn()
-      .pipe(switchMap((loggedIn) => (loggedIn ? this.users.getMe() : of(null))))
+      .pipe(
+        switchMap((loggedIn) => (loggedIn ? this.users.getMe() : of(null))),
+        takeUntil(this.destroy$)
+      )
       .subscribe((user) => {
         this.currentUser = user ?? undefined;
         this.isAdmin = user?.roleName === 'ADMIN';
@@ -46,6 +50,11 @@ export class PostDetailComponent implements OnInit {
       return;
     }
     this.fetch(id);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   fetch(id: number) {

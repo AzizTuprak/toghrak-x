@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 import { SiteSettingsService } from '../../../services/site-settings.service';
 import { ImagesService } from '../../../services/images.service';
 import { SiteSettings } from '../../../models/site-settings';
@@ -9,26 +10,34 @@ import { SiteSettings } from '../../../models/site-settings';
   templateUrl: './admin-branding.component.html',
   styleUrls: ['./admin-branding.component.css'],
 })
-export class AdminBrandingComponent implements OnInit {
+export class AdminBrandingComponent implements OnInit, OnDestroy {
   form: Partial<SiteSettings> = { title: 'TuprakNews', logoUrl: '', slogan: '' };
   loading = false;
   saving = false;
   success?: string;
   error?: string;
+  private destroy$ = new Subject<void>();
 
   constructor(private settings: SiteSettingsService, private images: ImagesService) {}
 
   ngOnInit(): void {
     this.loading = true;
-    this.settings.settings$.subscribe((s) => {
-      if (s) {
-        this.form.title = s.title || 'TuprakNews';
-        this.form.logoUrl = s.logoUrl || '';
-        this.form.slogan = s.slogan || '';
-      }
-      this.loading = false;
-    });
+    this.settings.settings$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((s) => {
+        if (s) {
+          this.form.title = s.title || 'TuprakNews';
+          this.form.logoUrl = s.logoUrl || '';
+          this.form.slogan = s.slogan || '';
+        }
+        this.loading = false;
+      });
     this.settings.load();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onFileSelected(event: Event) {

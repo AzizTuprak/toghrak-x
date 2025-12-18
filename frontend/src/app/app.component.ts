@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, Subject, of, switchMap, takeUntil } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { UsersService } from './services/users.service';
 import { CategoriesService } from './services/categories.service';
@@ -17,7 +17,7 @@ import { SiteSettingsService } from './services/site-settings.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   isLoggedIn$: Observable<boolean>;
   currentUser?: User;
   isAdmin = false;
@@ -29,6 +29,7 @@ export class AppComponent implements OnInit {
   brandTitle = 'TuprakNews';
   brandTagline = 'Stories that matter, in one place.';
   isMenuOpen = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private auth: AuthService,
@@ -52,7 +53,8 @@ export class AppComponent implements OnInit {
             return of(null);
           }
           return this.users.getMe();
-        })
+        }),
+        takeUntil(this.destroy$)
       )
       .subscribe((user) => {
         if (user) {
@@ -61,31 +63,44 @@ export class AppComponent implements OnInit {
         }
       });
 
-    this.categoriesService.categories$.subscribe((cats) => (this.categories = cats));
+    this.categoriesService.categories$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((cats) => (this.categories = cats));
     this.categoriesService.refresh();
 
-    this.pageService.pages$.subscribe((pages) => (this.footerPages = pages));
+    this.pageService.pages$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((pages) => (this.footerPages = pages));
     this.pageService.load();
-    this.socialLinksService.links$.subscribe((links) => (this.socialLinks = links));
+    this.socialLinksService.links$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((links) => (this.socialLinks = links));
     this.socialLinksService.load();
-    this.siteSettingsService.settings$.subscribe((settings) => {
-      if (settings?.title) {
-        this.brandTitle = settings.title;
-      } else {
-        this.brandTitle = 'TuprakNews';
-      }
-      if (settings?.logoUrl) {
-        this.brandLogo = settings.logoUrl;
-      } else {
-        this.brandLogo = 'assets/tn.png';
-      }
-      if (settings?.slogan) {
-        this.brandTagline = settings.slogan;
-      } else {
-        this.brandTagline = 'Stories that matter, in one place.';
-      }
-    });
+    this.siteSettingsService.settings$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((settings) => {
+        if (settings?.title) {
+          this.brandTitle = settings.title;
+        } else {
+          this.brandTitle = 'TuprakNews';
+        }
+        if (settings?.logoUrl) {
+          this.brandLogo = settings.logoUrl;
+        } else {
+          this.brandLogo = 'assets/tn.png';
+        }
+        if (settings?.slogan) {
+          this.brandTagline = settings.slogan;
+        } else {
+          this.brandTagline = 'Stories that matter, in one place.';
+        }
+      });
     this.siteSettingsService.load();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   logout() {

@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, of, switchMap, combineLatest } from 'rxjs';
+import { Observable, Subject, of, switchMap, combineLatest, takeUntil } from 'rxjs';
 import { PostsService } from '../../../services/posts.service';
 import { AuthService } from '../../../services/auth.service';
 import { UsersService } from '../../../services/users.service';
@@ -15,7 +15,7 @@ import { Category } from '../../../models/category';
   templateUrl: './posts-list.component.html',
   styleUrls: ['./posts-list.component.css'],
 })
-export class PostsListComponent implements OnInit {
+export class PostsListComponent implements OnInit, OnDestroy {
   page?: Page<PostResponse>;
   loading = false;
   error: string | null = null;
@@ -27,6 +27,7 @@ export class PostsListComponent implements OnInit {
   isAdmin = false;
   currentCategoryId?: number;
   currentCategorySlug?: string | null;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private postsService: PostsService,
@@ -46,15 +47,17 @@ export class PostsListComponent implements OnInit {
   ngOnInit(): void {
     this.isLoggedIn$
       .pipe(
-        switchMap((loggedIn) => (loggedIn ? this.users.getMe() : of(null)))
+        switchMap((loggedIn) => (loggedIn ? this.users.getMe() : of(null))),
+        takeUntil(this.destroy$)
       )
       .subscribe((user) => {
         this.currentUser = user ?? undefined;
         this.isAdmin = user?.roleName === 'ADMIN';
       });
 
-    combineLatest([this.route.paramMap, this.route.queryParamMap]).subscribe(
-      ([params, q]) => {
+    combineLatest([this.route.paramMap, this.route.queryParamMap])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([params, q]) => {
         const slug = params.get('slug');
         const pageParam = q.get('page');
         const pageNum = pageParam ? Number(pageParam) : 0;
@@ -70,10 +73,14 @@ export class PostsListComponent implements OnInit {
           this.currentPage = pageNum;
           this.load(this.currentPage, categoryId);
         }
-      }
-    );
+      });
 
     this.loadPopular();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   canEdit(post: PostResponse): boolean {

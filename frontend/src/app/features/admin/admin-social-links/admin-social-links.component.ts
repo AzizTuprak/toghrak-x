@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { SocialLinksService } from '../../../services/social-links.service';
 import { SocialLink } from '../../../models/social-link';
 
@@ -6,17 +7,25 @@ import { SocialLink } from '../../../models/social-link';
   selector: 'app-admin-social-links',
   templateUrl: './admin-social-links.component.html',
 })
-export class AdminSocialLinksComponent implements OnInit {
+export class AdminSocialLinksComponent implements OnInit, OnDestroy {
   links: SocialLink[] = [];
   saving = false;
   error: string | null = null;
   info: string | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(private socialLinks: SocialLinksService) {}
 
   ngOnInit(): void {
-    this.socialLinks.links$.subscribe((links) => (this.links = [...links]));
+    this.socialLinks.links$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((links) => (this.links = [...links]));
     this.socialLinks.load();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   add() {

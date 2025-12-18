@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { SearchService } from '../../../services/search.service';
 import { SearchResult } from '../../../models/search-result';
 
@@ -8,23 +9,31 @@ import { SearchResult } from '../../../models/search-result';
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css'],
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
   query = '';
   results: SearchResult[] = [];
   loading = false;
   error: string | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(private route: ActivatedRoute, private searchService: SearchService) {}
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe((params) => {
-      this.query = params.get('q') ?? '';
-      if (this.query) {
-        this.runSearch();
-      } else {
-        this.results = [];
-      }
-    });
+    this.route.queryParamMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        this.query = params.get('q') ?? '';
+        if (this.query) {
+          this.runSearch();
+        } else {
+          this.results = [];
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   runSearch() {

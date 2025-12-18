@@ -21,7 +21,7 @@
               <h2>{{ main.title }}</h2>
               <p class="hero-meta">{{ main.authorUsername }}</p>
               <p class="hero-desc">
-                {{ main.content | slice : 0 : 140 }}{{ main.content.length > 140 ? "…" : "" }}
+                {{ main.content | slice : 0 : 140 }}{{ main.content.length > 140 ? '...' : '' }}
               </p>
             </div>
           </ng-container>
@@ -55,7 +55,7 @@
                 {{ p.authorUsername }}
               </p>
               <p class="list-desc">
-                {{ p.content | slice : 0 : 120 }}{{ p.content.length > 120 ? "…" : "" }}
+                {{ p.content | slice : 0 : 120 }}{{ p.content.length > 120 ? '...' : '' }}
               </p>
               <div class="list-actions">
                 <a class="btn btn-sm btn-outline-primary" [routerLink]="['/posts', p.id]">Read</a>
@@ -90,7 +90,7 @@
         <div class="popular-rail">
           <div class="popular-header">
             <h5>Most read</h5>
-            <span *ngIf="popularLoading" class="text-muted small">Loading…</span>
+            <span *ngIf="popularLoading" class="text-muted small">Loading...</span>
           </div>
           <div class="popular-item" *ngFor="let p of popular" [routerLink]="['/posts', p.id]">
             <div class="popular-thumb" *ngIf="p.coverImage">
@@ -99,7 +99,7 @@
             <div class="popular-body">
               <div class="popular-title">{{ p.title }}</div>
               <div class="popular-meta">
-                {{ p.categoryName }} • {{ p.viewCount || 0 }} views
+                {{ p.categoryName }} <span class="dot"></span> {{ p.viewCount || 0 }} views
               </div>
             </div>
           </div>
