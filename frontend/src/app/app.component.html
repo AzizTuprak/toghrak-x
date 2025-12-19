@@ -1,4 +1,9 @@
 <header class="app-header">
+  <div class="global-banner" *ngIf="uiMessage$ | async as msg" [class.error]="msg.kind === 'error'">
+    <span>{{ msg.text }}</span>
+    <button type="button" class="close" aria-label="Dismiss message" (click)="dismissMessage()">×</button>
+  </div>
+
   <div class="brand-block text-center">
     <a class="brand-link" routerLink="/">
       <img [src]="brandLogo" [alt]="brandTitle" class="brand-logo" />

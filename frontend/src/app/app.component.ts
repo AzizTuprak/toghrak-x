@@ -1,8 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, Subject, of, switchMap, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { AuthService } from './services/auth.service';
-import { UsersService } from './services/users.service';
 import { CategoriesService } from './services/categories.service';
 import { PagesService } from './services/pages.service';
 import { SocialLinksService } from './services/social-links.service';
@@ -11,6 +10,8 @@ import { User } from './models/user';
 import { Category } from './models/category';
 import { ContentPage } from './models/content-page';
 import { SiteSettingsService } from './services/site-settings.service';
+import { SessionService } from './services/session.service';
+import { UiMessage, UiMessageService } from './services/ui-message.service';
 
 @Component({
   selector: 'app-root',
@@ -29,39 +30,28 @@ export class AppComponent implements OnInit, OnDestroy {
   brandTitle = 'TuprakNews';
   brandTagline = 'Stories that matter, in one place.';
   isMenuOpen = false;
+  uiMessage$: Observable<UiMessage | null>;
   private destroy$ = new Subject<void>();
 
   constructor(
     private auth: AuthService,
-    private users: UsersService,
+    private session: SessionService,
     private categoriesService: CategoriesService,
     private pageService: PagesService,
     private socialLinksService: SocialLinksService,
     private siteSettingsService: SiteSettingsService,
+    private ui: UiMessageService,
     private router: Router
   ) {
-    this.isLoggedIn$ = this.auth.isLoggedIn();
+    this.isLoggedIn$ = this.session.isLoggedIn$;
+    this.uiMessage$ = this.ui.message$;
   }
 
   ngOnInit(): void {
-    this.isLoggedIn$
-      .pipe(
-        switchMap((loggedIn) => {
-          if (!loggedIn) {
-            this.currentUser = undefined;
-            this.isAdmin = false;
-            return of(null);
-          }
-          return this.users.getMe();
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((user) => {
-        if (user) {
-          this.currentUser = user;
-          this.isAdmin = user.roleName === 'ADMIN';
-        }
-      });
+    this.session.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
+      this.currentUser = user ?? undefined;
+      this.isAdmin = user?.roleName === 'ADMIN';
+    });
 
     this.categoriesService.categories$
       .pipe(takeUntil(this.destroy$))
@@ -105,10 +95,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
   logout() {
     this.auth.logout();
-    this.currentUser = undefined;
-    this.isAdmin = false;
     this.router.navigateByUrl('/'); // go to home
     this.isMenuOpen = false;
+  }
+
+  dismissMessage() {
+    this.ui.clear();
   }
 
   goToCategory(cat?: Category) {

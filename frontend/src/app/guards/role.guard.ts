@@ -5,12 +5,12 @@ import {
   Router,
   UrlTree,
 } from '@angular/router';
-import { Observable, catchError, map, of } from 'rxjs';
-import { UsersService } from '../services/users.service';
+import { Observable, catchError, map, of, switchMap, take } from 'rxjs';
+import { SessionService } from '../services/session.service';
 
 @Injectable({ providedIn: 'root' })
 export class RoleGuard implements CanActivate {
-  constructor(private users: UsersService, private router: Router) {}
+  constructor(private session: SessionService, private router: Router) {}
 
   canActivate(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
     const requiredRoles = route.data['roles'] as string[] | undefined;
@@ -18,7 +18,9 @@ export class RoleGuard implements CanActivate {
       return of(true);
     }
 
-    return this.users.getMe().pipe(
+    return this.session.user$.pipe(
+      take(1),
+      switchMap((user) => (user ? of(user) : this.session.refreshUser())),
       map((user) => {
         const role = user.roleName;
         if (role && requiredRoles.includes(role)) {

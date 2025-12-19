@@ -1,14 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subject, of, switchMap, combineLatest, takeUntil } from 'rxjs';
+import { Observable, Subject, combineLatest, takeUntil } from 'rxjs';
 import { PostsService } from '../../../services/posts.service';
-import { AuthService } from '../../../services/auth.service';
-import { UsersService } from '../../../services/users.service';
 import { PostResponse } from '../../../models/post';
 import { Page } from '../../../models/page';
 import { User } from '../../../models/user';
 import { CategoriesService } from '../../../services/categories.service';
 import { Category } from '../../../models/category';
+import { SessionService } from '../../../services/session.service';
 
 @Component({
   selector: 'app-posts-list',
@@ -31,13 +30,12 @@ export class PostsListComponent implements OnInit, OnDestroy {
 
   constructor(
     private postsService: PostsService,
-    private auth: AuthService,
-    private users: UsersService,
+    private session: SessionService,
     private categoriesService: CategoriesService,
     private route: ActivatedRoute,
     public router: Router
   ) {
-    this.isLoggedIn$ = this.auth.isLoggedIn();
+    this.isLoggedIn$ = this.session.isLoggedIn$;
   }
 
   get posts(): PostResponse[] {
@@ -45,15 +43,10 @@ export class PostsListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.isLoggedIn$
-      .pipe(
-        switchMap((loggedIn) => (loggedIn ? this.users.getMe() : of(null))),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((user) => {
-        this.currentUser = user ?? undefined;
-        this.isAdmin = user?.roleName === 'ADMIN';
-      });
+    this.session.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
+      this.currentUser = user ?? undefined;
+      this.isAdmin = user?.roleName === 'ADMIN';
+    });
 
     combineLatest([this.route.paramMap, this.route.queryParamMap])
       .pipe(takeUntil(this.destroy$))

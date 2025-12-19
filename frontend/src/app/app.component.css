@@ -2,6 +2,43 @@
   padding: 12px 16px;
 }
 
+.global-banner {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #eef4ff;
+  color: #0b2a55;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.global-banner.error {
+  background: #fff1f1;
+  color: #7a1616;
+  border-color: rgba(122, 22, 22, 0.25);
+}
+
+.global-banner .close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  color: inherit;
+}
+
+.global-banner .close:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 .menu-toggle {
   display: none;
   margin: 8px auto;

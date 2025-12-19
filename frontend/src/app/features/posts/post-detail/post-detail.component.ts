@@ -2,10 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PostsService } from '../../../services/posts.service';
 import { PostResponse } from '../../../models/post';
-import { Subject, of, switchMap, takeUntil } from 'rxjs';
-import { AuthService } from '../../../services/auth.service';
-import { UsersService } from '../../../services/users.service';
+import { Subject, takeUntil } from 'rxjs';
 import { User } from '../../../models/user';
+import { SessionService } from '../../../services/session.service';
 
 @Component({
   selector: 'app-post-detail',
@@ -26,23 +25,16 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private posts: PostsService,
-    private auth: AuthService,
-    private users: UsersService
+    private session: SessionService
   ) {}
 
   ngOnInit(): void {
     // Load current user to decide if edit/delete actions should show
-    this.auth
-      .isLoggedIn()
-      .pipe(
-        switchMap((loggedIn) => (loggedIn ? this.users.getMe() : of(null))),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((user) => {
-        this.currentUser = user ?? undefined;
-        this.isAdmin = user?.roleName === 'ADMIN';
-        this.updateOwnershipFlag();
-      });
+    this.session.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
+      this.currentUser = user ?? undefined;
+      this.isAdmin = user?.roleName === 'ADMIN';
+      this.updateOwnershipFlag();
+    });
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (isNaN(id)) {
