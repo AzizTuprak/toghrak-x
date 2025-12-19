@@ -5,6 +5,7 @@ import { PostResponse } from '../../../models/post';
 import { Subject, takeUntil } from 'rxjs';
 import { User } from '../../../models/user';
 import { SessionService } from '../../../services/session.service';
+import { NavHighlightService } from '../../../services/nav-highlight.service';
 
 @Component({
   selector: 'app-post-detail',
@@ -25,7 +26,8 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private posts: PostsService,
-    private session: SessionService
+    private session: SessionService,
+    private navHighlight: NavHighlightService
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +47,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.navHighlight.clear();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -56,11 +59,16 @@ export class PostDetailComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.post = res;
         this.loading = false;
+        this.navHighlight.setCategory({
+          id: res.categoryId ?? null,
+          name: res.categoryName ?? null,
+        });
         this.updateOwnershipFlag();
       },
       error: () => {
         this.error = 'Post not found.';
         this.loading = false;
+        this.navHighlight.clear();
       },
     });
   }

@@ -5,6 +5,7 @@ import { AuthService } from './services/auth.service';
 import { CategoriesService } from './services/categories.service';
 import { PagesService } from './services/pages.service';
 import { SocialLinksService } from './services/social-links.service';
+import { NavHighlightCategory, NavHighlightService } from './services/nav-highlight.service';
 import { SocialLink } from './models/social-link';
 import { User } from './models/user';
 import { Category } from './models/category';
@@ -36,6 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isHomeActive = true;
   uiMessage$: Observable<UiMessage | null>;
   private destroy$ = new Subject<void>();
+  private navHighlightCategory: NavHighlightCategory | null = null;
 
   constructor(
     private auth: AuthService,
@@ -45,6 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private socialLinksService: SocialLinksService,
     private siteSettingsService: SiteSettingsService,
     private ui: UiMessageService,
+    private navHighlight: NavHighlightService,
     private router: Router
   ) {
     this.isLoggedIn$ = this.session.isLoggedIn$;
@@ -53,6 +56,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.updateActiveSectionFromUrl(this.router.url);
+    this.navHighlight.category$.pipe(takeUntil(this.destroy$)).subscribe((category) => {
+      this.navHighlightCategory = category;
+      this.updateActiveSectionFromUrl(this.router.url);
+    });
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
@@ -67,7 +74,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.categoriesService.categories$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((cats) => (this.categories = cats));
+      .subscribe((cats) => {
+        this.categories = cats;
+        this.updateActiveSectionFromUrl(this.router.url);
+      });
     this.categoriesService.refresh();
 
     this.pageService.pages$
@@ -101,6 +111,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.setBodyScrollLock(false);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -140,6 +151,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (!this.isMenuOpen) {
       this.isAccountMenuOpen = false;
     }
+    this.setBodyScrollLock(this.isMenuOpen);
   }
 
   closeMenu() {
@@ -149,6 +161,7 @@ export class AppComponent implements OnInit, OnDestroy {
   closeAllMenus() {
     this.isMenuOpen = false;
     this.isAccountMenuOpen = false;
+    this.setBodyScrollLock(false);
   }
 
   onAccountMenuToggle(event: Event) {
@@ -166,7 +179,9 @@ export class AppComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const first = clean.split('/')[0] ?? '';
+    const parts = clean.split('/');
+    const first = parts[0] ?? '';
+    const second = parts[1] ?? '';
     const reserved = new Set([
       'posts',
       'login',
@@ -179,11 +194,36 @@ export class AppComponent implements OnInit, OnDestroy {
 
     if (reserved.has(first)) {
       this.isHomeActive = false;
-      this.activeCategorySlug = null;
+      if (first === 'posts' && /^\d+$/.test(second)) {
+        this.activeCategorySlug = this.resolveHighlightedCategorySlug();
+      } else {
+        this.activeCategorySlug = null;
+      }
       return;
     }
 
     this.isHomeActive = false;
     this.activeCategorySlug = first;
+  }
+
+  private resolveHighlightedCategorySlug(): string | null {
+    const highlight = this.navHighlightCategory;
+    if (!highlight) return null;
+    if (!this.categories.length) return null;
+
+    if (highlight.id != null) {
+      const byId = this.categories.find((c) => c.id === highlight.id);
+      return byId?.slug ?? null;
+    }
+
+    const name = (highlight.name ?? '').trim().toLowerCase();
+    if (!name) return null;
+    const byName = this.categories.find((c) => c.name.trim().toLowerCase() === name);
+    return byName?.slug ?? null;
+  }
+
+  private setBodyScrollLock(lock: boolean): void {
+    if (typeof document === 'undefined') return;
+    document.body.style.overflow = lock ? 'hidden' : '';
   }
 }
