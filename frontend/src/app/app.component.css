@@ -52,12 +52,14 @@
   font-weight: 700;
   gap: 6px;
   align-items: center;
+  justify-content: center;
 }
 
 .menu-icon {
   display: inline-block;
   width: 18px;
   height: 12px;
+  flex: 0 0 auto;
   background:
     linear-gradient(#111, #111) 0 0 / 100% 2px no-repeat,
     linear-gradient(#111, #111) 0 50% / 100% 2px no-repeat,
@@ -262,7 +264,7 @@ footer .footer-shell {
 
 @media (max-width: 768px) {
   .menu-toggle {
-    display: inline-block;
+    display: inline-flex;
   }
   .menu {
     position: fixed;
