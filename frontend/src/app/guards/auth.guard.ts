@@ -7,6 +7,7 @@ import {
   UrlTree,
 } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { Observable, catchError, map, of } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -15,13 +16,21 @@ export class AuthGuard implements CanActivate {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): boolean | UrlTree {
-    const token = this.auth.getToken();
-    if (token) {
-      return true;
-    }
-    return this.router.createUrlTree(['/login'], {
-      queryParams: { returnUrl: state.url },
-    });
+  ): Observable<boolean | UrlTree> {
+    return this.auth.ensureToken().pipe(
+      map((token) => {
+        if (token) return true;
+        return this.router.createUrlTree(['/login'], {
+          queryParams: { returnUrl: state.url },
+        });
+      }),
+      catchError(() =>
+        of(
+          this.router.createUrlTree(['/login'], {
+            queryParams: { returnUrl: state.url },
+          })
+        )
+      )
+    );
   }
 }

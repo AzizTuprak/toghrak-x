@@ -35,6 +35,9 @@ export class SessionService implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(private auth: AuthService, private users: UsersService) {
+    // Best-effort session restore: if a refresh cookie exists, acquire an access token in-memory.
+    this.auth.refresh().subscribe({ next: () => {}, error: () => {} });
+
     this.isLoggedIn$
       .pipe(
         switchMap((loggedIn) => {

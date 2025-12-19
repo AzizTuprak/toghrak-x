@@ -1,13 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PostsListComponent } from './features/posts/posts-list/posts-list.component';
-import { PageViewComponent } from './features/static/page-view/page-view.component';
-import { SearchComponent } from './features/static/search/search.component';
 import { NotFoundComponent } from './features/static/not-found/not-found.component';
 
 const routes: Routes = [
-  { path: '', component: PostsListComponent }, //Home
-
   {
     path: 'posts',
     loadChildren: () =>
@@ -29,10 +24,21 @@ const routes: Routes = [
       import('./features/admin/admin.module').then((m) => m.AdminModule),
   },
   { path: 'home', redirectTo: '', pathMatch: 'full' },
-  { path: 'page/:slug', component: PageViewComponent },
-  { path: 'search', component: SearchComponent },
-  // Category slug route (e.g., /events)
-  { path: ':slug', component: PostsListComponent },
+  {
+    path: 'search',
+    loadChildren: () =>
+      import('./features/static/search/search.module').then((m) => m.SearchModule),
+  },
+  {
+    path: 'page',
+    loadChildren: () =>
+      import('./features/static/page-view/page-view.module').then((m) => m.PageViewModule),
+  },
+  {
+    path: '',
+    loadChildren: () =>
+      import('./features/home/home.module').then((m) => m.HomeModule),
+  },
   { path: '**', component: NotFoundComponent },
 ];
 

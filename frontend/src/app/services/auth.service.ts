@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, distinctUntilChanged, finalize, map, of, shareReplay, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LoginRequest, LoginResponse } from '../models/auth';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private tokenKey = 'nb_token';
-  private loggedIn$ = new BehaviorSubject<boolean>(!!this.getToken());
+  private tokenSubject = new BehaviorSubject<string | null>(null);
+  private refresh$?: Observable<LoginResponse>;
 
   constructor(private http: HttpClient) {}
 
@@ -35,26 +35,43 @@ export class AuthService {
   }
 
   isLoggedIn(): Observable<boolean> {
-    return this.loggedIn$.asObservable();
+    return this.tokenSubject.asObservable().pipe(
+      map((t) => !!t),
+      distinctUntilChanged()
+    );
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return this.tokenSubject.value;
   }
 
   refresh(): Observable<LoginResponse> {
-    return this.http
-      .post<LoginResponse>(`${environment.apiBaseUrl}/auth/refresh`, {}, { withCredentials: true })
-      .pipe(tap((res) => this.setToken(res.token)));
+    if (!this.refresh$) {
+      this.refresh$ = this.http
+        .post<LoginResponse>(`${environment.apiBaseUrl}/auth/refresh`, {}, { withCredentials: true })
+        .pipe(
+          tap((res) => this.setToken(res.token)),
+          finalize(() => {
+            this.refresh$ = undefined;
+          }),
+          shareReplay(1)
+        );
+    }
+    return this.refresh$;
+  }
+
+  ensureToken(): Observable<string> {
+    const existing = this.getToken();
+    if (existing) return of(existing);
+
+    return this.refresh().pipe(map((res) => res.token));
   }
 
   private setToken(token: string) {
-    localStorage.setItem(this.tokenKey, token);
-    this.loggedIn$.next(true);
+    this.tokenSubject.next(token);
   }
 
   clearToken(): void {
-    localStorage.removeItem(this.tokenKey);
-    this.loggedIn$.next(false);
+    this.tokenSubject.next(null);
   }
 }
