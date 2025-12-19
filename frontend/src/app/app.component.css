@@ -1,5 +1,8 @@
 .app-header {
   padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
 }
 
 .global-banner {
@@ -91,7 +94,130 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  transition: max-height 0.2s ease;
+  position: relative;
+}
+
+.menu-surface {
+  display: contents;
+}
+
+.menu-surface-header {
+  display: none;
+}
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 40;
+}
+
+.header-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.header-search input {
+  width: min(420px, 72vw);
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+.header-search button {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #f8f9fb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-menu {
+  position: relative;
+}
+
+.account-trigger {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+
+.account-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.account-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.account-caret {
+  font-size: 16px;
+  opacity: 0.75;
+  line-height: 1;
+}
+
+.account-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+  padding: 8px;
+  z-index: 60;
+}
+
+.account-item {
+  width: 100%;
+  display: block;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #111;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.account-item:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.account-group {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.account-group-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.6);
+  padding: 4px 10px;
+}
+
+.account-logout {
+  color: #7a1616;
 }
 
 .menu-links {
@@ -105,6 +231,18 @@
   text-decoration: none;
   color: #111;
   font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.menu-item.active {
+  color: #0b4bb3;
+  background: rgba(91, 141, 239, 0.14);
+}
+
+.menu-item:focus-visible {
+  outline: 2px solid rgba(11, 75, 179, 0.65);
+  outline-offset: 2px;
 }
 
 .menu-actions {
@@ -112,6 +250,7 @@
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
+  align-items: center;
 }
 
 footer .footer-shell {
@@ -126,17 +265,72 @@ footer .footer-shell {
     display: inline-block;
   }
   .menu {
-    max-height: 0;
-    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    padding: 12px;
+    z-index: 50;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
   }
   .menu.open {
-    max-height: 2000px;
+    display: flex;
+  }
+  .menu-surface {
+    display: block;
+    width: min(520px, 100%);
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    padding: 12px;
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+  }
+  .menu-surface-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 4px 10px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .menu-surface-title {
+    font-weight: 800;
+  }
+  .menu-close {
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
   }
   .menu-links,
   .menu-actions {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
+  }
+  .menu-links {
+    align-items: center;
+  }
+  .header-search {
+    width: 100%;
+  }
+  .header-search input {
+    width: 100%;
+  }
+  .account-menu,
+  .account-trigger {
+    width: 100%;
+  }
+  .account-panel {
+    position: static;
+    min-width: 0;
+    box-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
   }
   .menu-actions .btn {
     width: 100%;

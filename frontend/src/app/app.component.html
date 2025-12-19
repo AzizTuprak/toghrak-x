@@ -13,44 +13,90 @@
   </div>
 
   <button
-    class="menu-toggle d-md-none"
+    class="menu-toggle"
     type="button"
     (click)="toggleMenu()"
     aria-label="Toggle navigation"
-    [attr.aria-expanded]="isMenuOpen"
+    [attr.aria-expanded]="isMenuOpen ? 'true' : 'false'"
     aria-controls="primary-nav"
   >
     <span class="menu-icon" aria-hidden="true"></span>
     <span class="menu-label">Menu</span>
   </button>
 
+  <div class="menu-backdrop" *ngIf="isMenuOpen" (click)="closeMenu()" aria-hidden="true"></div>
+
   <nav id="primary-nav" class="menu" [class.open]="isMenuOpen">
-    <div class="menu-links">
-      <a class="menu-item" [routerLink]="['/']" [queryParams]="{ page: 0 }" (click)="closeMenu()">Home</a>
-      <a
-        class="menu-item"
-        *ngFor="let c of categories"
-        [routerLink]="['/', c.slug]"
-        [queryParams]="{ page: 0 }"
-        (click)="closeMenu()"
-      >
-        {{ c.name }}
-      </a>
-    </div>
-    <div class="menu-actions">
-      <ng-container *ngIf="isLoggedIn$ | async; else loggedOut">
-        <a *ngIf="isAdmin" class="btn btn-primary btn-sm" routerLink="/admin/users" (click)="closeMenu()">Manage Users</a>
-        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/categories" (click)="closeMenu()">Manage Categories</a>
-        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/pages" (click)="closeMenu()">Manage Pages</a>
-        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/social-links" (click)="closeMenu()">Manage Socials</a>
-        <a *ngIf="isAdmin" class="btn btn-outline-primary btn-sm" routerLink="/admin/branding" (click)="closeMenu()">Manage Branding</a>
-        <a class="btn btn-outline-primary btn-sm" routerLink="/posts/new" (click)="closeMenu()">New Post</a>
-        <a class="btn btn-outline-secondary btn-sm" routerLink="/profile" (click)="closeMenu()">Profile</a>
-        <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
-      </ng-container>
-      <ng-template #loggedOut>
-        <!-- Login available via direct URL (/login); hidden from public header -->
-      </ng-template>
+    <div class="menu-surface">
+      <div class="menu-surface-header">
+        <div class="menu-surface-title">Menu</div>
+        <button type="button" class="menu-close" aria-label="Close menu" (click)="closeMenu()">×</button>
+      </div>
+
+      <div class="menu-links" aria-label="Primary navigation">
+        <a
+          class="menu-item"
+          [class.active]="isHomeActive"
+          [attr.aria-current]="isHomeActive ? 'page' : null"
+          [routerLink]="['/']"
+          [queryParams]="{ page: 0 }"
+          (click)="closeAllMenus()"
+        >
+          Home
+        </a>
+        <a
+          class="menu-item"
+          *ngFor="let c of categories"
+          [class.active]="activeCategorySlug === c.slug"
+          [attr.aria-current]="activeCategorySlug === c.slug ? 'page' : null"
+          [routerLink]="['/', c.slug]"
+          [queryParams]="{ page: 0 }"
+          (click)="closeAllMenus()"
+        >
+          {{ c.name }}
+        </a>
+      </div>
+
+      <div class="menu-actions">
+        <form class="header-search" role="search" (submit)="onHeaderSearchSubmit($event)">
+          <input
+            type="search"
+            name="headerSearch"
+            aria-label="Search articles"
+            placeholder="Search"
+            [(ngModel)]="headerSearch"
+          />
+          <button type="submit" aria-label="Run search">Search</button>
+        </form>
+
+        <ng-container *ngIf="isLoggedIn$ | async; else loggedOut">
+          <details class="account-menu" [open]="isAccountMenuOpen" (toggle)="onAccountMenuToggle($event)">
+            <summary class="account-trigger" aria-label="Account menu">
+              <span class="account-name">{{ currentUser?.username || 'Account' }}</span>
+              <span class="account-caret" aria-hidden="true">⚙</span>
+            </summary>
+            <div class="account-panel">
+              <a class="account-item" routerLink="/profile" (click)="closeAllMenus()">Profile</a>
+              <a class="account-item" routerLink="/posts/new" (click)="closeAllMenus()">New Post</a>
+
+              <div class="account-group" *ngIf="isAdmin">
+                <div class="account-group-title">Admin</div>
+                <a class="account-item" routerLink="/admin/users" (click)="closeAllMenus()">Users</a>
+                <a class="account-item" routerLink="/admin/categories" (click)="closeAllMenus()">Categories</a>
+                <a class="account-item" routerLink="/admin/pages" (click)="closeAllMenus()">Pages</a>
+                <a class="account-item" routerLink="/admin/social-links" (click)="closeAllMenus()">Social Links</a>
+                <a class="account-item" routerLink="/admin/branding" (click)="closeAllMenus()">Branding</a>
+              </div>
+
+              <button type="button" class="account-item account-logout" (click)="logout()">Logout</button>
+            </div>
+          </details>
+        </ng-container>
+
+        <ng-template #loggedOut>
+          <!-- Login available via direct URL (/login); hidden from public header -->
+        </ng-template>
+      </div>
     </div>
   </nav>
 </header>
@@ -69,15 +115,21 @@
           type="text"
           aria-label="Search topics"
           placeholder="Search topics you want"
-          (keyup.enter)="goToSearch()"
+          (keyup.enter)="goToSearch(footerSearch)"
           [(ngModel)]="footerSearch"
         />
-        <button type="button" (click)="goToSearch()" aria-label="Run search">Search</button>
+        <button type="button" (click)="goToSearch(footerSearch)" aria-label="Run search">Search</button>
       </div>
       <div class="footer-contact">
         <div>Contact with us</div>
         <div class="socials">
-          <a *ngFor="let s of socialLinks" [href]="s.url" target="_blank" rel="noreferrer" [attr.aria-label]="s.label">
+          <a
+            *ngFor="let s of socialLinks"
+            [href]="s.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            [attr.aria-label]="s.label"
+          >
             {{ s.icon || s.label.slice(0, 2) }}
           </a>
         </div>

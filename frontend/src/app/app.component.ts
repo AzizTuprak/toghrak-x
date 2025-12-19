@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { NavigationEnd, Router } from '@angular/router';
+import { Observable, Subject, filter, takeUntil } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { CategoriesService } from './services/categories.service';
 import { PagesService } from './services/pages.service';
@@ -23,6 +23,7 @@ export class AppComponent implements OnInit, OnDestroy {
   currentUser?: User;
   isAdmin = false;
   categories: Category[] = [];
+  headerSearch = '';
   footerSearch = '';
   footerPages: ContentPage[] = [];
   socialLinks: SocialLink[] = [];
@@ -30,6 +31,9 @@ export class AppComponent implements OnInit, OnDestroy {
   brandTitle = 'TuprakNews';
   brandTagline = 'Stories that matter, in one place.';
   isMenuOpen = false;
+  isAccountMenuOpen = false;
+  activeCategorySlug: string | null = null;
+  isHomeActive = true;
   uiMessage$: Observable<UiMessage | null>;
   private destroy$ = new Subject<void>();
 
@@ -48,6 +52,14 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.updateActiveSectionFromUrl(this.router.url);
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((e) => this.updateActiveSectionFromUrl(e.urlAfterRedirects));
+
     this.session.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       this.currentUser = user ?? undefined;
       this.isAdmin = user?.roleName === 'ADMIN';
@@ -96,7 +108,7 @@ export class AppComponent implements OnInit, OnDestroy {
   logout() {
     this.auth.logout();
     this.router.navigateByUrl('/'); // go to home
-    this.isMenuOpen = false;
+    this.closeAllMenus();
   }
 
   dismissMessage() {
@@ -109,19 +121,69 @@ export class AppComponent implements OnInit, OnDestroy {
     } else {
       this.router.navigate(['/', cat.slug], { queryParams: { page: 0 } });
     }
-    this.isMenuOpen = false;
+    this.closeAllMenus();
   }
 
-  goToSearch() {
-    this.router.navigate(['/search'], { queryParams: { q: this.footerSearch || null } });
-    this.isMenuOpen = false;
+  onHeaderSearchSubmit(event: Event) {
+    event.preventDefault();
+    this.goToSearch(this.headerSearch);
+  }
+
+  goToSearch(query?: string) {
+    const q = (query ?? '').trim();
+    this.router.navigate(['/search'], { queryParams: { q: q || null } });
+    this.closeAllMenus();
   }
 
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
+    if (!this.isMenuOpen) {
+      this.isAccountMenuOpen = false;
+    }
   }
 
   closeMenu() {
+    this.closeAllMenus();
+  }
+
+  closeAllMenus() {
     this.isMenuOpen = false;
+    this.isAccountMenuOpen = false;
+  }
+
+  onAccountMenuToggle(event: Event) {
+    const details = event.target as HTMLDetailsElement | null;
+    this.isAccountMenuOpen = !!details?.open;
+  }
+
+  private updateActiveSectionFromUrl(url: string) {
+    const path = (url.split('#')[0] ?? '').split('?')[0] ?? '';
+    const clean = path.replace(/^\/+/, '').replace(/\/+$/, '');
+
+    if (!clean) {
+      this.isHomeActive = true;
+      this.activeCategorySlug = null;
+      return;
+    }
+
+    const first = clean.split('/')[0] ?? '';
+    const reserved = new Set([
+      'posts',
+      'login',
+      'profile',
+      'admin',
+      'page',
+      'search',
+      'home',
+    ]);
+
+    if (reserved.has(first)) {
+      this.isHomeActive = false;
+      this.activeCategorySlug = null;
+      return;
+    }
+
+    this.isHomeActive = false;
+    this.activeCategorySlug = first;
   }
 }

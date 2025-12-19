@@ -1,8 +1,4 @@
 <div class="bbc-container">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <a *ngIf="isLoggedIn$ | async" class="btn btn-primary btn-sm" routerLink="/posts/new">New Post</a>
-  </div>
-
   <div *ngIf="currentCategoryId" class="mb-2">
     <span class="badge bg-secondary">Filtered by category</span>
     <button class="btn btn-link btn-sm" (click)="clearCategory()">Clear</button>
