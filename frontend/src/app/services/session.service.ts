@@ -1,5 +1,18 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, distinctUntilChanged, map, of, switchMap, takeUntil, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  Subject,
+  catchError,
+  distinctUntilChanged,
+  finalize,
+  map,
+  of,
+  shareReplay,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 import { AuthService } from './auth.service';
 import { UsersService } from './users.service';
 import { User } from '../models/user';
@@ -8,6 +21,7 @@ import { User } from '../models/user';
 export class SessionService implements OnDestroy {
   private userSubject = new BehaviorSubject<User | null>(null);
   readonly user$ = this.userSubject.asObservable();
+  private meRequest$?: Observable<User>;
 
   readonly isLoggedIn$: Observable<boolean> = this.auth
     .isLoggedIn()
@@ -28,18 +42,33 @@ export class SessionService implements OnDestroy {
             this.userSubject.next(null);
             return of(null);
           }
-          return this.users.getMe();
+          return this.fetchMeShared().pipe(
+            catchError(() => {
+              this.userSubject.next(null);
+              return of(null);
+            })
+          );
         }),
         takeUntil(this.destroy$)
       )
-      .subscribe({
-        next: (u) => this.userSubject.next(u),
-        error: () => this.userSubject.next(null),
-      });
+      .subscribe();
   }
 
   refreshUser(): Observable<User> {
-    return this.users.getMe().pipe(tap((u) => this.userSubject.next(u)));
+    return this.fetchMeShared();
+  }
+
+  private fetchMeShared(): Observable<User> {
+    if (!this.meRequest$) {
+      this.meRequest$ = this.users.getMe().pipe(
+        tap((u) => this.userSubject.next(u)),
+        finalize(() => {
+          this.meRequest$ = undefined;
+        }),
+        shareReplay(1)
+      );
+    }
+    return this.meRequest$;
   }
 
   ngOnDestroy(): void {
@@ -47,4 +76,3 @@ export class SessionService implements OnDestroy {
     this.destroy$.complete();
   }
 }
-
