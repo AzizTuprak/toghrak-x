@@ -11,7 +11,7 @@ import { SiteSettings } from '../../../models/site-settings';
   styleUrls: ['./admin-branding.component.css'],
 })
 export class AdminBrandingComponent implements OnInit, OnDestroy {
-  form: Partial<SiteSettings> = { title: 'TuprakNews', logoUrl: '', slogan: '' };
+  form: Partial<SiteSettings> = { title: 'Toghrak Publishing Platform', logoUrl: '', slogan: '' };
   loading = false;
   saving = false;
   success?: string;
@@ -26,7 +26,7 @@ export class AdminBrandingComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((s) => {
         if (s) {
-          this.form.title = s.title || 'TuprakNews';
+          this.form.title = s.title || 'Toghrak Publishing Platform';
           this.form.logoUrl = s.logoUrl || '';
           this.form.slogan = s.slogan || '';
         }

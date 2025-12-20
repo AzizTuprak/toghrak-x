@@ -1,6 +1,6 @@
-# TuprakNews
+# Toghrak Publishing Platform
 
-Full-stack news/blog platform with categories, posts, pages, footer links, and admin workflows.
+Full-stack news/blog publishing platform with categories, posts, pages, footer links, and admin workflows.
 Stack: Angular (frontend) + Spring Boot (backend) + PostgreSQL + JWT.
 
 ## Features
@@ -22,7 +22,7 @@ Stack: Angular (frontend) + Spring Boot (backend) + PostgreSQL + JWT.
 1) Create a PostgreSQL DB/user.
 2) Set `backend/src/main/resources/application.properties`:
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/tupraknews
+spring.datasource.url=jdbc:postgresql://localhost:5432/blogdb
 spring.datasource.username=YOUR_DB_USER
 spring.datasource.password=YOUR_DB_PASS
 app.jwt.secret=CHANGE_ME

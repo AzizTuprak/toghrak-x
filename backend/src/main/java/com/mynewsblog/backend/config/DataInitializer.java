@@ -71,12 +71,12 @@ public class DataInitializer {
                 log.info("DataInitializer: Default admin user seeded successfully.");
             }
 
-            // Seed default pages if missing
+                // Seed default pages if missing
             if (pageRepository.count() == 0) {
                 List<Page> defaults = List.of(
-                        Page.builder().slug("about").title("About").content("Tell readers about TuprakNews.").updatedAt(LocalDateTime.now()).build(),
-                        Page.builder().slug("contact").title("Contact").content("Email: hello@tupraknews.example").updatedAt(LocalDateTime.now()).build(),
-                        Page.builder().slug("how-it-works").title("How It Works").content("Explain how TuprakNews works for creators and readers.").updatedAt(LocalDateTime.now()).build(),
+                        Page.builder().slug("about").title("About").content("Tell readers about Toghrak Publishing Platform.").updatedAt(LocalDateTime.now()).build(),
+                        Page.builder().slug("contact").title("Contact").content("Email: hello@toghrakpublishingplatform.example").updatedAt(LocalDateTime.now()).build(),
+                        Page.builder().slug("how-it-works").title("How It Works").content("Explain how Toghrak Publishing Platform works for creators and readers.").updatedAt(LocalDateTime.now()).build(),
                         Page.builder().slug("faq").title("FAQ").content("Add common questions and answers.").updatedAt(LocalDateTime.now()).build(),
                         Page.builder().slug("privacy").title("Privacy Policy").content("Describe how user data is handled.").updatedAt(LocalDateTime.now()).build(),
                         Page.builder().slug("terms").title("Terms of Use").content("Outline acceptable use and responsibilities.").updatedAt(LocalDateTime.now()).build()
@@ -86,9 +86,9 @@ public class DataInitializer {
 
             if (socialLinkRepository.count() == 0) {
                 socialLinkRepository.saveAll(List.of(
-                        SocialLink.builder().label("Twitter").url("https://twitter.com/tupraknews").icon("x").build(),
-                        SocialLink.builder().label("Facebook").url("https://facebook.com/tupraknews").icon("f").build(),
-                        SocialLink.builder().label("LinkedIn").url("https://linkedin.com/company/tupraknews").icon("in").build()
+                        SocialLink.builder().label("Twitter").url("https://twitter.com/toghrakplatform").icon("x").build(),
+                        SocialLink.builder().label("Facebook").url("https://facebook.com/toghrakplatform").icon("f").build(),
+                        SocialLink.builder().label("LinkedIn").url("https://linkedin.com/company/toghrakplatform").icon("in").build()
                 ));
             }
         };

@@ -29,7 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
   footerPages: ContentPage[] = [];
   socialLinks: SocialLink[] = [];
   brandLogo = 'assets/tn.png';
-  brandTitle = 'TuprakNews';
+  brandTitle = 'Toghrak Publishing Platform';
   brandTagline = 'Stories that matter, in one place.';
   isMenuOpen = false;
   isAccountMenuOpen = false;
@@ -94,7 +94,7 @@ export class AppComponent implements OnInit, OnDestroy {
         if (settings?.title) {
           this.brandTitle = settings.title;
         } else {
-          this.brandTitle = 'TuprakNews';
+          this.brandTitle = 'Toghrak Publishing Platform';
         }
         if (settings?.logoUrl) {
           this.brandLogo = settings.logoUrl;

@@ -11,11 +11,11 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>com.mynewsblog</groupId>
-	<artifactId>news-blog-api</artifactId>
+	<groupId>com.toghrak</groupId>
+	<artifactId>toghrak-publishing-platform-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>News Blog Backend</name>
-	<description>A Spring Boot backend for tuprak-news application.</description>
+	<name>Toghrak Publishing Platform Backend</name>
+	<description>A Spring Boot backend for Toghrak Publishing Platform.</description>
 
 	<properties>
 		<java.version>21</java.version>
