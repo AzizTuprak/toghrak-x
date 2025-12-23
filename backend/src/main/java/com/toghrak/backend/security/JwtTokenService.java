@@ -22,6 +22,9 @@ public class JwtTokenService {
             @Value("${app.jwt.expiration}") Long jwtExpirationMs) {
         // Convert the secret string to a Key.
         // The secret must be long enough (at least 64 characters for HS512).
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("JWT secret is not set. Provide JWT_SECRET env/property and restart.");
+        }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.jwtExpirationMs = jwtExpirationMs;
     }
