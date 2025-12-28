@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@OpenAPIDefinition(info = @Info(title = "News Blog API", version = "v1"), security = {
-                @SecurityRequirement(name = "bearerAuth") })
+@OpenAPIDefinition(info = @Info(title = "Publishing Platform API", version = "v1"), security = {
+        @SecurityRequirement(name = "bearerAuth") })
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT", description = "Paste your JWT here: Bearer token without the 'Bearer ' prefix")
 
 public class OpenApiConfig {
