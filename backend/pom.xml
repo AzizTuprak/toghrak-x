@@ -12,10 +12,10 @@
 	</parent>
 
 	<groupId>com.toghrak</groupId>
-	<artifactId>toghrak-publishing-platform-api</artifactId>
+	<artifactId>toghrak-x-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Toghrak Publishing Platform Backend</name>
-	<description>A Spring Boot backend for Toghrak Publishing Platform.</description>
+	<name>Toghrak X Backend</name>
+	<description>A Spring Boot backend for Toghrak X.</description>
 
 	<properties>
 		<java.version>21</java.version>

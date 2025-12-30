@@ -76,13 +76,13 @@ public class DataInitializer {
                         if (pageRepository.count() == 0) {
                                 List<Page> defaults = List.of(
                                                 Page.builder().slug("about").title("About")
-                                                                .content("Tell readers about Toghrak Publishing Platform.")
+                                                                .content("Tell readers about Toghrak X.")
                                                                 .updatedAt(LocalDateTime.now()).build(),
                                                 Page.builder().slug("contact").title("Contact")
                                                                 .content("Email: hello@toghrakpublishingplatform.example")
                                                                 .updatedAt(LocalDateTime.now()).build(),
                                                 Page.builder().slug("how-it-works").title("How It Works")
-                                                                .content("Explain how Toghrak Publishing Platform works for creators and readers.")
+                                                                .content("Explain how Toghrak X works for creators and readers.")
                                                                 .updatedAt(LocalDateTime.now()).build(),
                                                 Page.builder().slug("faq").title("FAQ")
                                                                 .content("Add common questions and answers.")

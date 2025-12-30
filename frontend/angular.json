@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "toghrak-publishing-platform": {
+    "toghrak-x": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/toghrak-publishing-platform",
+            "outputPath": "dist/toghrak-x",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -59,10 +59,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "toghrak-publishing-platform:build:production"
+              "browserTarget": "toghrak-x:build:production"
             },
             "development": {
-              "browserTarget": "toghrak-publishing-platform:build:development"
+              "browserTarget": "toghrak-x:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -70,7 +70,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "toghrak-publishing-platform:build"
+            "browserTarget": "toghrak-x:build"
           }
         },
         "test": {

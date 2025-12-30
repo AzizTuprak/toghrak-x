@@ -32,7 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
   footerPages: ContentPage[] = [];
   socialLinks: SocialLink[] = [];
   brandLogo = 'assets/tn.png';
-  brandTitle = 'Toghrak Publishing Platform';
+  brandTitle = 'Toghrak X';
   brandTagline = 'Stories that matter, in one place.';
   isMenuOpen = false;
   isAccountMenuOpen = false;
@@ -99,7 +99,7 @@ export class AppComponent implements OnInit, OnDestroy {
         if (settings?.title) {
           this.brandTitle = settings.title;
         } else {
-          this.brandTitle = 'Toghrak Publishing Platform';
+          this.brandTitle = 'Toghrak X';
         }
         if (settings?.logoUrl) {
           this.brandLogo = settings.logoUrl;
