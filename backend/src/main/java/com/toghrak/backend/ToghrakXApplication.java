@@ -6,10 +6,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 @SpringBootApplication
 @EnableMethodSecurity
-public class ToghrakPublishingPlatformApplication {
+public class ToghrakXApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ToghrakPublishingPlatformApplication.class, args);
+		SpringApplication.run(ToghrakXApplication.class, args);
 	}
 
 }
