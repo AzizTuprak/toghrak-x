@@ -5,7 +5,10 @@ import { AuthService } from './services/auth.service';
 import { CategoriesService } from './services/categories.service';
 import { PagesService } from './services/pages.service';
 import { SocialLinksService } from './services/social-links.service';
-import { NavHighlightCategory, NavHighlightService } from './services/nav-highlight.service';
+import {
+  NavHighlightCategory,
+  NavHighlightService,
+} from './services/nav-highlight.service';
 import { SocialLink } from './models/social-link';
 import { User } from './models/user';
 import { Category } from './models/category';
@@ -56,10 +59,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.updateActiveSectionFromUrl(this.router.url);
-    this.navHighlight.category$.pipe(takeUntil(this.destroy$)).subscribe((category) => {
-      this.navHighlightCategory = category;
-      this.updateActiveSectionFromUrl(this.router.url);
-    });
+    this.navHighlight.category$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((category) => {
+        this.navHighlightCategory = category;
+        this.updateActiveSectionFromUrl(this.router.url);
+      });
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
@@ -218,7 +223,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
     const name = (highlight.name ?? '').trim().toLowerCase();
     if (!name) return null;
-    const byName = this.categories.find((c) => c.name.trim().toLowerCase() === name);
+    const byName = this.categories.find(
+      (c) => c.name.trim().toLowerCase() === name
+    );
     return byName?.slug ?? null;
   }
 

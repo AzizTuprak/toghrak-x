@@ -11,27 +11,32 @@ import { SiteSettings } from '../../../models/site-settings';
   styleUrls: ['./admin-branding.component.css'],
 })
 export class AdminBrandingComponent implements OnInit, OnDestroy {
-  form: Partial<SiteSettings> = { title: 'Toghrak Publishing Platform', logoUrl: '', slogan: '' };
+  form: Partial<SiteSettings> = {
+    title: 'Toghrak Publishing Platform',
+    logoUrl: '',
+    slogan: '',
+  };
   loading = false;
   saving = false;
   success?: string;
   error?: string;
   private destroy$ = new Subject<void>();
 
-  constructor(private settings: SiteSettingsService, private images: ImagesService) {}
+  constructor(
+    private settings: SiteSettingsService,
+    private images: ImagesService
+  ) {}
 
   ngOnInit(): void {
     this.loading = true;
-    this.settings.settings$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((s) => {
-        if (s) {
-          this.form.title = s.title || 'Toghrak Publishing Platform';
-          this.form.logoUrl = s.logoUrl || '';
-          this.form.slogan = s.slogan || '';
-        }
-        this.loading = false;
-      });
+    this.settings.settings$.pipe(takeUntil(this.destroy$)).subscribe((s) => {
+      if (s) {
+        this.form.title = s.title || 'Toghrak Publishing Platform';
+        this.form.logoUrl = s.logoUrl || '';
+        this.form.slogan = s.slogan || '';
+      }
+      this.loading = false;
+    });
     this.settings.load();
   }
 

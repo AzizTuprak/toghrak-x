@@ -1,6 +1,8 @@
 <div class="admin-branding" *ngIf="!loading; else loadingTpl">
   <h3>Site Branding</h3>
-  <p class="text-muted">Update the logo and tagline shown in the header and footer.</p>
+  <p class="text-muted">
+    Update the logo and tagline shown in the header and footer.
+  </p>
 
   <form #f="ngForm" (ngSubmit)="save(f)">
     <div class="card">
@@ -26,7 +28,11 @@
             <div *ngIf="!form.logoUrl" class="placeholder">No logo set</div>
           </div>
           <div class="btn-row">
-            <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+            <input
+              type="file"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+            />
           </div>
           <small class="text-muted">You can also paste a URL below.</small>
           <input
@@ -53,7 +59,13 @@
         </div>
       </div>
       <div class="card-footer d-flex gap-2">
-        <button class="btn btn-primary" type="submit" [disabled]="saving || f.invalid">Save</button>
+        <button
+          class="btn btn-primary"
+          type="submit"
+          [disabled]="saving || f.invalid"
+        >
+          Save
+        </button>
         <div *ngIf="saving" class="text-muted">Saving...</div>
         <div *ngIf="success" class="text-success">{{ success }}</div>
         <div *ngIf="error" class="text-danger">{{ error }}</div>
