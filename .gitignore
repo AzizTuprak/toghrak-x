@@ -1,69 +1,69 @@
 ############################################
-#       BACKEND (Spring Boot / Maven)      #
+# Backend (Spring Boot / Maven)
 ############################################
-
-# Compiled files
 target/
 *.class
-
-# Maven build artifacts
 pom.xml.tag
 pom.xml.releaseBackup
 dependency-reduced-pom.xml
 buildNumber.properties
-
 .gradle/
 build/
-
-# Maven wrapper 
-# if you want to ignore the Maven wrapper uncomment the following line
-#.mvn/
-
-# Logs (if any)
 logs/**
-# Uploaded media (do not version local files)
 /uploads/
 backend/uploads/
+backend/HELP.md
+hs_err_pid*.log
+replay_pid*.log
+
+# Maven wrapper (keep tracked; do NOT ignore .mvn/wrapper)
+!mvnw
+!mvnw.cmd
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/**
+# If you truly want to ignore wrapper, uncomment:
+# .mvn/
 
 ############################################
-#         FRONTEND (Angular / Node)        #
+# Frontend (Angular / Node)
 ############################################
-
-# Node.js dependencies
 node_modules/
 dist/
-# Angular cache folder
 .angular/
-
-# Environment files (if you store secrets or environment-specific config)
-.env
-
-# npm/yarn logs
+.tmp/
+coverage/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+/tmp
+/out-tsc
+/bazel-out
 
 ############################################
-#           IDE / OS Settings              #
+# Env / secrets
 ############################################
+.env
+.env.local
+.env.*.local
+.env.*
 
-# IntelliJ
+############################################
+# IDE / OS
+############################################
 .idea/
 *.iml
-
-# VSCode
+*.ipr
+*.iws
 .vscode/
-
-# macOS
+.project
+.classpath
+.settings/
 .DS_Store
 Thumbs.db
+.history/
 
 ############################################
-#            Other / Tools                 #
+# Other
 ############################################
-
-# Temporary build cache
-.tmp/
 *.log
-# Docker
 docker-compose.override.yml
