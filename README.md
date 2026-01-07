@@ -8,7 +8,10 @@ Stack: Angular (frontend) + Spring Boot (backend) + PostgreSQL + JWT.
 - Public: browse posts by recency/popularity/category, view post detail with images, static pages (About/Contact/FAQ/Terms/Privacy) with galleries, footer links & social links, responsive UI.
 - Auth: JWT login.
 - Admin: manage posts (with images/categories), categories (CRUD + navbar updates), static pages (CRUD + gallery images), footer links, social links, users/roles.
-
+- REST API design and clear separation of concerns for maintainability
+- Authentication and authorization (JWT + role-based access) to support Admin/Editor flows
+- Developer experience and operability, including API documentation (OpenAPI/Swagger)
+  
 ## Tech
 
 - Frontend: Angular, RxJS, Angular Router, Bootstrap styles, custom CSS/SCSS.
