@@ -1,6 +1,6 @@
 # Toghrak X
 
-Full-stack news/blog x with categories, posts, pages, footer links, and admin workflows.
+Full-stack publishing platform with categories, posts, pages, footer links, and admin workflows.
 Stack: Angular (frontend) + Spring Boot (backend) + PostgreSQL + JWT.
 
 ## Features
