@@ -4,8 +4,9 @@ import { SocialLinksService } from '../../../services/social-links.service';
 import { SocialLink } from '../../../models/social-link';
 
 @Component({
-  selector: 'app-admin-social-links',
-  templateUrl: './admin-social-links.component.html',
+    selector: 'app-admin-social-links',
+    templateUrl: './admin-social-links.component.html',
+    standalone: false
 })
 export class AdminSocialLinksComponent implements OnInit, OnDestroy {
   links: SocialLink[] = [];

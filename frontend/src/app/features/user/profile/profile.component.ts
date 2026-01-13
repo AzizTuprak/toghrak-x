@@ -4,8 +4,9 @@ import { User } from '../../../models/user';
 import { SessionService } from '../../../services/session.service';
 
 @Component({
-  selector: 'app-profile',
-  templateUrl: './profile.component.html',
+    selector: 'app-profile',
+    templateUrl: './profile.component.html',
+    standalone: false
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   user?: User;

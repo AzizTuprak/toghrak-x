@@ -17,7 +17,10 @@ import { NavHighlightService } from './services/nav-highlight.service';
 import { Category } from './models/category';
 import { User } from './models/user';
 
-@Component({ template: '' })
+@Component({
+    template: '',
+    standalone: false
+})
 class DummyComponent {}
 
 describe('AppComponent', () => {

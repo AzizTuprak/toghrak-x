@@ -6,9 +6,10 @@ import { ImagesService } from '../../../services/images.service';
 import { SiteSettings } from '../../../models/site-settings';
 
 @Component({
-  selector: 'app-admin-branding',
-  templateUrl: './admin-branding.component.html',
-  styleUrls: ['./admin-branding.component.css'],
+    selector: 'app-admin-branding',
+    templateUrl: './admin-branding.component.html',
+    styleUrls: ['./admin-branding.component.css'],
+    standalone: false
 })
 export class AdminBrandingComponent implements OnInit, OnDestroy {
   form: Partial<SiteSettings> = {
