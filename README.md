@@ -51,6 +51,7 @@ app.jwt.expiration=3600000
 - Set `app.jwt.secret` securely.
 - Adjust CORS in SecurityConfig if hosting frontend separately.
 - Configure image storage/CDN for uploads.
+- Frontend build output is `frontend/dist/toghrak-x/browser` with the application builder; deploy that folder.
 - Consider adding Flyway/Liquibase migrations in production.
 
 ## Scripts
