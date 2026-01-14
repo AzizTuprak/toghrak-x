@@ -18,9 +18,10 @@ import { SessionService } from './services/session.service';
 import { UiMessage, UiMessageService } from './services/ui-message.service';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    standalone: false
 })
 export class AppComponent implements OnInit, OnDestroy {
   isLoggedIn$: Observable<boolean>;

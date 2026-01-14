@@ -3,8 +3,9 @@ import { CategoriesService } from '../../../services/categories.service';
 import { Category } from '../../../models/category';
 
 @Component({
-  selector: 'app-admin-categories',
-  templateUrl: './admin-categories.component.html',
+    selector: 'app-admin-categories',
+    templateUrl: './admin-categories.component.html',
+    standalone: false
 })
 export class AdminCategoriesComponent implements OnInit {
   categories: Category[] = [];

@@ -10,9 +10,10 @@ import { Category } from '../../../models/category';
 import { SessionService } from '../../../services/session.service';
 
 @Component({
-  selector: 'app-posts-list',
-  templateUrl: './posts-list.component.html',
-  styleUrls: ['./posts-list.component.css'],
+    selector: 'app-posts-list',
+    templateUrl: './posts-list.component.html',
+    styleUrls: ['./posts-list.component.css'],
+    standalone: false
 })
 export class PostsListComponent implements OnInit, OnDestroy {
   page?: Page<PostResponse>;

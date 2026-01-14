@@ -8,9 +8,10 @@ import { SessionService } from '../../../services/session.service';
 import { NavHighlightService } from '../../../services/nav-highlight.service';
 
 @Component({
-  selector: 'app-post-detail',
-  templateUrl: './post-detail.component.html',
-  styleUrls: ['./post-detail.component.css'],
+    selector: 'app-post-detail',
+    templateUrl: './post-detail.component.html',
+    styleUrls: ['./post-detail.component.css'],
+    standalone: false
 })
 export class PostDetailComponent implements OnInit, OnDestroy {
   post?: PostResponse;

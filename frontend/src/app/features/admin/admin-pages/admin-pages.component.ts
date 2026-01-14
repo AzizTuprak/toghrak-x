@@ -4,8 +4,9 @@ import { ImagesService } from '../../../services/images.service';
 import { ContentPage, UpsertContentPageRequest } from '../../../models/content-page';
 
 @Component({
-  selector: 'app-admin-pages',
-  templateUrl: './admin-pages.component.html',
+    selector: 'app-admin-pages',
+    templateUrl: './admin-pages.component.html',
+    standalone: false
 })
 export class AdminPagesComponent implements OnInit {
   pages: ContentPage[] = [];

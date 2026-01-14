@@ -5,9 +5,10 @@ import { PagesService } from '../../../services/pages.service';
 import { ContentPage } from '../../../models/content-page';
 
 @Component({
-  selector: 'app-page-view',
-  templateUrl: './page-view.component.html',
-  styleUrls: ['./page-view.component.css'],
+    selector: 'app-page-view',
+    templateUrl: './page-view.component.html',
+    styleUrls: ['./page-view.component.css'],
+    standalone: false
 })
 export class PageViewComponent implements OnInit, OnDestroy {
   page?: ContentPage;

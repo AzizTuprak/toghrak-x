@@ -12,8 +12,9 @@ import {
 } from '../../../models/post';
 
 @Component({
-  selector: 'app-post-form',
-  templateUrl: './post-form.component.html',
+    selector: 'app-post-form',
+    templateUrl: './post-form.component.html',
+    standalone: false
 })
 export class PostFormComponent implements OnInit {
   isEdit = false;

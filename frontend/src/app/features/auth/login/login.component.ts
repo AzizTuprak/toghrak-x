@@ -5,8 +5,9 @@ import { AuthService } from '../../../services/auth.service';
 import { LoginRequest } from '../../../models/auth';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    standalone: false
 })
 export class LoginComponent {
   loading = false;
