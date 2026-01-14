@@ -1,7 +1,11 @@
 <div class="container mt-4">
   <h4>Social Links</h4>
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-  <div *ngIf="info" class="alert alert-success">{{ info }}</div>
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+  @if (info) {
+    <div class="alert alert-success">{{ info }}</div>
+  }
   <table class="table table-sm align-middle">
     <thead>
       <tr>
@@ -12,15 +16,17 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let link of links">
-        <td><input class="form-control form-control-sm" [(ngModel)]="link.label" /></td>
-        <td><input class="form-control form-control-sm" [(ngModel)]="link.url" /></td>
-        <td><input class="form-control form-control-sm" [(ngModel)]="link.icon" placeholder="Optional" /></td>
-        <td class="d-flex gap-1">
-          <button class="btn btn-success btn-sm" type="button" (click)="save(link)" [disabled]="saving">Save</button>
-          <button class="btn btn-outline-danger btn-sm" type="button" (click)="remove(link)">Delete</button>
-        </td>
-      </tr>
+      @for (link of links; track link) {
+        <tr>
+          <td><input class="form-control form-control-sm" [(ngModel)]="link.label" /></td>
+          <td><input class="form-control form-control-sm" [(ngModel)]="link.url" /></td>
+          <td><input class="form-control form-control-sm" [(ngModel)]="link.icon" placeholder="Optional" /></td>
+          <td class="d-flex gap-1">
+            <button class="btn btn-success btn-sm" type="button" (click)="save(link)" [disabled]="saving">Save</button>
+            <button class="btn btn-outline-danger btn-sm" type="button" (click)="remove(link)">Delete</button>
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
   <button class="btn btn-primary btn-sm" type="button" (click)="add()">Add link</button>

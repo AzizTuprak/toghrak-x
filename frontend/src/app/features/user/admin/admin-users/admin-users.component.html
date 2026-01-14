@@ -1,7 +1,11 @@
 <div class="container mt-4">
   <h4>Users</h4>
-  <div *ngIf="loading" class="alert alert-info">Loading...</div>
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  @if (loading) {
+    <div class="alert alert-info">Loading...</div>
+  }
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
 
   <form class="row g-2 mb-3" (ngSubmit)="create()">
     <div class="col-sm-3">
@@ -11,7 +15,7 @@
         name="username"
         placeholder="Username"
         required
-      />
+        />
     </div>
     <div class="col-sm-3">
       <input
@@ -20,7 +24,7 @@
         name="email"
         placeholder="Email"
         required
-      />
+        />
     </div>
     <div class="col-sm-3">
       <input
@@ -30,7 +34,7 @@
         name="password"
         placeholder="Password"
         required
-      />
+        />
     </div>
     <div class="col-sm-2">
       <select class="form-select" [(ngModel)]="form.roleName" name="roleName">
@@ -55,16 +59,18 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let u of users">
-        <td>{{ u.username }}</td>
-        <td>{{ u.email }}</td>
-        <td>{{ u.roleName }}</td>
-        <td>
-          <button class="btn btn-outline-danger btn-sm" (click)="delete(u.id)">
-            Delete
-          </button>
-        </td>
-      </tr>
+      @for (u of users; track u) {
+        <tr>
+          <td>{{ u.username }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.roleName }}</td>
+          <td>
+            <button class="btn btn-outline-danger btn-sm" (click)="delete(u.id)">
+              Delete
+            </button>
+          </td>
+        </tr>
+      }
     </tbody>
   </table>
 </div>

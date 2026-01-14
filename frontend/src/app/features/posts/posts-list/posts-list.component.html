@@ -1,106 +1,132 @@
 <div class="bbc-container">
-  <div *ngIf="currentCategoryId" class="mb-2">
-    <span class="badge bg-secondary">Filtered by category</span>
-    <button class="btn btn-link btn-sm" (click)="clearCategory()">Clear</button>
-  </div>
+  @if (currentCategoryId) {
+    <div class="mb-2">
+      <span class="badge bg-secondary">Filtered by category</span>
+      <button class="btn btn-link btn-sm" (click)="clearCategory()">Clear</button>
+    </div>
+  }
 
-  <div *ngIf="loading" class="alert alert-info">Loading...</div>
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  @if (loading) {
+    <div class="alert alert-info">Loading...</div>
+  }
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
 
-  <ng-container *ngIf="posts.length">
+  @if (posts.length) {
     <div class="bbc-layout" [class.has-sidebar]="popular.length">
       <div class="main-col">
         <div class="bbc-hero no-side">
-          <ng-container *ngIf="posts[0] as main">
+          @if (posts[0]; as main) {
             <div class="hero-left" (click)="router.navigate(['/posts', main.id])">
-              <img *ngIf="main.coverImage" [src]="main.coverImage" alt="cover" loading="lazy" />
+              @if (main.coverImage) {
+                <img [src]="main.coverImage" alt="cover" loading="lazy" />
+              }
               <h2>{{ main.title }}</h2>
               <p class="hero-meta">{{ main.authorUsername }}</p>
               <p class="hero-desc">
                 {{ main.content | slice : 0 : 140 }}{{ main.content.length > 140 ? '...' : '' }}
               </p>
             </div>
-          </ng-container>
-
+          }
           <div class="hero-center">
-            <ng-container *ngIf="posts[1] as sec">
+            @if (posts[1]; as sec) {
               <div class="hero-tile" (click)="router.navigate(['/posts', sec.id])">
-                <img *ngIf="sec.coverImage" [src]="sec.coverImage" alt="cover" loading="lazy" />
+                @if (sec.coverImage) {
+                  <img [src]="sec.coverImage" alt="cover" loading="lazy" />
+                }
                 <h4>{{ sec.title }}</h4>
               </div>
-            </ng-container>
-            <ng-container *ngIf="posts[2] as third">
+            }
+            @if (posts[2]; as third) {
               <div class="hero-tile" (click)="router.navigate(['/posts', third.id])">
-                <img *ngIf="third.coverImage" [src]="third.coverImage" alt="cover" loading="lazy" />
+                @if (third.coverImage) {
+                  <img [src]="third.coverImage" alt="cover" loading="lazy" />
+                }
                 <h4>{{ third.title }}</h4>
               </div>
-            </ng-container>
+            }
           </div>
         </div>
-
-        <div class="bbc-list" *ngIf="posts.length > 3">
-          <div class="list-card" *ngFor="let p of posts.slice(3, 9)">
-            <div class="list-thumb" *ngIf="p.coverImage">
-              <img [src]="p.coverImage" alt="cover" loading="lazy" />
-            </div>
-            <div class="list-body">
-              <h5>{{ p.title }}</h5>
-              <p class="list-meta">
-                {{ p.categoryName }}
-                <span class="dot"></span>
-                {{ p.authorUsername }}
-              </p>
-              <p class="list-desc">
-                {{ p.content | slice : 0 : 120 }}{{ p.content.length > 120 ? '...' : '' }}
-              </p>
-              <div class="list-actions">
-                <a class="btn btn-sm btn-outline-primary" [routerLink]="['/posts', p.id]">Read</a>
-                <a *ngIf="canEdit(p)" class="btn btn-sm btn-outline-secondary" [routerLink]="['/posts', p.id, 'edit']">
-                  Edit
-                </a>
+        @if (posts.length > 3) {
+          <div class="bbc-list">
+            @for (p of posts.slice(3, 9); track p) {
+              <div class="list-card">
+                @if (p.coverImage) {
+                  <div class="list-thumb">
+                    <img [src]="p.coverImage" alt="cover" loading="lazy" />
+                  </div>
+                }
+                <div class="list-body">
+                  <h5>{{ p.title }}</h5>
+                  <p class="list-meta">
+                    {{ p.categoryName }}
+                    <span class="dot"></span>
+                    {{ p.authorUsername }}
+                  </p>
+                  <p class="list-desc">
+                    {{ p.content | slice : 0 : 120 }}{{ p.content.length > 120 ? '...' : '' }}
+                  </p>
+                  <div class="list-actions">
+                    <a class="btn btn-sm btn-outline-primary" [routerLink]="['/posts', p.id]">Read</a>
+                    @if (canEdit(p)) {
+                      <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/posts', p.id, 'edit']">
+                        Edit
+                      </a>
+                    }
+                  </div>
+                </div>
               </div>
-            </div>
+            }
           </div>
-        </div>
-
-        <nav *ngIf="page" class="mt-3">
-          <ul class="pagination">
-            <li class="page-item" [class.disabled]="page.first">
-              <button class="page-link" aria-label="Previous page" (click)="goToPage(page.number - 1)" [disabled]="page.first">
-                Prev
-              </button>
-            </li>
-            <li class="page-item disabled">
-              <span class="page-link">Page {{ page.number + 1 }} of {{ page.totalPages }}</span>
-            </li>
-            <li class="page-item" [class.disabled]="page.last">
-              <button class="page-link" aria-label="Next page" (click)="goToPage(page.number + 1)" [disabled]="page.last">
-                Next
-              </button>
-            </li>
-          </ul>
-        </nav>
+        }
+        @if (page) {
+          <nav class="mt-3">
+            <ul class="pagination">
+              <li class="page-item" [class.disabled]="page.first">
+                <button class="page-link" aria-label="Previous page" (click)="goToPage(page.number - 1)" [disabled]="page.first">
+                  Prev
+                </button>
+              </li>
+              <li class="page-item disabled">
+                <span class="page-link">Page {{ page.number + 1 }} of {{ page.totalPages }}</span>
+              </li>
+              <li class="page-item" [class.disabled]="page.last">
+                <button class="page-link" aria-label="Next page" (click)="goToPage(page.number + 1)" [disabled]="page.last">
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
+        }
       </div>
-
-      <aside class="sidebar" *ngIf="popular.length">
-        <div class="popular-rail">
-          <div class="popular-header">
-            <h5>Most read</h5>
-            <span *ngIf="popularLoading" class="text-muted small">Loading...</span>
-          </div>
-          <div class="popular-item" *ngFor="let p of popular" [routerLink]="['/posts', p.id]">
-            <div class="popular-thumb" *ngIf="p.coverImage">
-              <img [src]="p.coverImage" alt="cover" loading="lazy" />
+      @if (popular.length) {
+        <aside class="sidebar">
+          <div class="popular-rail">
+            <div class="popular-header">
+              <h5>Most read</h5>
+              @if (popularLoading) {
+                <span class="text-muted small">Loading...</span>
+              }
             </div>
-            <div class="popular-body">
-              <div class="popular-title">{{ p.title }}</div>
-              <div class="popular-meta">
-                {{ p.categoryName }} <span class="dot"></span> {{ p.viewCount || 0 }} views
+            @for (p of popular; track p) {
+              <div class="popular-item" [routerLink]="['/posts', p.id]">
+                @if (p.coverImage) {
+                  <div class="popular-thumb">
+                    <img [src]="p.coverImage" alt="cover" loading="lazy" />
+                  </div>
+                }
+                <div class="popular-body">
+                  <div class="popular-title">{{ p.title }}</div>
+                  <div class="popular-meta">
+                    {{ p.categoryName }} <span class="dot"></span> {{ p.viewCount || 0 }} views
+                  </div>
+                </div>
               </div>
-            </div>
+            }
           </div>
-        </div>
-      </aside>
+        </aside>
+      }
     </div>
-  </ng-container>
+  }
 </div>

@@ -1,56 +1,76 @@
 <div class="container mt-4" style="max-width: 720px">
   <h4 class="mb-3">{{ isEdit ? "Edit Post" : "New Post" }}</h4>
 
-  <div *ngIf="loading" class="alert alert-info">Loading...</div>
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  @if (loading) {
+    <div class="alert alert-info">Loading...</div>
+  }
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
 
   <form (ngSubmit)="submit()" [formGroup]="form">
     <div class="mb-3">
       <label class="form-label">Title</label>
       <input class="form-control" formControlName="title" />
-      <div class="text-danger small" *ngIf="form.controls.title.invalid && form.controls.title.touched">
-        Title is required.
-      </div>
+      @if (form.controls.title.invalid && form.controls.title.touched) {
+        <div class="text-danger small">
+          Title is required.
+        </div>
+      }
     </div>
     <div class="mb-3">
       <label class="form-label">Content</label>
       <textarea class="form-control" rows="8" formControlName="content"></textarea>
-      <div class="text-danger small" *ngIf="form.controls.content.invalid && form.controls.content.touched">
-        Content is required.
-      </div>
+      @if (form.controls.content.invalid && form.controls.content.touched) {
+        <div class="text-danger small">
+          Content is required.
+        </div>
+      }
     </div>
     <div class="mb-3">
       <label class="form-label">Category</label>
       <select class="form-select" formControlName="categoryId">
         <option [ngValue]="null">Select a category</option>
-        <option *ngFor="let c of categories" [ngValue]="c.id">
-          {{ c.name }}
-        </option>
+        @for (c of categories; track c) {
+          <option [ngValue]="c.id">
+            {{ c.name }}
+          </option>
+        }
       </select>
-      <div class="text-danger small" *ngIf="form.controls.categoryId.invalid && form.controls.categoryId.touched">
-        Please choose a category.
-      </div>
+      @if (form.controls.categoryId.invalid && form.controls.categoryId.touched) {
+        <div class="text-danger small">
+          Please choose a category.
+        </div>
+      }
     </div>
     <div class="mb-3">
       <label class="form-label">Cover Image URL</label>
       <input class="form-control" formControlName="coverImage" />
       <div class="form-text">Or upload a file:</div>
       <input type="file" class="form-control" (change)="onCoverSelected($event)" />
-      <div *ngIf="uploadError" class="text-danger small">{{ uploadError }}</div>
+      @if (uploadError) {
+        <div class="text-danger small">{{ uploadError }}</div>
+      }
     </div>
 
     <div class="mb-3">
       <label class="form-label">Gallery Images</label>
-      <div class="d-flex flex-wrap gap-2 mb-2" *ngIf="imageUrls.length">
-        <div class="position-relative" *ngFor="let img of imageUrls">
-          <img [src]="img" class="img-thumbnail gallery-thumb" alt="gallery" />
-          <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0"
-            aria-label="Remove" (click)="removeGalleryImage(img)"></button>
+      @if (imageUrls.length) {
+        <div class="d-flex flex-wrap gap-2 mb-2">
+          @for (img of imageUrls; track img) {
+            <div class="position-relative">
+              <img [src]="img" class="img-thumbnail gallery-thumb" alt="gallery" />
+              <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0"
+              aria-label="Remove" (click)="removeGalleryImage(img)"></button>
+            </div>
+          }
         </div>
-      </div>
+      }
       <input type="file" class="form-control" multiple (change)="onGallerySelected($event)" />
       <div class="form-text">Upload one or more images to include in the article gallery.</div>
-      <div *ngIf="uploadingGallery" class="small text-muted mt-1">Uploading...</div>
+      @if (uploadingGallery) {
+        <div class="small text-muted mt-1">Uploading...</div>
+      }
     </div>
 
     <button class="btn btn-primary" type="submit" [disabled]="saving">

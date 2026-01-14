@@ -1,27 +1,38 @@
 <div class="page-shell">
-  <div *ngIf="loading" class="alert alert-info">Loading...</div>
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  @if (loading) {
+    <div class="alert alert-info">Loading...</div>
+  }
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
 
-  <ng-container *ngIf="page && !loading">
+  @if (page && !loading) {
     <section class="page-hero">
-      <div class="hero-image" *ngIf="page.images as imgs" [class.hidden]="imgs.length === 0">
-        <img [src]="imgs[0]" alt="Page hero image" loading="lazy" />
-      </div>
+      @if (page.images; as imgs) {
+        <div class="hero-image" [class.hidden]="imgs.length === 0">
+          <img [src]="imgs[0]" alt="Page hero image" loading="lazy" />
+        </div>
+      }
       <div class="hero-copy">
         <div class="accent"></div>
         <h1 class="page-title">{{ page.title }}</h1>
-        <div class="page-meta" *ngIf="page.updatedAt">Updated: {{ page.updatedAt | date: 'mediumDate' }}</div>
+        @if (page.updatedAt) {
+          <div class="page-meta">Updated: {{ page.updatedAt | date: 'mediumDate' }}</div>
+        }
         <div class="page-content">{{ page.content }}</div>
       </div>
     </section>
-
-    <section class="page-gallery" *ngIf="page.images as imgs">
-      <ng-container *ngIf="imgs.length > 1">
-        <div class="gallery-header">Gallery</div>
-        <div class="page-gallery-grid">
-          <img *ngFor="let img of imgs.slice(1)" [src]="img" alt="Page gallery image" loading="lazy" />
-        </div>
-      </ng-container>
-    </section>
-  </ng-container>
+    @if (page.images; as imgs) {
+      <section class="page-gallery">
+        @if (imgs.length > 1) {
+          <div class="gallery-header">Gallery</div>
+          <div class="page-gallery-grid">
+            @for (img of imgs.slice(1); track img) {
+              <img [src]="img" alt="Page gallery image" loading="lazy" />
+            }
+          </div>
+        }
+      </section>
+    }
+  }
 </div>

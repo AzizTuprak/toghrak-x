@@ -1,42 +1,53 @@
-<div class="post-shell" *ngIf="post; else loadingTpl">
-  <div class="post-header">
-    <button class="btn btn-outline-secondary btn-sm" routerLink="/" aria-label="Back to home">Back</button>
-    <div class="post-actions" *ngIf="isAdmin || isOwner">
-      <a class="btn btn-outline-primary btn-sm" [routerLink]="['/posts', post.id, 'edit']" aria-label="Edit post">Edit</a>
-      <button class="btn btn-outline-danger btn-sm" (click)="deletePost()" [disabled]="deleting" aria-label="Delete post">
-        {{ deleting ? 'Deleting...' : 'Delete' }}
-      </button>
+@if (post) {
+  <div class="post-shell">
+    <div class="post-header">
+      <button class="btn btn-outline-secondary btn-sm" routerLink="/" aria-label="Back to home">Back</button>
+      @if (isAdmin || isOwner) {
+        <div class="post-actions">
+          <a class="btn btn-outline-primary btn-sm" [routerLink]="['/posts', post.id, 'edit']" aria-label="Edit post">Edit</a>
+          <button class="btn btn-outline-danger btn-sm" (click)="deletePost()" [disabled]="deleting" aria-label="Delete post">
+            {{ deleting ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      }
     </div>
-  </div>
-
-  <article class="post-card">
-    <h1>{{ post.title }}</h1>
-    <div class="post-meta">
-      <span class="badge bg-light text-dark">{{ post.categoryName }}</span>
-      <span>By {{ post.authorUsername }}</span>
-      <span *ngIf="post.createdAt">{{ post.createdAt | date: 'mediumDate' }}</span>
-    </div>
-
-    <figure class="post-cover" *ngIf="post.coverImage">
-      <img [src]="post.coverImage" alt="Cover image" loading="lazy" />
-    </figure>
-
-    <div class="post-body">
-      <p class="post-content">{{ post.content }}</p>
-    </div>
-
-    <div class="post-gallery" *ngIf="post.imageUrls.length">
-      <h5>Gallery</h5>
-      <div class="gallery-grid">
-        <img *ngFor="let img of post.imageUrls" [src]="img" alt="Gallery image" loading="lazy" />
+    <article class="post-card">
+      <h1>{{ post.title }}</h1>
+      <div class="post-meta">
+        <span class="badge bg-light text-dark">{{ post.categoryName }}</span>
+        <span>By {{ post.authorUsername }}</span>
+        @if (post.createdAt) {
+          <span>{{ post.createdAt | date: 'mediumDate' }}</span>
+        }
       </div>
-    </div>
-  </article>
-</div>
-
-<ng-template #loadingTpl>
-  <div class="container mt-4">
-    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-    <div *ngIf="!error" class="alert alert-info">Loading...</div>
+      @if (post.coverImage) {
+        <figure class="post-cover">
+          <img [src]="post.coverImage" alt="Cover image" loading="lazy" />
+        </figure>
+      }
+      <div class="post-body">
+        <p class="post-content">{{ post.content }}</p>
+      </div>
+      @if (post.imageUrls.length) {
+        <div class="post-gallery">
+          <h5>Gallery</h5>
+          <div class="gallery-grid">
+            @for (img of post.imageUrls; track img) {
+              <img [src]="img" alt="Gallery image" loading="lazy" />
+            }
+          </div>
+        </div>
+      }
+    </article>
   </div>
-</ng-template>
+} @else {
+  <div class="container mt-4">
+    @if (error) {
+      <div class="alert alert-danger">{{ error }}</div>
+    }
+    @if (!error) {
+      <div class="alert alert-info">Loading...</div>
+    }
+  </div>
+}
+
